@@ -2,6 +2,7 @@ import { PageContext, PageContextWithUser } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 import { Tooltip } from '../Tooltip'
+import { BreakpointIndicator } from './BreakpointIndicator'
 import { Footer } from './Footer'
 import { FreezeBanner } from './FreezeBanner'
 import { Head } from './Head'
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function Page(props: Props) {
+  const isPreview = process.env.DEPLOYMENT_ENV === 'preview'
   return (
     <html
       lang="en"
@@ -43,8 +45,10 @@ export function Page(props: Props) {
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
+        {isPreview && <BreakpointIndicator />}
         <Navbar searchBar={!props.withoutSearch} context={props.context} />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
+        <GradientBackground />
         {props.children}
         <Footer />
         <Tooltip />
@@ -53,6 +57,14 @@ export function Page(props: Props) {
         ))}
       </body>
     </html>
+  )
+}
+
+function GradientBackground() {
+  return (
+    <div className="relative">
+      <div className="absolute top-0 -z-50 h-96 w-full bg-gradient-to-b from-[#262646] via-transparent "></div>
+    </div>
   )
 }
 

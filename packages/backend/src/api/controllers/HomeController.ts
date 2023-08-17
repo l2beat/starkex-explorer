@@ -29,6 +29,8 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'FinalizeEscape',
   'FreezeRequest',
 ]
+const SPACE_BETWEEN_TABLES_IN_ROWS = 3
+const EMPTY_TABLE_HEIGHT_IN_ROWS = 2
 
 export class HomeController {
   constructor(
@@ -48,34 +50,50 @@ export class HomeController {
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const paginationOpts = { offset: 0, limit: 6 }
+
     const [
       l2Transactions,
       lastStateDetailsWithL2TransactionsStatistics,
       liveL2TransactionsStatistics,
-      stateUpdates,
       stateUpdatesCount,
       forcedUserTransactions,
       forcedUserTransactionsCount,
       availableOffers,
-      availableOffersCount,
+      offersCount,
     ] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMulti(
-        paginationOpts,
+        { offset: 0, limit: 8 },
         this.excludeL2TransactionTypes
       ),
       this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
       this.l2TransactionRepository.getLiveStatistics(),
-      this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
-        ...paginationOpts,
+        offset: 0,
+        limit: 4,
         types: FORCED_TRANSACTION_TYPES,
       }),
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
-      this.forcedTradeOfferRepository.getAvailablePaginated(paginationOpts),
-      this.forcedTradeOfferRepository.countAvailable(),
+      this.forcedTradeOfferRepository.getAvailablePaginated({
+        offset: 0,
+        limit: 4,
+      }),
+      this.forcedTradeOfferRepository.countAll(),
     ])
+    const stateUpdatesLimit = this.calculateStateUpdateLimit(
+      {
+        l2Transactions: l2Transactions.length,
+        forcedTransactions: forcedUserTransactions.length,
+        offers: availableOffers.length,
+      },
+      context.showL2Transactions
+    )
+
+    const stateUpdates =
+      await this.preprocessedStateDetailsRepository.getPaginated({
+        offset: 0,
+        limit: stateUpdatesLimit,
+      })
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userTransactions: forcedUserTransactions,
@@ -104,21 +122,23 @@ export class HomeController {
         this.excludeL2TransactionTypes
       )
 
+    const statistics = {
+      stateUpdateCount: stateUpdatesCount,
+      l2TransactionCount: totalL2Transactions,
+      forcedTransactionCount: forcedUserTransactionsCount,
+      offerCount: offersCount,
+    }
+
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions,
+      statistics,
       stateUpdates: stateUpdateEntries,
-      totalStateUpdates: stateUpdatesCount,
       forcedTransactions: forcedTransactionEntries,
-      totalForcedTransactions: forcedUserTransactionsCount,
-      // We use forcedTradeOfferToEntry here because we only need status from the offer,
-      // as we do not show other statuses on this page
       offers: availableOffers.map((offer) =>
         this.forcedTradeOfferViewService.toOfferEntry(offer)
       ),
-      totalOffers: availableOffersCount,
     })
     return { type: 'success', content }
   }
@@ -221,5 +241,28 @@ export class HomeController {
     })
 
     return { type: 'success', content }
+  }
+
+  private calculateStateUpdateLimit(
+    recordCounts: {
+      l2Transactions: number
+      forcedTransactions: number
+      offers: number
+    },
+    showL2Transactions: boolean
+  ) {
+    const counts = {
+      l2Transactions: recordCounts.l2Transactions || EMPTY_TABLE_HEIGHT_IN_ROWS,
+      forcedTransactions:
+        recordCounts.forcedTransactions || EMPTY_TABLE_HEIGHT_IN_ROWS,
+      offers: recordCounts.offers || EMPTY_TABLE_HEIGHT_IN_ROWS,
+    }
+
+    const stateUpdateLimit =
+      counts.forcedTransactions + SPACE_BETWEEN_TABLES_IN_ROWS + counts.offers
+
+    return showL2Transactions
+      ? stateUpdateLimit + counts.l2Transactions + SPACE_BETWEEN_TABLES_IN_ROWS
+      : stateUpdateLimit
   }
 }

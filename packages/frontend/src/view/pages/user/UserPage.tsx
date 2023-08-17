@@ -112,11 +112,7 @@ function UserPage(props: UserPageProps) {
             {
               id: 'assets',
               name: assetsTableTitle,
-              accessoryRight: (
-                <div className="flex items-center justify-center gap-2">
-                  <CountBadge count={props.totalAssets} />
-                </div>
-              ),
+              accessoryRight: <CountBadge count={props.totalAssets} />,
               content: (
                 <>
                   <InfoBanner className="mb-3">
@@ -126,7 +122,6 @@ function UserPage(props: UserPageProps) {
                   <TablePreview
                     {...assetsTablePropsWithoutTitle}
                     visible={props.assets.length}
-                    total={props.totalAssets}
                   >
                     <UserAssetsTable
                       tradingMode={props.context.tradingMode}
@@ -146,9 +141,7 @@ function UserPage(props: UserPageProps) {
                     id: 'l2-transactions',
                     name: l2TransactionTableTitle,
                     accessoryRight: (
-                      <div className="flex items-center justify-center gap-2">
-                        <CountBadge count={props.totalL2Transactions} />
-                      </div>
+                      <CountBadge count={props.totalL2Transactions} />
                     ),
                     content: (
                       <>
@@ -159,7 +152,6 @@ function UserPage(props: UserPageProps) {
                         <TablePreview
                           {...l2TransactionsTablePropsWithoutTitle}
                           visible={props.l2Transactions.length}
-                          total={props.totalL2Transactions}
                         >
                           <L2TransactionsTable
                             transactions={props.l2Transactions}
@@ -179,7 +171,6 @@ function UserPage(props: UserPageProps) {
                 <TablePreview
                   {...balanceChangesTablePropsWithoutTitle}
                   visible={props.balanceChanges.length}
-                  total={props.totalBalanceChanges}
                 >
                   <UserBalanceChangesTable
                     tradingMode={props.context.tradingMode}
@@ -196,7 +187,6 @@ function UserPage(props: UserPageProps) {
                 <TablePreview
                   {...transactionTablePropsWithoutTitle}
                   visible={props.transactions.length}
-                  total={props.totalTransactions}
                 >
                   <TransactionsTable transactions={props.transactions} />
                 </TablePreview>
@@ -212,10 +202,8 @@ function UserPage(props: UserPageProps) {
                       <TablePreview
                         {...offerTablePropsWithoutTitle}
                         visible={props.offers.length}
-                        total={props.totalOffers}
                       >
                         <OffersTable
-                          showStatus
                           showRole
                           offers={props.offers}
                           context={props.context}

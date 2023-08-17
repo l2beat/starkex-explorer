@@ -57,15 +57,16 @@ export class StateUpdateController {
 
     const [
       stateUpdate,
+      preprocessedStateDetails,
       balanceChanges,
       totalBalanceChanges,
       prices,
       forcedUserTransactions,
       totalForcedUserTransactions,
       l2Transactions,
-      preprocessedStateDetails,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
+      this.preprocessedStateDetailsRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
         { offset: 0, limit: 10 }
@@ -89,9 +90,6 @@ export class StateUpdateController {
           limit: 6,
         },
         this.excludeL2TransactionTypes
-      ),
-      this.preprocessedStateDetailsRepository.findByStateUpdateId(
-        stateUpdateId
       ),
     ])
 
@@ -120,28 +118,24 @@ export class StateUpdateController {
     const content = renderStateUpdatePage({
       context,
       id: stateUpdateId.toString(),
+      transactionHash: stateUpdate.stateTransitionHash,
       hashes: {
-        factHash: stateUpdate.stateTransitionHash,
         positionTreeRoot: stateUpdate.rootHash,
         // TODO - extract this data:
         onChainVaultTreeRoot: undefined,
         offChainVaultTreeRoot: undefined,
         orderRoot: undefined,
       },
-      blockNumber: stateUpdate.blockNumber,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,
       balanceChanges: balanceChangeEntries,
-      totalBalanceChanges,
+      totalBalanceChanges: totalBalanceChanges,
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: preprocessedStateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics,
-            this.excludeL2TransactionTypes
-          )
-        : 'processing',
+      totalL2Transactions: sumUpTransactionCount(
+        preprocessedStateDetails?.cumulativeL2TransactionsStatistics
+      ),
       transactions,
       totalTransactions: totalForcedUserTransactions,
     })

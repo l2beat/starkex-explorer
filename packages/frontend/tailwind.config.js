@@ -26,13 +26,18 @@ module.exports = {
       fuchsia: {
         400: '#F770F1',
       },
+      indigo: {
+        900: '#333180',
+      },
       zinc: {
         500: '#70737D',
         800: '#272A31',
       },
       gray: {
         600: '#575B64',
+        750: '#2D3037',
         800: '#222531',
+        900: '#131622',
       },
       slate: {
         800: '#2F3341',
@@ -72,5 +77,5 @@ module.exports = {
       'brand-darker': '#4F4CD7',
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/container-queries')],
 }

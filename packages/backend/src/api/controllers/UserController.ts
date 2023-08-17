@@ -255,7 +255,7 @@ export class UserController {
 
     const totalTransactions = userTransactionsCount
     const offers =
-      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.toEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )
@@ -527,7 +527,7 @@ export class UserController {
     }
 
     const offers =
-      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.toEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )

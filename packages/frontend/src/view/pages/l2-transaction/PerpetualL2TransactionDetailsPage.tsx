@@ -53,7 +53,7 @@ export function PerpetualL2TransactionDetailsPage(
               isMultiOrAlt
             )}
           </PageTitle>
-          <span className="h-min rounded-full bg-fuchsia-400 py-2 px-2.5 text-sm font-bold text-black">
+          <span className="h-min rounded-full bg-fuchsia-400 px-2.5 py-2 text-sm font-bold text-black">
             L2 TRANSACTION
           </span>
         </div>

@@ -1,6 +1,8 @@
+import classNames from 'classnames'
 import React from 'react'
 
-import { Link } from '../../../components/Link'
+import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
+import { Card } from '../../../components/Card'
 import { SectionHeading } from '../../../components/SectionHeading'
 
 export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
@@ -22,6 +24,7 @@ export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
 ]
 
 interface HomeTutorialsProps {
+  className?: string
   tutorials: HomeTutorialEntry[]
 }
 
@@ -33,27 +36,33 @@ export interface HomeTutorialEntry {
 
 export function HomeTutorials(props: HomeTutorialsProps) {
   return (
-    <section className="xl:mt-[72px]">
+    <div className={classNames('flex flex-col', props.className)}>
       <SectionHeading
         title="Tutorials"
         description="Learn how to use the StarkEx Explorer"
-        leftAlign
       />
-      <ul className="flex flex-col gap-4">
+      <Card className="flex flex-grow flex-col gap-4">
         {props.tutorials.map((tutorial, i) => (
-          <li key={i}>
-            <a href={tutorial.href} className="flex w-full items-center gap-4">
-              <img className="h-20 w-[128px] rounded" src={tutorial.imageUrl} />
-              <div className="flex-1">
-                <p className="mb-1.5 text-lg font-semibold leading-tight">
-                  {tutorial.title}
-                </p>
-                <Link className="text-xs font-semibold">Read now</Link>
-              </div>
-            </a>
-          </li>
+          <a
+            key={i}
+            href={tutorial.href}
+            className="group flex w-full items-center gap-4"
+          >
+            <img
+              className="aspect-video h-[63px] rounded"
+              src={tutorial.imageUrl}
+            />
+            <div className="flex-1">
+              <p className="text-base font-semibold leading-tight">
+                {tutorial.title}
+              </p>
+              <span className="flex items-center text-xs font-semibold text-brand group-hover:underline">
+                Read now <ArrowRightIcon />
+              </span>
+            </div>
+          </a>
         ))}
-      </ul>
-    </section>
+      </Card>
+    </div>
   )
 }

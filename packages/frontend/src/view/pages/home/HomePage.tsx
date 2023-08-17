@@ -1,7 +1,8 @@
 import { PageContext } from '@explorer/shared'
-import cx from 'classnames'
 import React from 'react'
 
+import { Card } from '../../components/Card'
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
@@ -23,6 +24,7 @@ import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
+import { HomeStatistics, StatisticsEntry } from './components/HomeStatistics'
 import {
   DEFAULT_TUTORIALS,
   HomeTutorialEntry,
@@ -31,16 +33,12 @@ import {
 
 interface HomePageProps {
   context: PageContext
-  // TODO: statistics
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  totalStateUpdates: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number
   forcedTransactions: TransactionEntry[]
-  totalForcedTransactions: number
+  statistics: StatisticsEntry
   offers?: OfferEntry[]
-  totalOffers: number
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -57,57 +55,84 @@ function HomePage(props: HomePageProps) {
       context={props.context}
       withoutSearch
     >
-      <main
-        className={cx(
-          'mx-auto flex w-full max-w-[1024px] flex-1 flex-col gap-8 py-12 px-4 sm:px-8',
-          tutorials.length > 0 &&
-            'xl:grid xl:max-w-[1236px] xl:grid-cols-[minmax(760px,_1fr)_380px]'
-        )}
-      >
+      <ContentWrapper className="!max-w-[1340px]">
         <div className="flex flex-col gap-8">
-          <SearchBar tradingMode={props.context.tradingMode} />
-          {props.context.showL2Transactions && (
-            <TablePreview
-              {...L2_TRANSACTIONS_TABLE_PROPS}
-              visible={props.l2Transactions.length}
-              total={props.totalL2Transactions}
-            >
-              <L2TransactionsTable
-                transactions={props.l2Transactions}
-                context={props.context}
-              />
-            </TablePreview>
-          )}
-          <TablePreview
-            {...STATE_UPDATE_TABLE_PROPS}
-            visible={props.stateUpdates.length}
-            total={props.totalStateUpdates}
-          >
-            <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
-          </TablePreview>
-          <TablePreview
-            {...FORCED_TRANSACTION_TABLE_PROPS}
-            visible={props.forcedTransactions.length}
-            total={props.totalForcedTransactions}
-          >
-            <TransactionsTable transactions={props.forcedTransactions} />
-          </TablePreview>
-          {props.offers && props.context.tradingMode === 'perpetual' && (
-            <TablePreview
-              {...OFFER_TABLE_PROPS}
-              visible={props.offers.length}
-              total={props.totalOffers}
-            >
-              <OffersTable
-                showStatus
-                offers={props.offers}
-                context={props.context}
-              />
-            </TablePreview>
+          <div className="-mx-4 flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 sm:-mx-8 lg:mx-0 lg:rounded-lg">
+            <SearchBar
+              className="!w-3/4"
+              tradingMode={props.context.tradingMode}
+            />
+          </div>
+          <div className="grid gap-x-0 gap-y-8 xl:grid-cols-3 xl:gap-x-8">
+            <HomeStatistics
+              className={
+                tutorials.length > 0 ? 'xl:col-span-2' : 'xl:col-span-3'
+              }
+              statistics={props.statistics}
+              showL2Transactions={props.context.showL2Transactions}
+            />
+            {tutorials.length > 0 && (
+              <HomeTutorials tutorials={tutorials} className="hidden xl:flex" />
+            )}
+          </div>
+          <div className="grid grid-cols-1 gap-x-0 gap-y-8 xl:grid-cols-2 xl:gap-x-8 xl:gap-y-0">
+            <Card>
+              <TablePreview
+                {...STATE_UPDATE_TABLE_PROPS}
+                visible={props.stateUpdates.length}
+              >
+                <HomeStateUpdatesTable
+                  stateUpdates={props.stateUpdates}
+                  shortenOnMobile
+                />
+              </TablePreview>
+            </Card>
+            <Card className="flex h-min flex-col gap-[33px] bg-transparent !p-0 xl:bg-gray-800 xl:!p-6">
+              {props.context.showL2Transactions && (
+                <Card className="xl:p-0">
+                  <TablePreview
+                    {...L2_TRANSACTIONS_TABLE_PROPS}
+                    visible={props.l2Transactions.length}
+                  >
+                    <L2TransactionsTable
+                      transactions={props.l2Transactions}
+                      context={props.context}
+                      showDetails={false}
+                    />
+                  </TablePreview>
+                </Card>
+              )}
+              <Card className="xl:p-0">
+                <TablePreview
+                  {...FORCED_TRANSACTION_TABLE_PROPS}
+                  visible={props.forcedTransactions.length}
+                >
+                  <TransactionsTable
+                    transactions={props.forcedTransactions}
+                    hideAmount
+                  />
+                </TablePreview>
+              </Card>
+              {props.offers && props.context.tradingMode === 'perpetual' && (
+                <Card className="xl:p-0">
+                  <TablePreview
+                    {...OFFER_TABLE_PROPS}
+                    visible={props.offers.length}
+                  >
+                    <OffersTable
+                      offers={props.offers}
+                      context={props.context}
+                    />
+                  </TablePreview>
+                </Card>
+              )}
+            </Card>
+          </div>
+          {tutorials.length > 0 && (
+            <HomeTutorials tutorials={tutorials} className="xl:hidden" />
           )}
         </div>
-        {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
-      </main>
+      </ContentWrapper>
     </Page>
   )
 }

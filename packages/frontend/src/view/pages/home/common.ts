@@ -1,5 +1,5 @@
 export const STATE_UPDATE_TABLE_PROPS = {
-  title: 'Latest state updates',
+  title: 'State updates',
   entryShortNamePlural: 'updates',
   entryLongNamePlural: 'state updates',
   path: '/state-updates',
@@ -13,14 +13,14 @@ export const L2_TRANSACTIONS_TABLE_PROPS = {
 }
 
 export const FORCED_TRANSACTION_TABLE_PROPS = {
-  title: 'Latest forced transactions',
+  title: 'Forced transactions',
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'forced transactions',
   path: '/forced-transactions',
 }
 
 export const OFFER_TABLE_PROPS = {
-  title: 'Available forced trade offers',
+  title: 'Available offers',
   entryShortNamePlural: 'offers',
   entryLongNamePlural: 'trade offers',
   path: '/offers',

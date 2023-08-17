@@ -1,7 +1,6 @@
-import isNumber from 'lodash/isNumber'
 import React, { ReactNode } from 'react'
 
-import { formatInt } from '../../../utils/formatting/formatAmount'
+import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
@@ -12,44 +11,46 @@ interface TablePreviewProps {
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
-  total: number | 'processing'
   children: ReactNode
 }
 
-export function TablePreview(props: TablePreviewProps) {
+export function TablePreview({
+  title,
+  path,
+  entryShortNamePlural,
+  entryLongNamePlural,
+  visible,
+  children,
+}: TablePreviewProps) {
   return (
-    <section>
-      {props.title && (
+    <div>
+      {title && (
         <SectionHeading
-          title={props.title}
+          title={title}
           description={
-            props.total !== 'processing' &&
-            props.total > 0 && (
-              <>
-                You're viewing {formatInt(props.visible)} out of{' '}
-                <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
-                {props.entryShortNamePlural}
-              </>
-            )
+            <Link
+              className="!gap-0.5"
+              href={path}
+              accessoryRight={<ArrowRightIcon className="scale-90" />}
+            >
+              View all {entryShortNamePlural}
+            </Link>
           }
         />
       )}
-      {props.children}
-      {props.visible === 0 && (
-        <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
-          {props.total === 'processing'
-            ? `${props.entryLongNamePlural} are being processed...`
-            : `There are no ${props.entryLongNamePlural} to view.`}
+      {children}
+      {visible === 0 && (
+        <div className="flex h-20 items-center justify-center rounded bg-transparent text-center text-md text-zinc-500 group-[.Card]/card:bg-gray-900">
+          There are no {entryLongNamePlural} to view.
         </div>
       )}
-
-      {isNumber(props.total) && props.total > props.visible && (
+      {!title && (
         <div className="mt-6 flex items-center justify-center">
-          <Button as="a" variant="outlined" href={props.path}>
-            View all {props.entryLongNamePlural}
+          <Button as="a" variant="outlined" href={path}>
+            View all {entryLongNamePlural}
           </Button>
         </div>
       )}
-    </section>
+    </div>
   )
 }

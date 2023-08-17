@@ -16,8 +16,8 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
   const { user, instanceName, tradingMode, chainId } = context
   const isMainnet = chainId === 1
   return (
-    <div>
-      <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
+    <div className="border-b border-zinc-800">
+      <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-y-2 px-6 py-2.5">
         <a
           className="flex items-center justify-center gap-2 divide-x sm:gap-4"
           href="/"
@@ -30,14 +30,26 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
-        <div className="flex flex-wrap gap-y-2 gap-x-4">
+        <div className="flex gap-x-4 gap-y-2">
           {searchBar && (
             <SearchBar
               tradingMode={tradingMode}
               className="hidden w-auto min-w-[515px] lg:flex"
             />
           )}
-          {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
+          {!user && (
+            <>
+              <Button id="connect-with-metamask" className="sm:hidden">
+                Connect
+              </Button>
+              <Button
+                id="connect-with-metamask"
+                className="hidden whitespace-nowrap sm:block"
+              >
+                Connect wallet
+              </Button>
+            </>
+          )}
           {user && (
             <a
               href={`/users/${user.starkKey?.toString() ?? 'recover'}`}
@@ -53,7 +65,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
                 address={user.address}
                 size={18}
               />
-              <span className="font-mono">
+              <span className="font-mono whitespace-pre">
                 {user.address.slice(0, 6)}&hellip;
                 <span className="hidden sm:inline">
                   {user.address.slice(-4)}
@@ -62,7 +74,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             </a>
           )}
         </div>
-      </div>
+      </nav>
     </div>
   )
 }

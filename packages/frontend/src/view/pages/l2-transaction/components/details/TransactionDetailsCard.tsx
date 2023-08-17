@@ -16,7 +16,7 @@ export function L2TransactionDetailsCard({
   return (
     <Card className="relative flex flex-col gap-6">
       <Link
-        className="absolute top-6 right-6 items-center !gap-1 text-md font-semibold"
+        className="absolute right-6 top-6 items-center !gap-1 text-md font-semibold"
         href={`/raw-l2-transactions/${transactionId}`}
         accessoryLeft={<RawIcon />}
       >

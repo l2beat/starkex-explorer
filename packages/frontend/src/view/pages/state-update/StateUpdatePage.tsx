@@ -1,6 +1,7 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
+import { CountBadge } from '../../components/CountBadge'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TablePreview } from '../../components/table/TablePreview'
@@ -33,9 +34,9 @@ interface StateUpdatePageProps extends StateUpdateStatsProps {
   totalBalanceChanges: number
   priceChanges?: PriceEntry[]
   transactions: TransactionEntry[]
-  l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number | 'processing'
   totalTransactions: number
+  l2Transactions: PerpetualL2TransactionEntry[]
+  totalL2Transactions: number
 }
 
 export function renderStateUpdatePage(props: StateUpdatePageProps) {
@@ -69,11 +70,13 @@ function StateUpdatePage(props: StateUpdatePageProps) {
                   {
                     id: 'l2-transactions',
                     name: l2TransactionsTableTitle,
+                    accessoryRight: (
+                      <CountBadge count={props.totalL2Transactions} />
+                    ),
                     content: (
                       <TablePreview
                         {...l2TransactionsTablePropsWithoutTitle}
                         visible={props.l2Transactions.length}
-                        total={props.totalL2Transactions}
                       >
                         <L2TransactionsTable
                           transactions={props.l2Transactions}
@@ -87,11 +90,11 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             {
               id: 'balance-changes',
               name: balanceChangesTableTitle,
+              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
               content: (
                 <TablePreview
                   {...balanceChangesTablePropsWithoutTitle}
                   visible={props.balanceChanges.length}
-                  total={props.totalBalanceChanges}
                 >
                   <StateUpdateBalanceChangesTable
                     tradingMode={props.context.tradingMode}
@@ -103,15 +106,15 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             {
               id: 'transactions',
               name: transactionTableTitle,
+              accessoryRight: <CountBadge count={props.totalTransactions} />,
               content: (
                 <TablePreview
                   {...transactionTablePropsWithoutTitle}
                   visible={props.transactions.length}
-                  total={props.totalTransactions}
                 >
                   <TransactionsTable
-                    hideTime
                     transactions={props.transactions}
+                    hideAge
                   />
                 </TablePreview>
               ),
@@ -121,11 +124,10 @@ function StateUpdatePage(props: StateUpdatePageProps) {
                   {
                     id: 'prices',
                     name: 'Prices',
-                    content: (
-                      <section>
-                        <PricesTable prices={props.priceChanges} />
-                      </section>
+                    accessoryRight: (
+                      <CountBadge count={props.priceChanges.length} />
                     ),
+                    content: <PricesTable prices={props.priceChanges} />,
                   },
                 ]
               : []),
