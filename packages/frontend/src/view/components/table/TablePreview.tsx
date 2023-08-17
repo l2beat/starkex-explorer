@@ -32,7 +32,7 @@ export function TablePreview(props: TablePreviewProps) {
       )}
       {props.children}
       {props.visible === 0 && (
-        <div className="group-[.Card]/card:bg-gray-900 flex h-20 items-center justify-center rounded bg-transparent text-center text-md text-zinc-500">
+        <div className="flex h-20 items-center justify-center rounded bg-transparent text-center text-md text-zinc-500 group-[.Card]/card:bg-gray-900">
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}

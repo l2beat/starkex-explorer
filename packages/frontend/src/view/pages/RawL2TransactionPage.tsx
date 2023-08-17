@@ -32,7 +32,7 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
       <ContentWrapper className="flex !max-w-6xl flex-col">
         <div className="flex gap-3">
           <PageTitle>{`Raw data of transaction #${props.transaction.transactionId}`}</PageTitle>
-          <span className="h-min rounded-full bg-fuchsia-400 py-2 px-2.5 text-sm font-bold text-black">
+          <span className="h-min rounded-full bg-fuchsia-400 px-2.5 py-2 text-sm font-bold text-black">
             L2 TRANSACTION
           </span>
         </div>

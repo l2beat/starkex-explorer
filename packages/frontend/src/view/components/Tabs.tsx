@@ -26,7 +26,7 @@ export function Tabs({ items }: TabsProps) {
         <div className="TabsItemsContainer scrollbar-hide relative flex overflow-x-auto md:gap-x-2">
           {items.map((tab) => (
             <a
-              className="TabsItem group relative flex items-center justify-center whitespace-nowrap rounded-t-lg py-3 px-4 font-semibold transition-colors"
+              className="TabsItem group relative flex items-center justify-center whitespace-nowrap rounded-t-lg px-4 py-3 font-semibold transition-colors"
               key={tab.id}
               id={tab.id}
               href={`#${tab.id}`}
