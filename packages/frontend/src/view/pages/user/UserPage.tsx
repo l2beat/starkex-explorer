@@ -112,11 +112,7 @@ function UserPage(props: UserPageProps) {
             {
               id: 'assets',
               name: assetsTableTitle,
-              accessoryRight: (
-                <div className="flex items-center justify-center gap-2">
-                  <CountBadge count={props.totalAssets} />
-                </div>
-              ),
+              accessoryRight: <CountBadge count={props.totalAssets} />,
               content: (
                 <>
                   <InfoBanner className="mb-3">
@@ -145,9 +141,7 @@ function UserPage(props: UserPageProps) {
                     id: 'l2-transactions',
                     name: l2TransactionTableTitle,
                     accessoryRight: (
-                      <div className="flex items-center justify-center gap-2">
-                        <CountBadge count={props.totalL2Transactions} />
-                      </div>
+                      <CountBadge count={props.totalL2Transactions} />
                     ),
                     content: (
                       <>
