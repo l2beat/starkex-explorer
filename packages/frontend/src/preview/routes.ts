@@ -306,12 +306,12 @@ const routes: Route[] = [
           )
         ),
         l2Transactions: [],
-        l2TransactionsTotal: 0,
+        totalL2Transactions: 0,
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
-        balanceChangesTotal: 1200,
+        totalBalanceChanges: 1200,
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
         transactions: repeat(5, randomStateUpdateTransactionEntry),
-        transactionsTotal: 5,
+        totalTransactions: 5,
       })
     },
   },
@@ -341,12 +341,12 @@ const routes: Route[] = [
           )
         ),
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
-        balanceChangesTotal: 1000,
+        totalBalanceChanges: 1000,
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
         l2Transactions: repeat(5, randomPerpetualL2TransactionEntry),
-        l2TransactionsTotal: 150000,
+        totalL2Transactions: 150000,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
-        transactionsTotal: 150,
+        totalTransactions: 150,
       })
     },
   },

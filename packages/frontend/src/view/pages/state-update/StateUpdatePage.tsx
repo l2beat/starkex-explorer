@@ -31,12 +31,12 @@ import {
 interface StateUpdatePageProps extends StateUpdateStatsProps {
   context: PageContext
   balanceChanges: StateUpdateBalanceChangeEntry[]
-  balanceChangesTotal: number
+  totalBalanceChanges: number
   priceChanges?: PriceEntry[]
   transactions: TransactionEntry[]
-  transactionsTotal: number
+  totalTransactions: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  l2TransactionsTotal: number
+  totalL2Transactions: number
 }
 
 export function renderStateUpdatePage(props: StateUpdatePageProps) {
@@ -71,7 +71,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
                     id: 'l2-transactions',
                     name: l2TransactionsTableTitle,
                     accessoryRight: (
-                      <CountBadge count={props.l2TransactionsTotal} />
+                      <CountBadge count={props.totalL2Transactions} />
                     ),
                     content: (
                       <TablePreview
@@ -90,7 +90,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             {
               id: 'balance-changes',
               name: balanceChangesTableTitle,
-              accessoryRight: <CountBadge count={props.balanceChangesTotal} />,
+              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
               content: (
                 <TablePreview
                   {...balanceChangesTablePropsWithoutTitle}
@@ -106,7 +106,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             {
               id: 'transactions',
               name: transactionTableTitle,
-              accessoryRight: <CountBadge count={props.transactionsTotal} />,
+              accessoryRight: <CountBadge count={props.totalTransactions} />,
               content: (
                 <TablePreview
                   {...transactionTablePropsWithoutTitle}

@@ -130,14 +130,14 @@ export class StateUpdateController {
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,
       balanceChanges: balanceChangeEntries,
-      balanceChangesTotal: totalBalanceChanges,
+      totalBalanceChanges: totalBalanceChanges,
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      l2TransactionsTotal: sumUpTransactionCount(
+      totalL2Transactions: sumUpTransactionCount(
         preprocessedStateDetails?.cumulativeL2TransactionsStatistics
       ),
       transactions,
-      transactionsTotal: totalForcedUserTransactions,
+      totalTransactions: totalForcedUserTransactions,
     })
 
     return { type: 'success', content }
