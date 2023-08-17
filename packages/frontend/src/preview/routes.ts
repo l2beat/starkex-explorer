@@ -310,8 +310,8 @@ const routes: Route[] = [
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
         totalBalanceChanges: 1200,
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
-        transactions: repeat(5, randomStateUpdateTransactionEntry),
-        totalTransactions: 5,
+        transactions: repeat(10, randomStateUpdateTransactionEntry),
+        totalTransactions: 123,
       })
     },
   },
@@ -343,9 +343,9 @@ const routes: Route[] = [
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
         totalBalanceChanges: 1000,
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
-        l2Transactions: repeat(5, randomPerpetualL2TransactionEntry),
+        l2Transactions: repeat(10, randomPerpetualL2TransactionEntry),
         totalL2Transactions: 150000,
-        transactions: repeat(5, randomStateUpdateTransactionEntry),
+        transactions: repeat(10, randomStateUpdateTransactionEntry),
         totalTransactions: 150,
       })
     },

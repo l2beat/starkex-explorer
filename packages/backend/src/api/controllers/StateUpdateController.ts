@@ -55,6 +55,7 @@ export class StateUpdateController {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
 
+    const paginationOpts = { offset: 0, limit: 10 }
     const [
       stateUpdate,
       preprocessedStateDetails,
@@ -69,7 +70,7 @@ export class StateUpdateController {
       this.preprocessedStateDetailsRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
-        { offset: 0, limit: 10 }
+        paginationOpts
       ),
       this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
         stateUpdateId
@@ -78,17 +79,14 @@ export class StateUpdateController {
       this.userTransactionRepository.getByStateUpdateId(
         stateUpdateId,
         FORCED_TRANSACTION_TYPES,
-        { offset: 0, limit: 6 }
+        paginationOpts
       ),
       this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
         stateUpdateId
       ),
       this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
         stateUpdateId,
-        {
-          offset: 0,
-          limit: 6,
-        },
+        paginationOpts,
         this.excludeL2TransactionTypes
       ),
     ])
