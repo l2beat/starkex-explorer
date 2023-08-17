@@ -15,7 +15,7 @@ interface TablePreviewProps {
 
 export function TablePreview(props: TablePreviewProps) {
   return (
-    <section>
+    <div>
       {props.title && (
         <SectionHeading
           title={props.title}
@@ -36,6 +36,6 @@ export function TablePreview(props: TablePreviewProps) {
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-    </section>
+    </div>
   )
 }
