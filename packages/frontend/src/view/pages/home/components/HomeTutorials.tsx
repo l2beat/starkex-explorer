@@ -49,7 +49,7 @@ export function HomeTutorials(props: HomeTutorialsProps) {
             className="group flex w-full items-center gap-4"
           >
             <img
-              className="h-[63px] w-[112px] rounded"
+              className="aspect-video h-[63px] rounded"
               src={tutorial.imageUrl}
             />
             <div className="flex-1">
