@@ -14,7 +14,7 @@ export function TableRow(props: TableRowProps) {
   return (
     <tr
       className={cx(
-        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium ',
+        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium last:border-none group-[.Card]/card:border-b-gray-750 ',
         props.fullBackground ? 'h-16' : 'h-10',
         props.link && 'cursor-pointer hover:bg-gray-900 hover:bg-opacity-40',
         props.shortenOnMobile &&
