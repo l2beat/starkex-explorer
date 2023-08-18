@@ -46,11 +46,11 @@ export interface OfferEntry {
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
     { header: 'Id' },
+    { header: 'Type' },
     ...(props.showTradeDetails
       ? [{ header: 'Trade', align: 'center' as const }]
       : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
-    { header: 'Type' },
     { header: 'Status' },
     { header: 'Age' },
   ]
@@ -63,6 +63,7 @@ export function OffersTable(props: OffersTableProps) {
       rows={props.offers.map((offer) => {
         const cells: ReactNode[] = [
           <Link>#{offer.id}</Link>,
+          <span className="capitalize">{offer.type.toLowerCase()}</span>,
           ...(props.showTradeDetails
             ? [
                 <TradeColumn
@@ -71,11 +72,9 @@ export function OffersTable(props: OffersTableProps) {
                 />,
               ]
             : []),
-
           ...(props.showRole
             ? [<span className="capitalize">{offer.role?.toLowerCase()}</span>]
             : []),
-          <span className="capitalize">{offer.type.toLowerCase()}</span>,
           <StatusBadge type={toStatusType(offer.status)}>
             {toStatusText(offer.status)}
           </StatusBadge>,
