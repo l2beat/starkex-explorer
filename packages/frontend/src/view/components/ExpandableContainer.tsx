@@ -9,15 +9,12 @@ interface ExpandableContainerProps {
   visible: ReactNode
   expandedContent: ReactNode
   className?: string
-  toggleButtonLabels?: {
-    expand: string
-    collapse: string
-  }
+  subject?: string
 }
 
 export function ExpandableContainer(props: ExpandableContainerProps) {
-  const expandLabel = props.toggleButtonLabels?.expand ?? 'Show more'
-  const collapseLabel = props.toggleButtonLabels?.collapse ?? 'Show less'
+  const expandLabel = `View ${props.subject ?? 'more'}`
+  const collapseLabel = `Hide ${props.subject ?? 'less'}`
   return (
     <div className="ExpandableContainer">
       <Card>

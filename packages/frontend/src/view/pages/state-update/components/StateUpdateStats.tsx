@@ -88,10 +88,7 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
             )}
           </div>
         }
-        toggleButtonLabels={{
-          expand: 'View advanced data',
-          collapse: 'Hide advanced data',
-        }}
+        subject="advanced data"
       />
     </section>
   )
