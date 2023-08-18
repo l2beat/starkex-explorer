@@ -65,7 +65,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               data-instance-name={props.context.instanceName}
               data-chain-id={props.context.chainId}
             >
-              Recover Stark key
+              Recover
             </Button>
           </div>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
