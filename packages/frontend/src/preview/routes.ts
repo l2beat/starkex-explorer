@@ -473,7 +473,7 @@ const routes: Route[] = [
         totalTransactions: 48,
         l2Transactions: [],
         totalL2Transactions: 1643000,
-        offers: repeat(6, randomUserOfferEntry),
+        offers: repeat(6, () => randomUserOfferEntry(true)),
         totalOffers: 6,
         escapableAssets: [],
       })
@@ -509,7 +509,7 @@ const routes: Route[] = [
         totalTransactions: 48,
         l2Transactions: [],
         totalL2Transactions: 3643000,
-        offers: repeat(6, randomUserOfferEntry),
+        offers: repeat(6, () => randomUserOfferEntry(true)),
         totalOffers: 7,
         escapableAssets: [],
       })
@@ -538,7 +538,7 @@ const routes: Route[] = [
         totalTransactions: 23,
         l2Transactions: [],
         totalL2Transactions: 0,
-        offers: repeat(6, randomUserOfferEntry),
+        offers: repeat(6, () => randomUserOfferEntry(true)),
         totalOffers: 12,
         escapableAssets: [],
       })
@@ -569,7 +569,7 @@ const routes: Route[] = [
         totalTransactions: 99,
         l2Transactions: repeat(6, randomPerpetualUserL2TransactionEntry),
         totalL2Transactions: 123000000,
-        offers: repeat(6, randomUserOfferEntry),
+        offers: repeat(6, () => randomUserOfferEntry(true)),
         totalOffers: 12,
         escapableAssets: [],
       })
@@ -665,7 +665,7 @@ const routes: Route[] = [
       ctx.body = renderUserOffersPage({
         context,
         starkKey: StarkKey.fake(),
-        offers: repeat(visible, randomUserOfferEntry),
+        offers: repeat(visible, () => randomUserOfferEntry(true)),
         limit,
         offset,
         total,
