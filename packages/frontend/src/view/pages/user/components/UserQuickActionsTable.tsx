@@ -18,7 +18,6 @@ interface UserQuickActionsTableProps {
   readonly finalizableOffers: readonly FinalizableOfferEntry[]
   readonly starkKey: StarkKey
   readonly exchangeAddress: EthereumAddress
-  readonly isMine?: boolean
 }
 
 export interface EscapableAssetEntry {
@@ -40,7 +39,6 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
     props.escapableAssets.length === 0 &&
     !(
       props.context.tradingMode === 'perpetual' &&
-      props.isMine &&
       props.finalizableOffers.length
     )
   ) {
@@ -52,7 +50,6 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
       {props.escapableAssets.length > 0 && <EscapableAssets {...props} />}
       {props.context.tradingMode === 'perpetual' &&
-        props.isMine &&
         props.finalizableOffers.length > 0 && (
           <OffersToFinalize
             finalizableOffers={props.finalizableOffers}
@@ -66,7 +63,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
 function EscapableAssets(
   props: Pick<
     UserQuickActionsTableProps,
-    'escapableAssets' | 'isMine' | 'context' | 'starkKey' | 'exchangeAddress'
+    'escapableAssets' | 'context' | 'starkKey' | 'exchangeAddress'
   >
 ) {
   return (
@@ -90,8 +87,7 @@ function EscapableAssets(
                 </InlineEllipsis>
               </strong>
             </p>
-            {props.isMine &&
-              props.context.user &&
+            {props.context.user &&
               props.context.tradingMode === 'perpetual' && (
                 <FinalizeEscapeForm
                   tradingMode={props.context.tradingMode}
@@ -102,8 +98,7 @@ function EscapableAssets(
                   quantizedAmount={asset.amount}
                 />
               )}
-            {props.isMine &&
-              props.context.user &&
+            {props.context.user &&
               props.context.tradingMode === 'spot' &&
               asset.asset.details?.assetHash && (
                 <FinalizeEscapeForm
@@ -126,7 +121,7 @@ function EscapableAssets(
 function WithdrawableAssets(
   props: Pick<
     UserQuickActionsTableProps,
-    'withdrawableAssets' | 'isMine' | 'context' | 'starkKey' | 'exchangeAddress'
+    'withdrawableAssets' | 'context' | 'starkKey' | 'exchangeAddress'
   >
 ) {
   return (
@@ -150,7 +145,7 @@ function WithdrawableAssets(
                 </InlineEllipsis>
               </strong>
             </p>
-            {props.isMine && props.context.user && asset.asset.details && (
+            {props.context.user && asset.asset.details && (
               <RegularWithdrawalForm
                 assetDetails={asset.asset.details}
                 account={props.context.user.address}

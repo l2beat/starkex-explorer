@@ -89,8 +89,9 @@ const offerStatusBucket = new Bucket([
   'EXPIRED',
 ] as const)
 const offerTypeBucket = new Bucket(['BUY', 'SELL'] as const)
+const roleBucket = new Bucket(['MAKER', 'TAKER'] as const)
 
-export function randomUserOfferEntry(): OfferEntry {
+export function randomUserOfferEntry(withRole?: boolean): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),
@@ -98,6 +99,7 @@ export function randomUserOfferEntry(): OfferEntry {
     syntheticAmount: amountBucket.pick(),
     collateralAmount: amountBucket.pick(),
     status: offerStatusBucket.pick(),
+    role: withRole ? roleBucket.pick() : undefined,
     type: offerTypeBucket.pick(),
   }
 }

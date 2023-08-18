@@ -4,7 +4,6 @@ import React from 'react'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
-import { InfoBanner } from '../../components/InfoBanner'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -26,18 +25,20 @@ function UserRegisterPage(props: UserRegisterPageProps) {
     >
       <ContentWrapper className="flex gap-12">
         <div className="flex-1">
-          <div className="text-xxl font-semibold">Register Stark key</div>
+          <div className="text-xxl font-semibold">
+            Register your Ethereum address
+          </div>
           <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
             <span>
-              You have connected your wallet and recovered the stark key but our
-              system doesn't see any registered account for this address. There
-              is no need for doing anything, registering your stark key is only
-              needed when you want to perform forced actions.
+              Our system doesn't recognize any Ethereum address registered to
+              your Stark key.
             </span>
             <span>
-              Registering means that your stark key will be linked to your
-              ethereum address on L1. However the cost is very high so do not do
-              this if you don't need to.
+              This registration is needed to perform forced operations. However,
+              <strong>
+                the cost of registration is very high, and so is not recommended
+                if not absolutely necessary.
+              </strong>
             </span>
           </div>
         </div>
@@ -56,9 +57,8 @@ function UserRegisterPage(props: UserRegisterPageProps) {
               Register
             </Button>
           </div>
-          <InfoBanner className="mt-3">Register your Stark key</InfoBanner>
           <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
-          <InlineEllipsis className="mt-1 max-w-[70%] font-semibold text-white">
+          <InlineEllipsis className="mt-1 max-w-[450px] font-semibold text-white">
             {props.context.user.starkKey.toString()}
           </InlineEllipsis>
         </Card>

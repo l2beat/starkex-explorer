@@ -5,49 +5,54 @@ import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
-interface TablePreviewProps {
-  title?: ReactNode
+type TablePreviewProps = {
   path: string
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
   children: ReactNode
-}
+} & (
+  | {
+      title: string
+      viewAllPosition: 'top'
+    }
+  | {
+      viewAllPosition: 'bottom'
+    }
+)
 
-export function TablePreview({
-  title,
-  path,
-  entryShortNamePlural,
-  entryLongNamePlural,
-  visible,
-  children,
-}: TablePreviewProps) {
+export function TablePreview(props: TablePreviewProps) {
   return (
     <div>
-      {title && (
+      {props.viewAllPosition === 'top' && (
         <SectionHeading
-          title={title}
+          title={props.title}
           description={
-            <Link
-              className="!gap-0.5"
-              href={path}
-              accessoryRight={<ArrowRightIcon className="scale-90" />}
-            >
-              View all {entryShortNamePlural}
-            </Link>
+            <>
+              <Link
+                className="hidden !gap-0.5 sm:flex"
+                href={props.path}
+                accessoryRight={<ArrowRightIcon className="scale-90" />}
+              >
+                View all {props.entryShortNamePlural}
+              </Link>
+              <Link className="!gap-0.5 sm:hidden" href={props.path}>
+                View all
+              </Link>
+            </>
           }
         />
       )}
-      {children}
-      {visible === 0 && (
+      {props.children}
+      {props.visible === 0 && (
         <div className="flex h-20 items-center justify-center rounded bg-transparent text-center text-md text-zinc-500 group-[.Card]/card:bg-gray-900">
-          There are no {entryLongNamePlural} to view.
+          There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-      {!title && (
+      {props.viewAllPosition === 'bottom' && props.visible !== 0 && (
         <div className="mt-6 flex items-center justify-center">
-          <Button as="a" variant="outlined" href={path}>
-            View all {entryLongNamePlural}
+          <Button as="a" variant="outlined" href={props.path}>
+            View all {props.entryLongNamePlural}
           </Button>
         </div>
       )}

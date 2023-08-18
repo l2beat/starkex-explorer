@@ -17,7 +17,7 @@ export function FreezeBanner({ freezeStatus }: { freezeStatus: FreezeStatus }) {
   if (freezeStatus === 'frozen') {
     return (
       <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-red-500 px-6 py-0.5 text-white">
-        <span>This exchange is FROZEN and no longer operates normally. </span>
+        <span>This exchange is frozen and no longer operates normally. </span>
       </div>
     )
   }

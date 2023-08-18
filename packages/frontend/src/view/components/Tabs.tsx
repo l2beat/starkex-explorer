@@ -18,7 +18,7 @@ export function Tabs({ items }: TabsProps) {
   return (
     <div className="Tabs">
       <div className="relative mb-4 border-b border-zinc-800">
-        <div className="TabsArrowLeft absolute inset-y-0 -left-1 z-10 w-6 cursor-pointer bg-gradient-to-r from-neutral-900 via-neutral-900 opacity-0 transition-opacity">
+        <div className="TabsArrowLeft absolute inset-y-0 -left-1 z-10 hidden w-6 cursor-pointer bg-gradient-to-r from-neutral-900 via-neutral-900">
           <div className="flex h-full items-center justify-center text-white">
             <ChevronLeftIcon />
           </div>
@@ -43,7 +43,7 @@ export function Tabs({ items }: TabsProps) {
           ))}
           <span className="TabsUnderline absolute bottom-0 block h-1 rounded-t-sm bg-brand transition-all duration-300" />
         </div>
-        <div className="TabsArrowRight absolute inset-y-0 -right-1 z-10 w-6 cursor-pointer bg-gradient-to-l from-neutral-900 via-neutral-900 opacity-0 transition-opacity">
+        <div className="TabsArrowRight absolute inset-y-0 -right-1 z-10 hidden w-6 cursor-pointer bg-gradient-to-l from-neutral-900 via-neutral-900">
           <div className="flex h-full items-center justify-center">
             <ChevronRightIcon />
           </div>

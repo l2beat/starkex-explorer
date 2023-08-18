@@ -76,23 +76,21 @@ function FreezeRequestActionPage(props: Props) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="mt-6 flex max-w-md flex-col">
-          <span className="text-xl font-semibold">Request Exchange Freeze</span>
+          <span className="text-xl font-semibold">Freeze exchange</span>
           <span className="mt-3">
             The exchange operators have not fulfilled their obligation to
-            included a "forced action" of one of the users. This means that the
-            exchange can be frozen (essentially "shut down").
-          </span>
-          <span className="mt-3">
-            You can see the ignored forced action{' '}
+            include a forced operation request from one of the users (you can
+            see the ignored forced operation{' '}
             <Link href={`/transactions/${props.transactionHash.toString()}`}>
               here
             </Link>
-            .
+            ), which means that the exchange can now be frozen (essentially
+            "shut down").
           </span>
           <span className="mt-3">
-            In the frozen state, the only possible operation is for users to
-            withdraw their funds using so called "escape hatch", which interacts
-            with the Ethereum blockchain directly.
+            Once frozen, the only possible action is for users to withdraw their
+            funds using the so-called "escape hatch", which interacts with the
+            Ethereum blockchain directly.
           </span>
         </div>
         <form

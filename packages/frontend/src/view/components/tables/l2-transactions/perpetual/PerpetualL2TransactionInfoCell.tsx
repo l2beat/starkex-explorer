@@ -6,20 +6,16 @@ import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
-import {
-  ArrowRightIcon,
-  HorizontalBidirectionalArrow,
-} from '../../../../assets/icons/ArrowIcon'
+import { HorizontalBidirectionalArrow } from '../../../../assets/icons/ArrowIcon'
 import { PerpetualL2TransactionEntry } from '../../../../pages/l2-transaction/common'
 import { AssetWithLogo } from '../../../AssetWithLogo'
-import { InlineEllipsis } from '../../../InlineEllipsis'
 
 interface L2TransactionFreeFormProps {
   data: PerpetualL2TransactionEntry['data']
   collateralAsset: CollateralAsset
 }
 
-export function PerpetualL2TransactionFreeForm({
+export function PerpetualL2TransactionInfoCell({
   data,
   collateralAsset,
 }: L2TransactionFreeFormProps) {
@@ -36,9 +32,6 @@ export function PerpetualL2TransactionFreeForm({
       const syntheticBuyer = data.partyAOrder.isBuyingSynthetic
         ? data.partyAOrder
         : data.partyBOrder
-      const syntheticSeller = data.partyAOrder.isBuyingSynthetic
-        ? data.partyBOrder
-        : data.partyAOrder
 
       return (
         <>
@@ -54,26 +47,10 @@ export function PerpetualL2TransactionFreeForm({
               },
             ]}
           />
-          <FreeFormTradeAddresses
-            addresses={[
-              syntheticSeller.starkKey.toString(),
-              syntheticBuyer.starkKey.toString(),
-            ]}
-          />
         </>
       )
     }
     case 'ForcedTrade': {
-      const partyA = {
-        starkKey: data.starkKeyA,
-        positionId: data.positionIdA,
-      }
-      const partyB = {
-        starkKey: data.starkKeyB,
-        positionId: data.positionIdB,
-      }
-      const syntheticBuyer = data.isABuyingSynthetic ? partyA : partyB
-      const syntheticSeller = data.isABuyingSynthetic ? partyB : partyA
       const collateralAssetId = validateCollateralAssetIdByHash(
         data.collateralAssetId,
         collateralAsset
@@ -92,12 +69,6 @@ export function PerpetualL2TransactionFreeForm({
               },
             ]}
           />
-          <FreeFormTradeAddresses
-            addresses={[
-              syntheticSeller.starkKey.toString(),
-              syntheticBuyer.starkKey.toString(),
-            ]}
-          />
         </>
       )
     }
@@ -109,10 +80,6 @@ export function PerpetualL2TransactionFreeForm({
             asset={{ hashOrId: collateralAsset.assetId }}
             amount={data.amount}
           />
-          <FreeFormAddressExchange
-            from={data.senderStarkKey.toString()}
-            to={data.receiverStarkKey.toString()}
-          />
         </>
       )
     case 'WithdrawalToAddress':
@@ -121,10 +88,6 @@ export function PerpetualL2TransactionFreeForm({
           <FreeFormAssetWithAmount
             asset={{ hashOrId: collateralAsset.assetId }}
             amount={data.amount}
-          />
-          <FreeFormAddressExchange
-            from={data.starkKey.toString()}
-            to={data.ethereumAddress.toString()}
           />
         </>
       )
@@ -164,32 +127,8 @@ export function PerpetualL2TransactionFreeForm({
         />
       )
     default:
-      return null
+      return <span>-</span>
   }
-}
-
-function FreeFormAddressExchange({ from, to }: { from: string; to: string }) {
-  return (
-    <FreeFormCard>
-      <FreeFormLink>{from}</FreeFormLink>
-      <ArrowRightIcon className="fill-zinc-500" />
-      <FreeFormLink>{to}</FreeFormLink>
-    </FreeFormCard>
-  )
-}
-
-function FreeFormTradeAddresses({
-  addresses,
-}: {
-  addresses: [string, string]
-}) {
-  return (
-    <FreeFormCard>
-      <FreeFormLink>{addresses[0]}</FreeFormLink>
-      <HorizontalBidirectionalArrow className="mr-1 fill-zinc-500" />
-      <FreeFormLink>{addresses[1]}</FreeFormLink>
-    </FreeFormCard>
-  )
 }
 
 function FreeFormTradeAssets({
@@ -224,13 +163,5 @@ function FreeFormAssetWithAmount({
 }
 
 function FreeFormCard({ children }: { children: ReactNode }) {
-  return (
-    <span className="flex h-7 items-center gap-1 rounded bg-gray-800 px-2 py-1">
-      {children}
-    </span>
-  )
-}
-
-function FreeFormLink({ children }: { children: ReactNode }) {
-  return <InlineEllipsis className="max-w-[60px]">{children}</InlineEllipsis>
+  return <span className="flex h-7 items-center gap-1">{children}</span>
 }

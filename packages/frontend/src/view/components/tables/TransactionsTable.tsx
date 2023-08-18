@@ -14,7 +14,7 @@ import { TimeAgeCell } from '../TimeAgeCell'
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
   hideAge?: boolean
-  hideAmount?: boolean
+  hideInfo?: boolean
 }
 
 export interface TransactionEntry {
@@ -36,8 +36,8 @@ export interface TransactionEntry {
 export function TransactionsTable(props: TransactionsTableProps) {
   const columns: Column[] = [
     { header: 'Tx Hash' },
-    ...(!props.hideAmount ? [{ header: 'Amount' }] : []),
     { header: 'Type' },
+    ...(!props.hideInfo ? [{ header: 'Info' }] : []),
     { header: 'Status' },
     ...(!props.hideAge ? [{ header: 'Age' }] : []),
   ]
@@ -54,7 +54,8 @@ export function TransactionsTable(props: TransactionsTableProps) {
               {transaction.hash.toString()}
             </InlineEllipsis>
           </Link>,
-          ...(!props.hideAmount
+          toTypeText(transaction.type),
+          ...(!props.hideInfo
             ? [
                 <div className="flex items-center gap-0.5">
                   {transaction.asset && transaction.amount !== undefined
@@ -71,7 +72,6 @@ export function TransactionsTable(props: TransactionsTableProps) {
                 </div>,
               ]
             : []),
-          toTypeText(transaction.type),
           <StatusBadge type={status.type}>{status.text}</StatusBadge>,
           ...(!props.hideAge
             ? [<TimeAgeCell timestamp={transaction.timestamp} />]
