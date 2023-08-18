@@ -35,7 +35,7 @@ export class TransactionValidator {
         isSuccess: false,
         controllerResult: {
           type: 'bad request',
-          message: `Invalid transaction`,
+          message: 'Invalid transaction',
         },
       }
     }

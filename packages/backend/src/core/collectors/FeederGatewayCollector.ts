@@ -52,7 +52,7 @@ export class FeederGatewayCollector {
       throw new Error(`State update ${stateUpdateId} not found`)
     }
 
-    this.logger.info(`Collecting transactions from Feeder Gateway`, {
+    this.logger.info('Collecting transactions from Feeder Gateway', {
       stateUpdateId: stateUpdate.id,
     })
 
