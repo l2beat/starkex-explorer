@@ -2,6 +2,11 @@
 module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
+    extend: {
+      transitionProperty: {
+        'max-height': 'max-height',
+      },
+    },
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
     },

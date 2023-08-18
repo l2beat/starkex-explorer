@@ -51,7 +51,7 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
       item.offsetLeft -
       tabsContainer.getBoundingClientRect().width / 2 +
       item.offsetWidth / 2
-    console.log(scrollPosition)
+
     tabsContainer.scrollTo({
       left: scrollPosition,
       behavior: 'smooth',

@@ -11,6 +11,7 @@ import { Navbar } from './Navbar'
 interface Props {
   context: PageContext | PageContextWithUser
   withoutSearch?: boolean
+  showNavLinks?: boolean
   description: string
   image?: string
   baseTitle?: string
@@ -46,7 +47,11 @@ export function Page(props: Props) {
       />
       <body className="flex h-full flex-col">
         {isPreview && <BreakpointIndicator />}
-        <Navbar searchBar={!props.withoutSearch} context={props.context} />
+        <Navbar
+          showSearchBar={!props.withoutSearch}
+          showNavLinks={props.showNavLinks}
+          context={props.context}
+        />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         <GradientBackground />
         {props.children}
