@@ -56,9 +56,9 @@ function HomePage(props: HomePageProps) {
       withoutSearch
       showNavLinks
     >
-      <ContentWrapper className="!max-w-[1340px]">
+      <ContentWrapper className="!max-w-[1340px] !pt-0 md:!pt-8 xl:!pt-16">
         <div className="flex flex-col gap-8">
-          <div className="-mx-4 flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 sm:-mx-8 lg:mx-0 lg:rounded-lg">
+          <div className="-mx-4 flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 sm:-mx-8 md:mx-0 md:rounded-lg">
             <SearchBar
               className="!w-3/4"
               tradingMode={props.context.tradingMode}
