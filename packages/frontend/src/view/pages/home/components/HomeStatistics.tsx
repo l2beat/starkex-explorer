@@ -79,8 +79,8 @@ function StatisticsItem({
         className
       )}
     >
-      <span className="text-[20px] font-semibold">{title}</span>
-      <span className="text-[50px] font-extrabold text-brand">
+      <span className="text-[18px] font-semibold md:text-[20px]">{title}</span>
+      <span className="text-[40px] font-extrabold text-brand md:text-[50px]">
         {formatStatisticsCount(value)}
       </span>
       <span className="hidden text-sm font-semibold text-zinc-500 md:inline">
