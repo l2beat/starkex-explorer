@@ -99,7 +99,7 @@ function HomePage(props: HomePageProps) {
                     <L2TransactionsTable
                       transactions={props.l2Transactions}
                       context={props.context}
-                      showDetails={false}
+                      showInfo={false}
                     />
                   </TablePreview>
                 </Card>
