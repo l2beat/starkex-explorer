@@ -1,3 +1,4 @@
+import { initExpandableContainers } from './expandableContainers'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
 import { initImageFallback } from './imageFallback'
@@ -6,15 +7,14 @@ import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
 import { initMetamask } from './metamask'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'
-import { initStateUpdateStats } from './stateUpdateStats'
 import { initTabs } from './tabs'
 import { initTooltips } from './tooltips'
 
 // #region UI elements
 initTabs()
 initTooltips()
-initStateUpdateStats()
 initPagination()
+initExpandableContainers()
 // #endregion
 // #region Forms
 initStarkKeyRecovery()
