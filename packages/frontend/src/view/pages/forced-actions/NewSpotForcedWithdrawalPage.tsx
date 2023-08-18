@@ -27,17 +27,16 @@ function NewSpotForcedWithdrawalPage(props: Props) {
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. This is achieved
-      through a mechanism called full withdrawals,{' '}
+      through a mechanism called{' '}
       <Link href="https://docs.starkware.co/starkex/spot/spot-trading-full-withdrawals.html">
-        link to docs
+        full withdrawals
       </Link>
-      .
+      . Note that you can only withdraw your entire funds.
     </>,
-    'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request.',
+    'After submitting the request you must now wait up to seven days (but usually just several hours) for the exchange to process your request.',
     <>
-      Once your request has been processed the status will change to{' '}
-      <span className="text-yellow-300">’processed’</span> and you will be able
-      to withdraw your funds by submitting a withdrawal transaction.
+      Once this is done the status will change to ’processed’ and you will be
+      able to withdraw your funds by submitting a withdrawal transaction.
     </>,
   ]
   const assetInfo = assetToInfo(props.asset)
@@ -57,9 +56,12 @@ function NewSpotForcedWithdrawalPage(props: Props) {
               Begin withdrawal process
             </span>
             <span className="mt-3 text-sm font-semibold text-zinc-500">
-              The process you are about to begin should be used only in
-              emergency. Please use a regular operation on the exchange to
-              perform it.
+              <strong>
+                The cost of this process is very high, and so should only be
+                used in an emergency.
+              </strong>{' '}
+              For regular usage, you should perform the equivalent standard
+              operation through the exchange.
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
               The withdrawal process consists of three steps:
