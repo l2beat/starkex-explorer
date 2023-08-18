@@ -27,7 +27,7 @@ export function PerpetualL2TransactionsTable(
   props: PerpetualL2TransactionsTableProps
 ) {
   const columns: Column[] = [
-    { header: `ID` },
+    { header: 'ID' },
     { header: 'Type' },
     ...(props.showInfo ? [{ header: 'Info' }] : []),
     { header: 'Status' },

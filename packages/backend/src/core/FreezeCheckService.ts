@@ -86,12 +86,12 @@ export class FreezeCheckService {
         'function FREEZE_GRACE_PERIOD() view returns (uint256)'
       )
     if (err) {
-      this.logger.error(`Failed calling FREEZE_GRACE_PERIOD()`)
+      this.logger.error('Failed calling FREEZE_GRACE_PERIOD()')
       throw err
     }
     if (freezeGracePeriod === undefined) {
       throw new Error(
-        `Failed calling FREEZE_GRACE_PERIOD(): received undefined`
+        'Failed calling FREEZE_GRACE_PERIOD(): received undefined'
       )
     }
     return freezeGracePeriod.toNumber()
