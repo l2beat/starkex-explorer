@@ -146,7 +146,7 @@ export class TransactionSubmitController {
       return fetched.controllerResult
     }
     if (!tradeMatchesOffer(offer, fetched.data)) {
-      return { type: 'bad request', message: `Trade does not match offer` }
+      return { type: 'bad request', message: 'Trade does not match offer' }
     }
 
     // TODO: cross repository transaction

@@ -13,7 +13,7 @@ import { LogTokenRegistered } from './events'
 const ETH_SELECTOR = '0x8322fff2'
 const ERC20_SELECTOR = '0xf47261b0'
 const ERC721_SELECTOR = '0x02571792'
-const ERC1155_SELECTOR = `0x3348691d`
+const ERC1155_SELECTOR = '0x3348691d'
 const MINTABLE_ERC721_SELECTOR = '0xb8b86672'
 const MINTABLE_ERC20_SELECTOR = '0x68646e2d'
 

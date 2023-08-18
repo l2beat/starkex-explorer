@@ -28,7 +28,7 @@ describe(encodeStateAsInt256Array.name, () => {
     // encodeState is tested in encodeOnchainData.test.ts
   })
 
-  it(`properly serialized state`, () => {
+  it('properly serialized state', () => {
     const result = encodeStateAsInt256Array(newState)
     expect(result).toEqual([
       4855295734011000137694901532041540081493925748614200896918173841152119144448n,

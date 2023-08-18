@@ -234,7 +234,7 @@ describe(TransactionHistory.name, () => {
         )
       })
 
-      it(`returns [INCLUDED, ...previousRegularTransactionHistoryResults] if userTransaction is included`, () => {
+      it('returns [INCLUDED, ...previousRegularTransactionHistoryResults] if userTransaction is included', () => {
         const forcedTradeOffer = fakeOffer()
         const sentTransaction = fakeSentTransaction()
         const userTransaction = fakeUserTransaction({
