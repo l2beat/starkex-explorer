@@ -14,9 +14,9 @@ export const getAssetsTableProps = (starkKey: StarkKey) => ({
 })
 
 export const getL2TransactionTableProps = (starkKey: StarkKey) => ({
-  title: 'Live Transactions',
+  title: 'Transactions',
   entryShortNamePlural: 'transactions',
-  entryLongNamePlural: 'live transactions',
+  entryLongNamePlural: 'transactions',
   path: `/users/${starkKey.toString()}/l2-transactions`,
   description: `Layer 2 transactions of user ${starkKey.toString()}`,
 })
@@ -30,11 +30,11 @@ export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
 })
 
 export const getTransactionTableProps = (starkKey: StarkKey) => ({
-  title: 'L1 transactions',
+  title: 'Forced transactions',
   entryShortNamePlural: 'transactions',
-  entryLongNamePlural: 'L1 transactions',
+  entryLongNamePlural: 'forced transactions',
   path: `/users/${starkKey.toString()}/transactions`,
-  description: `L1 transactions of user ${starkKey.toString()}`,
+  description: `Forced transactions of user ${starkKey.toString()}`,
 })
 
 export const getOfferTableProps = (starkKey: StarkKey) => ({
