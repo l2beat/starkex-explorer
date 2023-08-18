@@ -64,9 +64,9 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
       tabsContainer.scrollLeft >
       tabsContainer.scrollWidth - tabsContainer.clientWidth - ARROWS_THRESHOLD
 
-    arrowLeft.classList.toggle('opacity-0', isScrolledToStart)
+    arrowLeft.classList.toggle('hidden', isScrolledToStart)
 
-    arrowRight.classList.toggle('opacity-0', isScrolledToEnd)
+    arrowRight.classList.toggle('hidden', isScrolledToEnd)
   }
 
   const onArrowClick = (dir: 'left' | 'right') => {
