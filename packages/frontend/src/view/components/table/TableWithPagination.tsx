@@ -2,6 +2,7 @@ import isNumber from 'lodash/isNumber'
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
+import { Card } from '../Card'
 import { SectionHeading } from '../SectionHeading'
 import { TableLimitSelect } from './TableLimitSelect'
 import { TablePagination } from './TablePagination'
@@ -25,7 +26,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
     : undefined
 
   return (
-    <>
+    <Card>
       <SectionHeading
         title={props.title}
         description={getDescription(
@@ -67,7 +68,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           </div>
         </div>
       )}
-    </>
+    </Card>
   )
 }
 
