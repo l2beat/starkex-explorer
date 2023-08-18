@@ -112,7 +112,7 @@ function HomePage(props: HomePageProps) {
                 >
                   <TransactionsTable
                     transactions={props.forcedTransactions}
-                    hideAmount
+                    hideInfo
                   />
                 </TablePreview>
               </Card>
