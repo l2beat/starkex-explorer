@@ -12,7 +12,7 @@ const getWithdrawalInstructions = () => [
     . Note that you can only withdraw USDC, so to fully exit all funds you
     should first close all open positions.
   </>,
-  `After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the exchange to process your request.`,
+  'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the exchange to process your request.',
   <>
     Once this is done the status will change to ’processed,’ and you will be
     able to withdraw your funds by finalizing your withdrawal.
@@ -30,7 +30,7 @@ const getTradeInstructions = () => [
     </Link>
     .
   </>,
-  `After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the exchange to process your request. Once this is done, the trade will be executed, and the funds will be transferred between you and the counterparty.`,
+  'After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the exchange to process your request. Once this is done, the trade will be executed, and the funds will be transferred between you and the counterparty.',
 ]
 
 export function getForcedActionInstructionsParams(isWithdrawal: boolean) {
