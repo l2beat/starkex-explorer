@@ -1,9 +1,8 @@
-import { InstanceName } from '@explorer/shared'
 import React from 'react'
 
 import { Link } from '../../../components/Link'
 
-const getWithdrawalInstructions = (instanceName: InstanceName) => [
+const getWithdrawalInstructions = () => [
   <>
     Using this form you request a withdrawal of your funds. This is achieved
     through a mechanism called{' '}
@@ -20,7 +19,7 @@ const getWithdrawalInstructions = (instanceName: InstanceName) => [
   </>,
 ]
 
-const getTradeInstructions = (instanceName: InstanceName) => [
+const getTradeInstructions = () => [
   'You create a trade offer using this form. This is fully off-chain and does not require any gas fees.',
   'The offer will now be visible to all users of the system. You should seek out another user to accept the offer and become a counterparty to the trade. Accepting the offer is also fully off-chain and does not require any gas fees.',
   <>
@@ -34,20 +33,17 @@ const getTradeInstructions = (instanceName: InstanceName) => [
   `After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the exchange to process your request. Once this is done, the trade will be executed, and the funds will be transferred between you and the counterparty.`,
 ]
 
-export function getForcedActionInstructionsParams(
-  isWithdrawal: boolean,
-  instanceName: InstanceName
-) {
+export function getForcedActionInstructionsParams(isWithdrawal: boolean) {
   if (isWithdrawal) {
     return {
       header: 'Begin withdrawal process',
       description: 'The withdrawal process consists of three steps:',
-      items: getWithdrawalInstructions(instanceName),
+      items: getWithdrawalInstructions(),
     }
   }
   return {
     header: 'Begin trade process',
     description: 'The trade process consists of four steps:',
-    items: getTradeInstructions(instanceName),
+    items: getTradeInstructions(),
   }
 }

@@ -24,10 +24,7 @@ function NewPerpetualForcedActionPage(
   const { context } = props
   const isWithdrawal =
     props.asset.hashOrId === props.context.collateralAsset.assetId
-  const instructionParams = getForcedActionInstructionsParams(
-    isWithdrawal,
-    context.instanceName
-  )
+  const instructionParams = getForcedActionInstructionsParams(isWithdrawal)
 
   const propsJson = serializeForcedActionsFormProps(props)
   const userJson = JSON.stringify(context.user)
