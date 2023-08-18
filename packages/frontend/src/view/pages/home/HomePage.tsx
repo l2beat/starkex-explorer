@@ -54,6 +54,7 @@ function HomePage(props: HomePageProps) {
       description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
       context={props.context}
       withoutSearch
+      showNavLinks
     >
       <ContentWrapper className="!max-w-[1340px]">
         <div className="flex flex-col gap-8">
