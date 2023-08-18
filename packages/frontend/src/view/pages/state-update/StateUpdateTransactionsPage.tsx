@@ -40,7 +40,7 @@ function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
           {...common}
           title={
             <StateUpdatePageTitle
-              prefix="Included transactions of"
+              prefix="Forced transactions of state update"
               id={props.id}
             />
           }

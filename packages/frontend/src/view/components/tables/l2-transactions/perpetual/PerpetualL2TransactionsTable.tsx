@@ -15,12 +15,12 @@ import { Table } from '../../../table/Table'
 import { Column } from '../../../table/types'
 import { TimeAgeCell } from '../../../TimeAgeCell'
 import { TooltipWrapper } from '../../../Tooltip'
-import { PerpetualL2TransactionFreeForm } from './PerpetualL2TransactionFreeForm'
+import { PerpetualL2TransactionInfoCell } from './PerpetualL2TransactionInfoCell'
 
 export interface PerpetualL2TransactionsTableProps {
   transactions: PerpetualL2TransactionEntry[]
   collateralAsset: CollateralAsset
-  showDetails: boolean
+  showInfo: boolean
 }
 
 export function PerpetualL2TransactionsTable(
@@ -29,6 +29,7 @@ export function PerpetualL2TransactionsTable(
   const columns: Column[] = [
     { header: 'ID' },
     { header: 'Type' },
+    ...(props.showInfo ? [{ header: 'Info' }] : []),
     { header: 'Status' },
     { header: 'Age' },
   ]
@@ -42,11 +43,15 @@ export function PerpetualL2TransactionsTable(
         )
         const cells: ReactNode[] = [
           <Link>#{transaction.transactionId}</Link>,
-          <TypeCell
-            transaction={transaction}
-            collateralAsset={props.collateralAsset}
-            showDetails={props.showDetails}
-          />,
+          <TypeCell transaction={transaction} />,
+          ...(props.showInfo
+            ? [
+                <PerpetualL2TransactionInfoCell
+                  data={transaction.data}
+                  collateralAsset={props.collateralAsset}
+                />,
+              ]
+            : []),
           <StatusBadge type={statusBadgeValues.type}>
             {statusBadgeValues.text}
           </StatusBadge>,
@@ -68,14 +73,8 @@ export function PerpetualL2TransactionsTable(
 
 interface TypeCellProps {
   transaction: PerpetualL2TransactionEntry
-  collateralAsset: CollateralAsset
-  showDetails: boolean
 }
-function TypeCell({
-  transaction,
-  collateralAsset,
-  showDetails,
-}: TypeCellProps) {
+function TypeCell({ transaction }: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
       {l2TransactionTypeToText(transaction.data.type)}
@@ -101,12 +100,6 @@ function TypeCell({
             </TooltipWrapper>
           )}
         </div>
-      )}
-      {showDetails && (
-        <PerpetualL2TransactionFreeForm
-          data={transaction.data}
-          collateralAsset={collateralAsset}
-        />
       )}
     </span>
   )

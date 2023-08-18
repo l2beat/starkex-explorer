@@ -9,7 +9,7 @@ interface SectionHeadingProps {
 
 export function SectionHeading(props: SectionHeadingProps) {
   return (
-    <div className="mb-5 flex flex-col items-baseline justify-between gap-4 sm:flex-row">
+    <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
       <h2 className={cx('text-xl font-semibold', props.children && 'flex-1')}>
         {props.title}
       </h2>

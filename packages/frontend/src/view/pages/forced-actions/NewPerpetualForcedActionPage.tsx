@@ -24,10 +24,7 @@ function NewPerpetualForcedActionPage(
   const { context } = props
   const isWithdrawal =
     props.asset.hashOrId === props.context.collateralAsset.assetId
-  const instructionParams = getForcedActionInstructionsParams(
-    isWithdrawal,
-    context.instanceName
-  )
+  const instructionParams = getForcedActionInstructionsParams(isWithdrawal)
 
   const propsJson = serializeForcedActionsFormProps(props)
   const userJson = JSON.stringify(context.user)
@@ -48,9 +45,12 @@ function NewPerpetualForcedActionPage(
               {instructionParams.header}
             </span>
             <span className="mt-3 text-sm font-semibold text-zinc-500">
-              The process you are about to begin should be used only in
-              emergency. Please use a regular operation on the exchange to
-              perform it.
+              <strong>
+                The cost of this process is very high, and so should only be
+                used in an emergency.
+              </strong>{' '}
+              For regular usage, you should perform the equivalent standard
+              operation through the exchange.
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
               {instructionParams.description}

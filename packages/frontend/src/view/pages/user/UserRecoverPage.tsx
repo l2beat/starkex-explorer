@@ -4,7 +4,6 @@ import React from 'react'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
-import { InfoBanner } from '../../components/InfoBanner'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { Link } from '../../components/Link'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -29,28 +28,28 @@ function UserRecoverPage(props: UserRegisterPageProps) {
           <div className="text-xxl font-semibold">Recover Stark key</div>
           <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
             <span>
-              You have connected your wallet, but our system doesn't see any
-              registered account for this address. This is because StarkEx
-              systems use Stark keys and not Ethereum addresses as user ids. If
-              you are a user of this system please recover your Stark key with
-              your Ethereum address.
+              Our system doesn't recognize any Stark key associated with your
+              Ethereum address.
             </span>
             <span>
-              To obtain the key we will ask you to sign a message with metamask.
-              CAUTION This operation can be dangerous if done on a malicious
-              website. Make sure you trust this website (you can read the code{' '}
+              To obtain the key, we will ask you to sign a message with
+              MetaMask. Upon signing, MetaMask may alert that this message
+              should only be signed on a given domain. You can make an exception
+              for this explorer but note that{' '}
+              <strong>
+                this operation can be dangerous if done on a malicious website,
+                so make sure you trust this website
+              </strong>
+              (you can read the code{' '}
               <Link href="https://github.com/l2beat/starkex-explorer">
                 here
               </Link>
-              ). Metamask may say that the message should only be signed on
-              given domain, but you can make an exception for this explorer.
+              ).
             </span>
-            {/* TODO: Add link to DOMAIN */}
             <span>
-              As an alternative to recovering you can try to figure out your
-              stark key yourself. Then just paste it into the search bar. You
-              will however be unable to submit forced transactions without
-              registering.
+              Alternatively, you can try to figure out your Stark key by
+              yourself. However, you will be unable to submit forced
+              transactions without registering.
             </span>
           </div>
         </div>
@@ -69,7 +68,6 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               Recover
             </Button>
           </div>
-          <InfoBanner className="mt-3">Recover your Stark key</InfoBanner>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>

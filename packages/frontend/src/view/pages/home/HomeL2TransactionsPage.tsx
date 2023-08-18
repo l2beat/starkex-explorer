@@ -27,7 +27,7 @@ function HomeL2TransactionsPage(props: HomeL2TransactionsPageProps) {
   return (
     <Page
       path={L2_TRANSACTIONS_TABLE_PROPS.path}
-      description="Live transactions"
+      description="Transactions"
       context={props.context}
     >
       <ContentWrapper>

@@ -18,7 +18,7 @@ export function AssetWithLogo({
   symbolClassName,
 }: AssetWithLogoProps) {
   return (
-    <div className={classNames('flex items-center', className)}>
+    <div className={classNames('flex items-center gap-1', className)}>
       <img
         data-src={assetInfo.imageUrl}
         className={classNames(
@@ -31,7 +31,6 @@ export function AssetWithLogo({
       />
       <span
         className={classNames(
-          'ml-2',
           type === 'small' ? 'text-sm font-medium' : 'text-lg font-semibold'
         )}
       >

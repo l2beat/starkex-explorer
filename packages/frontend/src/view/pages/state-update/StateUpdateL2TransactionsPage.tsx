@@ -40,7 +40,7 @@ function StateUpdateL2TransactionsPage(
           {...common}
           title={
             <StateUpdatePageTitle
-              prefix="L2 transactions of state update"
+              prefix="Transactions of state update"
               id={props.id}
             />
           }

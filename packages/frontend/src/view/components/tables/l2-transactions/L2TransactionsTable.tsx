@@ -7,13 +7,13 @@ import { PerpetualL2TransactionsTable } from './perpetual/PerpetualL2Transaction
 export interface L2TransactionsTableProps {
   context: PageContext
   transactions: PerpetualL2TransactionEntry[]
-  showDetails?: boolean
+  showInfo?: boolean
 }
 
 export function L2TransactionsTable({
   context,
   transactions,
-  showDetails = true,
+  showInfo = true,
 }: L2TransactionsTableProps) {
   switch (context.tradingMode) {
     case 'perpetual':
@@ -21,7 +21,7 @@ export function L2TransactionsTable({
         <PerpetualL2TransactionsTable
           transactions={transactions}
           collateralAsset={context.collateralAsset}
-          showDetails={showDetails}
+          showInfo={showInfo}
         />
       )
     case 'spot':

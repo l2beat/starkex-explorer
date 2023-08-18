@@ -51,11 +51,10 @@ function EscapeHatchActionPage(props: Props) {
   const formPropsJson = serializeVerifyEscapeFormProps(formProps)
   const userJson = JSON.stringify(context.user)
   const steps = [
-    <> initiating (verifying) the escape (on this page)</>,
-    <> finalizing the escape (on user page)</>,
+    <>Initiating (verifying) the escape (on this page)</>,
+    <>Finalizing the escape (on user page)</>,
     <>
-      {' '}
-      withdrawing the funds (on user page - must be carried out by the owner of
+      Withdrawing the funds (on user page - must be carried out by the owner of
       this position){' '}
     </>,
   ]
