@@ -96,15 +96,16 @@ function UserPage(props: UserPageProps) {
               starkKey={props.starkKey}
               ethereumAddress={props.ethereumAddress}
             />
-            <UserQuickActionsTable
-              escapableAssets={props.escapableAssets}
-              withdrawableAssets={props.withdrawableAssets}
-              finalizableOffers={props.finalizableOffers}
-              isMine={isMine}
-              context={props.context}
-              exchangeAddress={props.exchangeAddress}
-              starkKey={props.starkKey}
-            />
+            {isMine && (
+              <UserQuickActionsTable
+                escapableAssets={props.escapableAssets}
+                withdrawableAssets={props.withdrawableAssets}
+                finalizableOffers={props.finalizableOffers}
+                context={props.context}
+                exchangeAddress={props.exchangeAddress}
+                starkKey={props.starkKey}
+              />
+            )}
           </div>
         </section>
         <Tabs
