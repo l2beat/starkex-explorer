@@ -42,8 +42,8 @@ export function UserProfile({
           </div>
           {isMine && (
             <InfoBanner className="mt-5">
-              Your stark key is not linked to your ethereum address. You don't
-              need this unless you want to perform forced actions.
+              Your Ethereum address is not registered to your Stark key
+              (unnecessary unless you want to perform forced operations)
             </InfoBanner>
           )}
         </>
