@@ -65,7 +65,6 @@ export function TableWithPagination(props: TableWithPaginationProps) {
               perPage={props.limit}
             />
           </div>
-          <TableLimitSelect limit={props.limit} link={props.path} />
         </div>
       )}
     </>
@@ -88,12 +87,11 @@ function getDescription(
 
   return visible !== 0 ? (
     <>
-      You're viewing {start}-{end} out of {formattedTotal}{' '}
-      {entryShortNamePlural}
+      {start}-{end} out of {formattedTotal} {entryShortNamePlural}
     </>
   ) : (
     <>
-      You're viewing 0 out of {formattedTotal} {entryShortNamePlural}
+      0 out of {formattedTotal} {entryShortNamePlural}
     </>
   )
 }
