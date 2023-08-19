@@ -132,7 +132,8 @@ export class StateUpdateController {
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       totalL2Transactions: sumUpTransactionCount(
-        preprocessedStateDetails?.cumulativeL2TransactionsStatistics
+        preprocessedStateDetails?.l2TransactionsStatistics,
+        this.excludeL2TransactionTypes
       ),
       transactions,
       totalTransactions: totalForcedUserTransactions,
