@@ -28,6 +28,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
     <>
       <SectionHeading
         title={props.title}
+        className="flex-col md:flex-row"
         description={getDescription(
           props.offset,
           props.visible,

@@ -16,7 +16,7 @@ interface Tab {
 
 export function Tabs({ items }: TabsProps) {
   return (
-    <div className="Tabs">
+    <div className="Tabs -mx-4 sm:mx-0">
       <div className="relative mb-4 border-b border-zinc-800">
         <div className="TabsArrowLeft absolute inset-y-0 -left-1 z-10 hidden w-6 cursor-pointer bg-gradient-to-r from-neutral-900 via-neutral-900">
           <div className="flex h-full items-center justify-center text-white">

@@ -10,7 +10,7 @@ export function ContentWrapper(props: ContentWrapperProps) {
   return (
     <main
       className={cx(
-        'mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8 sm:py-16',
+        'mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:py-16 md:px-8',
         props.className
       )}
     >

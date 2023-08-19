@@ -16,9 +16,9 @@ export function Table(props: TableProps) {
   const { alignLastColumnRight = true } = props
   return (
     <div
-      className={cx('overflow-x-auto sm:w-full', {
-        'rounded-lg bg-gray-800 pb-4': props.fullBackground,
-      })}
+      className={cx(
+        'overflow-x-auto rounded-lg bg-gray-800 pb-3 group-[.Card]/card:-mx-6 group-[.Card]/card:pb-0 sm:w-full sm:group-[.Card]/card:mx-0'
+      )}
     >
       <table
         cellPadding="0"
