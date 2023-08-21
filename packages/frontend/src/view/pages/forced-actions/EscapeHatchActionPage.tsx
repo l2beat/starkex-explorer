@@ -64,7 +64,7 @@ function EscapeHatchActionPage(props: Props) {
       description="Withdraw funds via Escape Hatch"
       context={props.context}
     >
-      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-12 lg:grid-cols-2">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
         <div className="flex flex-col">
           <div className="text-xxl font-semibold">Escape your funds</div>
           <span className="mb-3 mt-6">

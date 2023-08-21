@@ -23,7 +23,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
       description="Recover your stark key from your ethereum address"
       path="/users/recover"
     >
-      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-12 lg:grid-cols-2">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
         <div>
           <div className="text-xxl font-semibold">Recover Stark key</div>
           <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">

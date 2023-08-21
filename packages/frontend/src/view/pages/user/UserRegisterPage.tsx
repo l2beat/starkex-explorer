@@ -23,7 +23,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
       description="Register your stark key to your ethereum address"
       path="/users/register"
     >
-      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-12 lg:grid-cols-2">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
         <div>
           <div className="text-xxl font-semibold">
             Register your Ethereum address
