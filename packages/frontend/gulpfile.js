@@ -16,7 +16,7 @@ async function cleanStatic() {
 
 function buildScripts() {
   return exec(
-    `esbuild --bundle src/scripts/index.ts --outfile=build/static/scripts/main.js --minify`
+    'esbuild --bundle src/scripts/index.ts --outfile=build/static/scripts/main.js --minify'
   )
 }
 
@@ -28,10 +28,19 @@ function watchScripts() {
 }
 
 function buildStyles() {
+  const isPreviewDebug =
+    process.env.DEPLOYMENT_ENV === 'preview' && process.env.DEBUG === 'true'
   return Promise.all([
     exec(
-      `tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css`
+      'tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css'
     ),
+    ...(isPreviewDebug
+      ? [
+          exec(
+            'tailwindcss -i ./src/styles/debug.css -o ./build/static/styles/debug.css'
+          ),
+        ]
+      : []),
   ])
 }
 
@@ -48,7 +57,7 @@ function watchStatic() {
 }
 
 function buildTypescript() {
-  return exec(`tsc -p tsconfig.build.json`)
+  return exec('tsc -p tsconfig.build.json')
 }
 
 async function hashStaticFiles() {
@@ -61,7 +70,7 @@ async function hashStaticFiles() {
 
 function startPreview() {
   return exec(
-    `nodemon --watch src -e ts,tsx --exec "node -r esbuild-register" src/preview/index.ts`
+    'nodemon --watch src -e ts,tsx --exec "node -r esbuild-register" src/preview/index.ts'
   )
 }
 
