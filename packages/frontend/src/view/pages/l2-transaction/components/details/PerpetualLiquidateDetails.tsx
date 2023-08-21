@@ -34,11 +34,11 @@ export function PerpetualLiquidateDetails(
         value={props.data.liquidatorOrder.isBuyingSynthetic}
       />
       <AssetTradeCard
-        synthetic={{
+        left={{
           asset: { hashOrId: props.data.liquidatorOrder.syntheticAssetId },
           amount: props.data.actualSynthetic,
         }}
-        collateral={{
+        right={{
           asset: { hashOrId: props.collateralAsset.assetId },
           amount: props.data.actualCollateral,
         }}

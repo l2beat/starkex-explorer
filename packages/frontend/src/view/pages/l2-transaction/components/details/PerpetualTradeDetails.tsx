@@ -59,11 +59,11 @@ export function PerpetualTradeDetails(
         </TransactionField>
       </div>
       <AssetTradeCard
-        synthetic={{
+        left={{
           asset: { hashOrId: syntheticBuyer.syntheticAssetId },
           amount: props.data.actualSynthetic,
         }}
-        collateral={{
+        right={{
           asset: { hashOrId: collateralAssetId },
           amount: props.data.actualCollateral,
         }}

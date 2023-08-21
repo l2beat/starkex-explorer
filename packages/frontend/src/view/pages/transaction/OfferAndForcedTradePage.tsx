@@ -92,7 +92,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             {props.transactionHash ? (
               <TransactionPageTitle
                 title={`Forced ${props.type.toLowerCase()}`}

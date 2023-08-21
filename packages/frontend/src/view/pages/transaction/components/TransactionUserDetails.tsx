@@ -21,7 +21,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
   return (
     <section>
       <SectionHeading title={props.title} />
-      <div className="flex flex-col justify-between gap-8 rounded-lg bg-gray-800 p-6 font-semibold sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 rounded-lg bg-gray-800 p-6 font-semibold sm:flex-row sm:items-center sm:gap-8">
         {props.vaultOrPositionId && (
           <TransactionField
             label={props.tradingMode === 'perpetual' ? 'Position' : 'Vault'}

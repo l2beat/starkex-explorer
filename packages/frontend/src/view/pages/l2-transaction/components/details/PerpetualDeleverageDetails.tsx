@@ -31,11 +31,11 @@ export function PerpetualDeleverageDetails(
         value={props.data.isDeleveragerBuyingSynthetic}
       />
       <AssetTradeCard
-        synthetic={{
+        left={{
           asset: { hashOrId: props.data.syntheticAssetId },
           amount: props.data.syntheticAmount,
         }}
-        collateral={{
+        right={{
           asset: { hashOrId: props.collateralAsset.assetId },
           amount: props.data.collateralAmount,
         }}
