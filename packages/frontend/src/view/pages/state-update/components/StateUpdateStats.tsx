@@ -35,18 +35,18 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   // )
 
   return (
-    <section data-component="StateUpdateStats">
+    <section>
       <PageTitle>State Update #{props.id}</PageTitle>
       <ExpandableContainer
         visible={
-          <div className="flex justify-between gap-6">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row">
             <ValueItem label="Transaction hash">
               <EtherscanLink
                 chainId={props.context.chainId}
                 type="tx"
                 txHash={props.transactionHash.toString()}
               >
-                <InlineEllipsis className="max-w-[250px] lg:max-w-md">
+                <InlineEllipsis className="max-w-[300px] sm:max-w-[250px] lg:max-w-md">
                   {props.transactionHash.toString()}
                 </InlineEllipsis>
               </EtherscanLink>
