@@ -23,8 +23,8 @@ function UserRegisterPage(props: UserRegisterPageProps) {
       description="Register your stark key to your ethereum address"
       path="/users/register"
     >
-      <ContentWrapper className="flex gap-12">
-        <div className="flex-1">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-12 lg:grid-cols-2">
+        <div>
           <div className="text-xxl font-semibold">
             Register your Ethereum address
           </div>
@@ -42,7 +42,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </span>
           </div>
         </div>
-        <Card className="h-min max-w-lg flex-1">
+        <Card className="row-start-1 h-min lg:col-start-2">
           <p className="text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
@@ -58,7 +58,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </Button>
           </div>
           <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
-          <InlineEllipsis className="mt-1 max-w-[450px] font-semibold text-white">
+          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
             {props.context.user.starkKey.toString()}
           </InlineEllipsis>
         </Card>
