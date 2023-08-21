@@ -25,7 +25,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
         <div className="text-xxl font-semibold lg:hidden">
-          Recover Stark key
+          Register your Ethereum address
         </div>
         <div>
           <div className="hidden text-xxl font-semibold lg:block">
@@ -50,7 +50,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             Ethereum address
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <InlineEllipsis className="max-w-[200px] font-semibold">
+            <InlineEllipsis className="max-w-[120px] font-semibold sm:max-w-full lg:max-w-[250px]">
               {props.context.user.address.toString()}
             </InlineEllipsis>
             <Button
