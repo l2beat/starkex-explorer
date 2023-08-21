@@ -3,9 +3,10 @@ import React from 'react'
 
 import { Asset } from '../../../../utils/assets'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
+import { ArrowDownIcon, ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { AssetAmountCard } from '../../../components/AssetAmountCard'
 import { EtherscanLink } from '../../../components/EtherscanLink'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { TransactionField } from './TransactionField'
 
@@ -66,26 +67,29 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             txHash={props.transactionHash.toString()}
             type="tx"
           >
-            {props.transactionHash.toString()}
+            <InlineEllipsis className="max-w-[200px] sm:max-w-[500px] md:max-w-[100%]">
+              {props.transactionHash.toString()}
+            </InlineEllipsis>
           </EtherscanLink>
         </TransactionField>
       )}
       {props.value && (
         <AssetAmountCard
-          className="w-1/2"
+          className="sm:w-1/2"
           amount={props.value.amount}
           asset={props.value.asset}
         />
       )}
       {props.trade && (
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="grid items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
           <AssetAmountCard
             amountLabel="Offered amount"
             amount={props.trade.offeredAmount}
             assetLabel="Offered asset"
             asset={props.trade.offeredAsset}
           />
-          <ArrowRightIcon className="rounded bg-slate-800 text-zinc-500" />
+          <ArrowRightIcon className="hidden rounded bg-slate-800 text-zinc-500 sm:block" />
+          <ArrowDownIcon className="mx-auto rounded bg-slate-800 text-zinc-500 sm:hidden" />
           <AssetAmountCard
             amountLabel="Received amount"
             amount={props.trade.receivedAmount}
