@@ -6,6 +6,7 @@ import { Column, Row } from './types'
 interface TableRowProps extends Row {
   i: number
   columns: Column[]
+  className?: string
   fullBackground?: boolean
   shortenOnMobile?: boolean
 }
@@ -14,11 +15,11 @@ export function TableRow(props: TableRowProps) {
   return (
     <tr
       className={cx(
-        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium last:border-none group-[.Card]/card:border-b-gray-750 ',
-        props.fullBackground ? 'h-16' : 'h-10',
+        'h-10 whitespace-nowrap border-b border-b-gray-750 border-opacity-50 text-sm font-medium last:border-none',
         props.link && 'cursor-pointer hover:bg-gray-900 hover:bg-opacity-40',
         props.shortenOnMobile &&
-          '[&:nth-child(n+11)]:hidden xl:[&:nth-child(n+11)]:table-row'
+          '[&:nth-child(n+11)]:hidden xl:[&:nth-child(n+11)]:table-row',
+        props.className
       )}
     >
       {props.cells.map((cell, col) => {
