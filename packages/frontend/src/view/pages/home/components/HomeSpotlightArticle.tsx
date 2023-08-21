@@ -12,7 +12,7 @@ interface HomeSpotlightArticleProps {
 
 export function HomeSpotlightArticle(props: HomeSpotlightArticleProps) {
   return (
-    <Card className={classNames('grid grid-cols-2', props.className)}>
+    <Card className={classNames('grid grid-cols-2 gap-x-20', props.className)}>
       <div className="flex flex-col justify-center gap-4 pl-6">
         <span className="text-sm text-zinc-500">Spotlight article</span>
         <span className="text-xxl">{props.spotlightArticle.title}</span>
