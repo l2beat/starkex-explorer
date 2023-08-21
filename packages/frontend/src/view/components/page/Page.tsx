@@ -24,6 +24,7 @@ interface Props {
 }
 
 export function Page(props: Props) {
+  const isDebug = process.env.DEBUG === 'true'
   const isPreview = process.env.DEPLOYMENT_ENV === 'preview'
   return (
     <html
@@ -43,7 +44,12 @@ export function Page(props: Props) {
             `https://${props.context.instanceName.toLowerCase()}.l2beat.com`,
           props.path
         )}
-        stylesheets={props.stylesheets ?? ['/styles/main.css']}
+        stylesheets={
+          props.stylesheets ?? [
+            '/styles/main.css',
+            ...(isDebug && isPreview ? ['/styles/debug.css'] : []),
+          ]
+        }
       />
       <body className="flex h-full flex-col">
         {isPreview && <BreakpointIndicator />}

@@ -40,11 +40,11 @@ function NewPerpetualForcedActionPage(
       context={context}
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
-        <div className="mt-6 flex flex-col">
-          <span className="text-xl font-semibold">
+        <div className="flex flex-col lg:mt-6">
+          <span className="hidden text-xl font-semibold lg:inline">
             {instructionParams.header}
           </span>
-          <span className="mt-3 text-sm font-semibold text-zinc-500">
+          <span className="text-sm font-semibold text-zinc-500 lg:mt-3">
             <strong>
               The cost of this process is very high, and so should only be used
               in an emergency.

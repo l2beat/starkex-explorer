@@ -24,11 +24,14 @@ function UserRegisterPage(props: UserRegisterPageProps) {
       path="/users/register"
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
+        <div className="text-xxl font-semibold lg:hidden">
+          Recover Stark key
+        </div>
         <div>
-          <div className="text-xxl font-semibold">
+          <div className="hidden text-xxl font-semibold lg:block">
             Register your Ethereum address
           </div>
-          <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
+          <div className="flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500 lg:mt-6">
             <span>
               Our system doesn't recognize any Ethereum address registered to
               your Stark key.
@@ -42,7 +45,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </span>
           </div>
         </div>
-        <Card className="row-start-1 h-min lg:col-start-2">
+        <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
           <p className="text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>

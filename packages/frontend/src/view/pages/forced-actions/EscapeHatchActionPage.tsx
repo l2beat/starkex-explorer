@@ -65,23 +65,23 @@ function EscapeHatchActionPage(props: Props) {
       context={props.context}
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
-        <div className="flex flex-col">
-          <div className="text-xxl font-semibold">Escape your funds</div>
-          <span className="mb-3 mt-6">
+        <div className="flex flex-col gap-3">
+          <div className="hidden text-xxl font-semibold lg:block">
+            Escape your funds
+          </div>
+          <span className="text-sm font-semibold text-zinc-500 lg:mt-3">
             The exchange is frozen, preventing it from executing regular
             operations or supporting standard actions.
           </span>
-          <span className="mb-3">
+          <span className="text-sm font-semibold text-zinc-500">
             You have the option to request a withdrawal of the entire value of
             any position by activating an 'escape hatch.' This process involves
             interacting with an Ethereum contract, which calculates the total
             value of the position, including any open trades and funding rates.
           </span>
-          <span className="mb-3">
-            The escape process consists of three steps:
-          </span>
-          <OrderedList items={steps} className="mb-3" />
-          <span className="mb-3">
+          <span>The escape process consists of three steps:</span>
+          <OrderedList items={steps} />
+          <span className="text-sm font-semibold text-zinc-500">
             Please note, the execution of an Escape can be expensive due to
             Ethereum gas cost.
           </span>
@@ -93,15 +93,18 @@ function EscapeHatchActionPage(props: Props) {
             data-props={formPropsJson}
             data-user={userJson}
           >
-            <div className="flex gap-2">
-              <div className="flex flex-1 flex-col gap-2">
+            <div className="flex items-end justify-between">
+              <span className="text-xl font-semibold">Escape</span>
+              <span>
                 <span className="text-sm font-medium text-zinc-500">
-                  Position
-                </span>
-                <span className="text-xl font-semibold">
+                  {props.context.tradingMode === 'perpetual'
+                    ? 'Position'
+                    : 'Vault'}
+                </span>{' '}
+                <span className="text-lg font-semibold">
                   #{props.positionOrVaultId.toString()}
                 </span>
-              </div>
+              </span>
             </div>
             <Button className="w-full">Initiate Escape</Button>
           </form>

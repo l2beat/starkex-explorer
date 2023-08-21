@@ -11,7 +11,7 @@ export function OrderedList({ items, className }: FancyListProps) {
     <ol className={cx('ml-6', className)}>
       {items.map((item, index) => {
         return (
-          <li key={index} className="group relative pb-6 pl-4">
+          <li key={index} className="group relative pb-6 pl-4 last:pb-0">
             <div className="absolute -left-[13px] mt-2 h-full w-0.5 bg-zinc-500 group-last:hidden " />
             <Index index={index} />
             <span>{item}</span>
