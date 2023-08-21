@@ -91,7 +91,7 @@ function NewSpotForcedWithdrawalPage(props: Props) {
                     <span className="text-sm font-medium text-zinc-500">
                       Balance
                     </span>
-                    <span className="text-xl font-semibold">
+                    <span className="break-all text-xl font-semibold">
                       {formattedBalance}
                     </span>
                   </div>
