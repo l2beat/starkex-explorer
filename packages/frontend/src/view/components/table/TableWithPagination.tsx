@@ -2,6 +2,7 @@ import isNumber from 'lodash/isNumber'
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
+import { Card } from '../Card'
 import { SectionHeading } from '../SectionHeading'
 import { TableLimitSelect } from './TableLimitSelect'
 import { TablePagination } from './TablePagination'
@@ -25,17 +26,19 @@ export function TableWithPagination(props: TableWithPaginationProps) {
     : undefined
 
   return (
-    <>
-      <SectionHeading
-        title={props.title}
-        description={getDescription(
-          props.offset,
-          props.visible,
-          props.total,
-          props.entryShortNamePlural
-        )}
-      >
-        <TableLimitSelect limit={props.limit} link={props.path} />
+    <Card>
+      <SectionHeading title={props.title} className="flex-col md:flex-row">
+        <div className="flex w-full items-center justify-between gap-4 whitespace-pre md:w-min md:justify-end">
+          <p className="text-sm font-medium text-zinc-500">
+            {getDescription(
+              props.offset,
+              props.visible,
+              props.total,
+              props.entryShortNamePlural
+            )}
+          </p>
+          <TableLimitSelect limit={props.limit} link={props.path} />
+        </div>
       </SectionHeading>
       {props.children}
       {props.visible === 0 && (
@@ -67,7 +70,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           </div>
         </div>
       )}
-    </>
+    </Card>
   )
 }
 

@@ -1,4 +1,4 @@
-import { TradingMode } from '@explorer/shared'
+import { assertUnreachable, TradingMode } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -36,21 +36,9 @@ export interface UserAssetEntry {
 export function UserAssetsTable(props: UserAssetsTableProps) {
   const isUserRegistered = !!props.ethereumAddress
 
-  const escapeHatchElem = (entry: UserAssetEntry) =>
-    entry.action === 'ESCAPE' ? (
-      <Button
-        as="a"
-        href={getEscapeHatchLink(entry.vaultOrPositionId, isUserRegistered)}
-      >
-        ESCAPE
-      </Button>
-    ) : entry.action === 'USE_COLLATERAL_ESCAPE' ? (
-      <span className="text-zinc-500">use collateral escape</span>
-    ) : null
-
   return (
     <Table
-      fullBackground
+      rowClassName="h-16"
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
@@ -79,23 +67,31 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine &&
-              (!props.isFrozen ? (
-                <Button
-                  as="a"
-                  className="w-32"
-                  href={getForcedActionLink(
-                    props.tradingMode,
-                    entry,
-                    isUserRegistered
-                  )}
-                  disabled={isDisabled}
-                >
-                  {entry.action}
-                </Button>
-              ) : (
-                escapeHatchElem(entry)
-              )),
+            ...(props.isMine &&
+            entry.action !== 'NO_ACTION' &&
+            entry.action !== 'USE_COLLATERAL_ESCAPE'
+              ? [
+                  <Button
+                    as="a"
+                    href={getActionButtonLink(
+                      props.tradingMode,
+                      entry,
+                      isUserRegistered
+                    )}
+                    className="block"
+                    disabled={isDisabled}
+                  >
+                    {getActionButtonLabel(entry.action)}
+                  </Button>,
+                ]
+              : []),
+            ...(props.isMine && entry.action === 'USE_COLLATERAL_ESCAPE'
+              ? [
+                  <span className="text-zinc-500">
+                    {getActionButtonLabel(entry.action)}
+                  </span>,
+                ]
+              : []),
           ],
         }
       })}
@@ -103,17 +99,24 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
   )
 }
 
-function getEscapeHatchLink(
-  vaultOrPositionId: string,
-  isUserRegistered: boolean
-) {
-  if (!isUserRegistered) {
-    return '/users/register'
+function getActionButtonLabel(action: UserAssetEntry['action']) {
+  switch (action) {
+    case 'WITHDRAW':
+      return 'Withdraw'
+    case 'CLOSE':
+      return 'Close'
+    case 'ESCAPE':
+      return 'Escape'
+    case 'USE_COLLATERAL_ESCAPE':
+      return 'Use collateral escape'
+    case 'NO_ACTION':
+      throw new Error('No action')
+    default:
+      assertUnreachable(action)
   }
-  return `/escape/${vaultOrPositionId}`
 }
 
-function getForcedActionLink(
+function getActionButtonLink(
   tradingMode: TradingMode,
   entry: UserAssetEntry,
   isUserRegistered: boolean
@@ -122,9 +125,17 @@ function getForcedActionLink(
     return '/users/register'
   }
 
-  return tradingMode === 'perpetual'
-    ? `/forced/new/${
-        entry.vaultOrPositionId
-      }/${entry.asset.hashOrId.toString()}`
-    : `/forced/new/${entry.vaultOrPositionId}`
+  switch (entry.action) {
+    case 'WITHDRAW':
+    case 'CLOSE':
+      return tradingMode === 'perpetual'
+        ? `/forced/new/${
+            entry.vaultOrPositionId
+          }/${entry.asset.hashOrId.toString()}`
+        : `/forced/new/${entry.vaultOrPositionId}`
+    case 'ESCAPE':
+      return `/escape/${entry.vaultOrPositionId}`
+    default:
+      return undefined
+  }
 }

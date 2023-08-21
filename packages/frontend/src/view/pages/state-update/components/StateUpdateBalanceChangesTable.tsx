@@ -29,7 +29,7 @@ export function StateUpdateBalanceChangesTable(
   return (
     <Table
       columns={[
-        { header: 'StarkKey' },
+        { header: 'Stark Key' },
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         { header: 'Asset' },
         { header: 'Change', numeric: true },
