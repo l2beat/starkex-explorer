@@ -11,6 +11,7 @@ import { z } from 'zod'
 
 import { Button } from '../../components/Button'
 import { Link } from '../../components/Link'
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
@@ -74,8 +75,8 @@ function FreezeRequestActionPage(props: Props) {
       description="Request to freeze the exchange"
       context={props.context}
     >
-      <main className="mx-auto flex-1 p-16">
-        <div className="mt-6 flex max-w-md flex-col">
+      <ContentWrapper className="max-w-5xl sm:max-w-xl">
+        <div className="mt-6 flex  flex-col">
           <span className="text-xl font-semibold">Freeze exchange</span>
           <span className="mt-3">
             The exchange operators have not fulfilled their obligation to
@@ -101,7 +102,7 @@ function FreezeRequestActionPage(props: Props) {
         >
           <Button className="mt-6 w-fit">Request Freeze</Button>
         </form>
-      </main>
+      </ContentWrapper>
     </Page>
   )
 }
