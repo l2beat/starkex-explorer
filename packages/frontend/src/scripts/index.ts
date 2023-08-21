@@ -1,3 +1,4 @@
+import { initCopyButtons } from './copyButtons'
 import { initExpandableContainers } from './expandableContainers'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
@@ -12,6 +13,7 @@ import { initTooltips } from './tooltips'
 
 // #region UI elements
 initTabs()
+initCopyButtons()
 initTooltips()
 initPagination()
 initExpandableContainers()

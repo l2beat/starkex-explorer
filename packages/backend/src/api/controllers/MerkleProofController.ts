@@ -19,6 +19,7 @@ export class MerkleProofController {
     const merkleProof = await this.stateUpdater.generateMerkleProof(
       positionOrVaultId
     )
+
     const content = renderMerkleProofPage({
       context,
       positionOrVaultId,

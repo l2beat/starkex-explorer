@@ -64,7 +64,7 @@ export function initTooltips() {
 
   window.addEventListener('resize', hide)
   $$('.TableView').forEach((x) => x.addEventListener('scroll', hide))
-  document.body.addEventListener('scroll', hide)
+  document.addEventListener('scroll', hide)
   document.body.addEventListener('click', (e) => {
     if (e.currentTarget !== tooltip) {
       hide()
@@ -72,17 +72,19 @@ export function initTooltips() {
   })
 
   for (const element of elements) {
+    const isOnHover = element.classList.contains('OnHover')
     const title = element.getAttribute('title') ?? ''
     element.removeAttribute('title')
     element.setAttribute('tabindex', '0')
-
     let mouseEnteredAt = Date.now()
 
-    element.addEventListener('mouseenter', () => {
-      mouseEnteredAt = Date.now()
-      show(element, title)
-    })
-    element.addEventListener('mouseleave', hide)
+    if (isOnHover) {
+      element.addEventListener('mouseenter', () => {
+        mouseEnteredAt = Date.now()
+        show(element, title)
+      })
+      element.addEventListener('mouseleave', hide)
+    }
     element.addEventListener('focus', () => show(element, title))
     element.addEventListener('blur', hide)
 
@@ -90,7 +92,7 @@ export function initTooltips() {
       e.stopPropagation()
       if (activeElement === element) {
         // only hide if immediately preceded by mouse enter
-        if (Date.now() - mouseEnteredAt > 50) {
+        if (isOnHover && Date.now() - mouseEnteredAt > 50) {
           hide()
         }
       } else {

@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 
 export function Tooltip() {
@@ -19,11 +20,21 @@ export function Tooltip() {
 interface TooltipWrapperProps {
   children: React.ReactNode
   content: string
+  onlyOnClick?: boolean
+  className?: string
 }
 
-export function TooltipWrapper({ children, content }: TooltipWrapperProps) {
+export function TooltipWrapper({
+  children,
+  content,
+  className,
+  onlyOnClick,
+}: TooltipWrapperProps) {
   return (
-    <span className="Tooltip" title={content}>
+    <span
+      className={classNames('Tooltip', className, !onlyOnClick && 'OnHover')}
+      title={content}
+    >
       {children}
     </span>
   )
