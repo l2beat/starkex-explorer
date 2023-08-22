@@ -1883,7 +1883,7 @@ const routes: Route[] = [
   // #endregion
   // #region Tutorial
   {
-    path: '/tutorial/example',
+    path: '/tutorials/example',
     description: 'Tutorial page',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
