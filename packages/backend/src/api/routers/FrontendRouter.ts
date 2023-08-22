@@ -13,6 +13,7 @@ import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
+import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
 import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
 import { addSpotTradingRoutes } from './SpotFrontendRouter'
@@ -30,6 +31,7 @@ export function createFrontendRouter(
   searchController: SearchController,
   l2TransactionController: L2TransactionController,
   escapeHatchController: EscapeHatchController,
+  tutorialController: TutorialController,
   config: Config
 ) {
   const router = new Router()
@@ -471,6 +473,25 @@ export function createFrontendRouter(
       )
     )
   }
+
+  router.get(
+    '/tutorials/:slug',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          slug: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await tutorialController.getTutorialPage(
+          givenUser,
+          ctx.params.slug
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   if (config.starkex.tradingMode === 'perpetual') {
     if (!forcedTradeOfferController) {

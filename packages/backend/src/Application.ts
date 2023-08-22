@@ -13,6 +13,7 @@ import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
+import { TutorialController } from './api/controllers/TutorialController'
 import { UserController } from './api/controllers/UserController'
 import { frontendErrorMiddleware } from './api/middleware/frontendErrorMiddleware'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
@@ -679,6 +680,8 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
+    const tutorialController = new TutorialController(pageContextService)
+
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -693,6 +696,7 @@ export class Application {
           searchController,
           l2TransactionController,
           escapeHatchController,
+          tutorialController,
           config
         ),
         createTransactionRouter(
