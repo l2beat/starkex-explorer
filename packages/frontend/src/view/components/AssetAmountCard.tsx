@@ -25,7 +25,7 @@ export function AssetAmountCard({
     <div className="@container">
       <div
         className={cx(
-          'flex flex-col justify-between gap-3 rounded-lg bg-slate-800 p-4 @[300px]:flex-row',
+          'flex flex-col justify-between gap-3 rounded-lg bg-slate-800 p-4 @[300px]:flex-row sm:flex-row',
           className
         )}
       >
