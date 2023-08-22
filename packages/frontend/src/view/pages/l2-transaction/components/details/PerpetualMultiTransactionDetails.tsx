@@ -2,10 +2,11 @@ import { CollateralAsset, PerpetualL2TransactionData } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
 import { TransactionField } from '../../../transaction/components/TransactionField'
+import { l2TransactionTypeToText } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionsList } from '../L2TransactionsList'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export interface PerpetualMultiTransactionDetailsProps {
   transactionId: number
@@ -20,7 +21,10 @@ export function PerpetualMultiTransactionDetails(
   props: PerpetualMultiTransactionDetailsProps
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
+      <TransactionField label="Type">
+        {l2TransactionTypeToText(props.data.type)}
+      </TransactionField>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -33,6 +37,6 @@ export function PerpetualMultiTransactionDetails(
           altIndex={props.altIndex}
         />
       </TransactionField>
-    </Card>
+    </L2TransactionDetailsCard>
   )
 }

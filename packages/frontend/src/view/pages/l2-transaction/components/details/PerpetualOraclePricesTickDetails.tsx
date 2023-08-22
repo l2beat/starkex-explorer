@@ -3,7 +3,10 @@ import React from 'react'
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetPriceCard } from '../../../../components/AssetPriceCard'
 import { TransactionField } from '../../../transaction/components/TransactionField'
-import { PerpetualTransactionDetailsProps } from '../../common'
+import {
+  l2TransactionTypeToText,
+  PerpetualTransactionDetailsProps,
+} from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
@@ -12,6 +15,9 @@ export function PerpetualOraclePricesTickDetails(
 ) {
   return (
     <L2TransactionDetailsCard transactionId={props.transactionId}>
+      <TransactionField label="Type">
+        {l2TransactionTypeToText(props.data.type)}
+      </TransactionField>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -19,7 +25,7 @@ export function PerpetualOraclePricesTickDetails(
         {formatTimestamp(props.data.timestamp)}
       </TransactionField>
       <TransactionField label="Oracle prices">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid gap-6 sm:grid-cols-2">
           {props.data.oraclePrices.map((oraclePrice, index) => {
             return (
               <AssetPriceCard
