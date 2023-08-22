@@ -16,11 +16,11 @@ interface HomeOffersPageProps {
   total: number
 }
 
-export function renderHomeOffersPage(props: HomeOffersPageProps) {
-  return reactToHtml(<HomeOffersPage {...props} />)
+export function renderHomeAvailableOffersPage(props: HomeOffersPageProps) {
+  return reactToHtml(<HomeAvailableOffersPage {...props} />)
 }
 
-function HomeOffersPage(props: HomeOffersPageProps) {
+function HomeAvailableOffersPage(props: HomeOffersPageProps) {
   return (
     <Page
       path={OFFER_TABLE_PROPS.path}

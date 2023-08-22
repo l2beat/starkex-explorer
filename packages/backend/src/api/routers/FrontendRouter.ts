@@ -481,6 +481,7 @@ export function createFrontendRouter(
 
     addPerpetualTradingRoutes(
       router,
+      homeController,
       forcedTradeOfferController,
       forcedActionController,
       l2TransactionController,
