@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 export const tutorial = `<h1 id="an-h1-header"><a class="Heading-Title" href="#an-h1-header">An h1 header</a></h1>
 <p>Paragraphs are separated by a blank line.</p>
 <p>2nd paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists

@@ -17,6 +17,7 @@ export function getHtmlFromMarkdown(filePath: string) {
   $('h1, h2, h3, h4, h5, h6').each(function () {
     const $el = $(this)
     const html = renderHeading(
+      //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       parseInt(this.tagName[1]!),
       $el.html(),
       getId($el)
