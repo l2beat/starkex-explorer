@@ -17,8 +17,8 @@ import {
   renderErrorPage,
   renderFinalizeEscapeDetailsPage,
   renderFreezeRequestDetailsPage,
+  renderHomeAvailableOffersPage,
   renderHomeL2TransactionsPage,
-  renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
@@ -240,12 +240,13 @@ const routes: Route[] = [
   },
   {
     path: '/offers',
-    description: 'Offer list accessible from home page. Supports pagination.',
+    description:
+      'Available offer list accessible from home page. Supports pagination.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeOffersPage({
+      ctx.body = renderHomeAvailableOffersPage({
         context,
         offers: repeat(visible, randomHomeOfferEntry),
         limit,

@@ -1,4 +1,5 @@
 import {
+  renderHomeAvailableOffersPage,
   renderHomeL2TransactionsPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
@@ -240,6 +241,31 @@ export class HomeController {
       ...pagination,
     })
 
+    return { type: 'success', content }
+  }
+
+  async getHomeAvailableOffersPage(
+    givenUser: Partial<UserDetails>,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+    if (context.tradingMode === 'spot') {
+      throw new Error('Page unavailable in spot trading mode')
+    }
+
+    const [availableOffers, availableOffersCount] = await Promise.all([
+      this.forcedTradeOfferRepository.getAvailablePaginated(pagination),
+      this.forcedTradeOfferRepository.countAvailable(),
+    ])
+
+    const content = renderHomeAvailableOffersPage({
+      context,
+      offers: availableOffers.map((offer) =>
+        this.forcedTradeOfferViewService.toOfferEntry(offer)
+      ),
+      total: availableOffersCount,
+      ...pagination,
+    })
     return { type: 'success', content }
   }
 
