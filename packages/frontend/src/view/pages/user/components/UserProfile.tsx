@@ -3,6 +3,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Button } from '../../../components/Button'
+import { Card } from '../../../components/Card'
 import { InfoBanner } from '../../../components/InfoBanner'
 import { LongHash } from '../../../components/LongHash'
 
@@ -19,7 +20,7 @@ export function UserProfile({
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
   return (
-    <section className="flex  flex-col rounded-lg bg-gray-800 p-6">
+    <Card>
       <p className="text-sm font-semibold text-zinc-500">Stark key</p>
       <LongHash className="mt-3 font-semibold text-white" withCopy>
         {starkKey.toString()}
@@ -57,6 +58,6 @@ export function UserProfile({
           )}
         </>
       )}
-    </section>
+    </Card>
   )
 }
