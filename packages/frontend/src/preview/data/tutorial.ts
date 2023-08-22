@@ -1,121 +1,134 @@
 /* eslint-disable no-useless-escape */
-export const tutorial = `<h1 id="an-h1-header"><a class="Heading-Title" href="#an-h1-header">An h1 header</a></h1>
-<p>Paragraphs are separated by a blank line.</p>
-<p>2nd paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
-look like:</p>
-<ul>
-<li>this one</li>
-<li>that one</li>
-<li>the other one</li>
-</ul>
-<p>Note that --- not considering the asterisk --- the actual text
-content starts at 4-columns in.</p>
+export const tutorial = `<h1 id="h1-heading-8"><a class="Heading-Title" href="#h1-heading-8">h1 Heading</a></h1>
+<h2 id="h2-heading"><a class="Heading-Title" href="#h2-heading">h2 Heading</a></h2>
+<h3 id="h3-heading"><a class="Heading-Title" href="#h3-heading">h3 Heading</a></h3>
+<h4 id="h4-heading"><a class="Heading-Title" href="#h4-heading">h4 Heading</a></h4>
+<h5 id="h5-heading"><a class="Heading-Title" href="#h5-heading">h5 Heading</a></h5>
+<h6 id="h6-heading"><a class="Heading-Title" href="#h6-heading">h6 Heading</a></h6>
+<h2 id="horizontal-rules"><a class="Heading-Title" href="#horizontal-rules">Horizontal Rules</a></h2>
+<hr>
+<hr>
+<hr>
+<h2 id="emphasis"><a class="Heading-Title" href="#emphasis">Emphasis</a></h2>
+<p><strong>This is bold text</strong></p>
+<p><strong>This is bold text</strong></p>
+<p><em>This is italic text</em></p>
+<p><em>This is italic text</em></p>
+<p><s>Strikethrough</s></p>
+<h2 id="blockquotes"><a class="Heading-Title" href="#blockquotes">Blockquotes</a></h2>
 <blockquote>
-<p>Block quotes are
-written like so.</p>
-<p>They can span multiple paragraphs,
-if you like.</p>
+<p>Blockquotes can also be nested...</p>
+<blockquote>
+<p>...by using additional greater-than signs right next to each other...</p>
+<blockquote>
+<p>...or with spaces between arrows.</p>
 </blockquote>
-<p>Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
-in chapters 12--14"). Three dots ... will be converted to an ellipsis.
-Unicode is supported. ☺</p>
-<h2 id="an-h2-header"><a class="Heading-Title" href="#an-h2-header">An h2 header</a></h2>
-<p>Here's a numbered list:</p>
-<ol>
-<li>first item</li>
-<li>second item</li>
-<li>third item</li>
-</ol>
-<p>Note again how the actual text starts at 4 columns in (4 characters
-from the left side). Here's a code sample:</p>
-<pre><code># Let me re-iterate ...
-for i in 1 .. 10 { do-something(i) }
-</code></pre>
-<p>As you probably guessed, indented 4 spaces. By the way, instead of
-indenting the block, you can use delimited blocks, if you like:</p>
-<pre><code>define foobar() {
-    print "Welcome to flavor country!";
-}
-</code></pre>
-<p>(which makes copying &amp; pasting easier). You can optionally mark the
-delimited block for Pandoc to syntax highlight it:</p>
-<pre><code class="language-python">import time
-# Quick, count to ten!
-for i in range(10):
-    # (but not *too* quick)
-    time.sleep(0.5)
-    print(i)
-</code></pre>
-<h3 id="an-h3-header"><a class="Heading-Title" href="#an-h3-header">An h3 header</a></h3>
-<p>Now a nested list:</p>
-<ol>
-<li>
-<p>First, get these ingredients:</p>
+</blockquote>
+</blockquote>
+<h2 id="lists"><a class="Heading-Title" href="#lists">Lists</a></h2>
+<p>Unordered</p>
 <ul>
-<li>carrots</li>
-<li>celery</li>
-<li>lentils</li>
+<li>Create a list by starting a line with <code>+</code>, <code>-</code>, or <code>*</code></li>
+<li>Sub-lists are made by indenting 2 spaces:
+<ul>
+<li>Marker character change forces new list start:
+<ul>
+<li>Ac tristique libero volutpat at</li>
+</ul>
+<ul>
+<li>Facilisis in pretium nisl aliquet</li>
+</ul>
+<ul>
+<li>Nulla volutpat aliquam velit</li>
 </ul>
 </li>
+</ul>
+</li>
+<li>Very easy!</li>
+</ul>
+<p>Ordered</p>
+<ol>
 <li>
-<p>Boil some water.</p>
+<p>Lorem ipsum dolor sit amet</p>
 </li>
 <li>
-<p>Dump everything in the pot and follow
-this algorithm:</p>
-<pre><code>find wooden spoon
-uncover pot
-stir
-cover pot
-balance wooden spoon precariously on pot handle
-wait 10 minutes
-goto first step (or shut off burner when done)
-</code></pre>
-<p>Do not bump wooden spoon or it will fall.</p>
+<p>Consectetur adipiscing elit</p>
+</li>
+<li>
+<p>Integer molestie lorem at massa</p>
+</li>
+<li>
+<p>You can use sequential numbers...</p>
+</li>
+<li>
+<p>...or keep all the numbers as <code>1.</code></p>
 </li>
 </ol>
-<p>Notice again how text always lines up on 4-space indents (including
-that last line which continues item 3 above).</p>
-<p>Here's a link to <a href="http://foo.bar" rel="noopener noreferrer" target="_blank">a website</a>, to a <a href="local-doc.html" rel="noopener noreferrer" target="_blank">local
-doc</a>, and to a <a href="#an-h2-header" rel="noopener noreferrer" target="_blank">section heading in the current
-doc</a>. Here's a footnote [^1].</p>
-<p>[^1]: Some footnote text.</p>
-<p>Tables can look like this:</p>
-<p>Name Size Material Color</p>
-<hr>
-<p>All Business 9 leather brown
-Roundabout 10 hemp canvas natural
-Cinderella 11 glass transparent</p>
-<p>Table: Shoes sizes, materials, and colors.</p>
-<p>(The above is the caption for the table.) Pandoc also supports
-multi-line tables:</p>
-<hr>
-<p>Keyword Text</p>
-<hr>
-<p>red Sunsets, apples, and
-other red or reddish
-things.</p>
-<p>green Leaves, grass, frogs
-and other things it's
-not easy being.</p>
-<hr>
-<p>A horizontal rule follows.</p>
-<hr>
-<p>Here's a definition list:</p>
-<p>apples
-: Good for making applesauce.</p>
-<p>oranges
-: Citrus!</p>
-<p>tomatoes
-: There's no "e" in tomatoe.</p>
-<p>Again, text is indented 4 spaces. (Put a blank line between each
-term and its definition to spread things out more.)</p>
-<p>Here's a "line block" (note how whitespace is honored):</p>
-<p>| Line one
-| Line too
-| Line tree</p>
-<p>Inline math equation: $\omega = d\phi / dt$. Display
-math should get its own line like so:</p>
-<p>$$I = \int \rho R^{2} dV$$</p>
-<p>And note that you can backslash-escape any punctuation characters
-which you wish to be displayed literally, ex.: \`foo\`, *bar*, etc.</p>`
+<p>Start numbering with offset:</p>
+<ol start="57">
+<li>foo</li>
+<li>bar</li>
+</ol>
+<h2 id="code"><a class="Heading-Title" href="#code">Code</a></h2>
+<p>Inline <code>code</code></p>
+<p>Indented code</p>
+<pre><code>// Some comments
+line 1 of code
+line 2 of code
+line 3 of code
+</code></pre>
+<p>Block code "fences"</p>
+<pre><code>Sample text here...
+</code></pre>
+<h2 id="tables"><a class="Heading-Title" href="#tables">Tables</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td>path to data files to supply the data that will be passed into templates.</td>
+</tr>
+<tr>
+<td>engine</td>
+<td>engine to be used for processing templates. Handlebars is the default.</td>
+</tr>
+<tr>
+<td>ext</td>
+<td>extension to be used for dest files.</td>
+</tr>
+</tbody>
+</table>
+<p>Right aligned columns</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">Option</th>
+<th style="text-align:right">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">data</td>
+<td style="text-align:right">path to data files to supply the data that will be passed into templates.</td>
+</tr>
+<tr>
+<td style="text-align:right">engine</td>
+<td style="text-align:right">engine to be used for processing templates. Handlebars is the default.</td>
+</tr>
+<tr>
+<td style="text-align:right">ext</td>
+<td style="text-align:right">extension to be used for dest files.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="links"><a class="Heading-Title" href="#links">Links</a></h2>
+<p><a href="http://dev.nodeca.com" rel="noopener noreferrer" target="_blank">link text</a></p>
+<p><a href="http://nodeca.github.io/pica/demo/" title="title text!" rel="noopener noreferrer" target="_blank">link with title</a></p>
+<h2 id="images"><a class="Heading-Title" href="#images">Images</a></h2>
+<p><img src="https://octodex.github.com/images/minion.png" alt="Minion">
+`
