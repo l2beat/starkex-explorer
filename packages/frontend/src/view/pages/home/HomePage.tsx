@@ -20,6 +20,7 @@ import {
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
+import { HomeSpotlightArticle } from './components/HomeSpotlightArticle'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
@@ -73,12 +74,21 @@ function HomePage(props: HomePageProps) {
               showL2Transactions={props.context.showL2Transactions}
             />
             {tutorials.length > 0 && (
-              <HomeTutorials tutorials={tutorials} className="hidden xl:flex" />
+              <HomeTutorials
+                tutorials={tutorials.slice(1)}
+                className="hidden xl:flex"
+              />
             )}
           </div>
           <Tables {...props} />
           {tutorials.length > 0 && (
             <HomeTutorials tutorials={tutorials} className="xl:hidden" />
+          )}
+          {tutorials[0] && (
+            <HomeSpotlightArticle
+              spotlightArticle={tutorials[0]}
+              className="hidden xl:grid"
+            />
           )}
         </div>
       </ContentWrapper>
