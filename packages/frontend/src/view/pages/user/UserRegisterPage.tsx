@@ -46,24 +46,25 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           </div>
         </div>
         <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
-          <p className="text-sm font-semibold text-zinc-500">
+          <p className="mt-3 text-sm font-semibold text-zinc-500">Stark key</p>
+          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
+            {props.context.user.starkKey.toString()}
+          </InlineEllipsis>
+          <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
           <div className="mt-3 flex items-center justify-between">
             <InlineEllipsis className="max-w-[120px] font-semibold sm:max-w-full lg:max-w-[250px]">
               {props.context.user.address.toString()}
             </InlineEllipsis>
-            <Button
-              id={REGISTER_STARK_KEY_BUTTON_ID}
-              data-exchange-address={props.exchangeAddress.toString()}
-            >
-              Register
-            </Button>
           </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
-          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
-            {props.context.user.starkKey.toString()}
-          </InlineEllipsis>
+          <Button
+            className="mt-3 w-full"
+            id={REGISTER_STARK_KEY_BUTTON_ID}
+            data-exchange-address={props.exchangeAddress.toString()}
+          >
+            Register your Ethereum address
+          </Button>
         </Card>
       </ContentWrapper>
     </Page>

@@ -66,13 +66,6 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               <WarningIcon />
               <p className="ml-2 font-semibold text-amber-500">Unknown</p>
             </div>
-            <Button
-              id={RECOVER_STARK_KEY_BUTTON_ID}
-              data-instance-name={props.context.instanceName}
-              data-chain-id={props.context.chainId}
-            >
-              Recover
-            </Button>
           </div>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
@@ -80,6 +73,14 @@ function UserRecoverPage(props: UserRegisterPageProps) {
           <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[100%] lg:max-w-[95%] ">
             {props.context.user.address.toString()}
           </InlineEllipsis>
+          <Button
+            className="mt-3 w-full"
+            id={RECOVER_STARK_KEY_BUTTON_ID}
+            data-instance-name={props.context.instanceName}
+            data-chain-id={props.context.chainId}
+          >
+            Recover
+          </Button>
         </Card>
       </ContentWrapper>
     </Page>
