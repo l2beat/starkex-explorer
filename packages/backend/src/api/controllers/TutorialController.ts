@@ -13,7 +13,7 @@ export class TutorialController {
     slug: string
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const articleContent = getHtmlFromMarkdown(`src/tutorials/${slug}`)
+    const articleContent = getHtmlFromMarkdown(`src/tutorials/${slug}.md`)
     return {
       type: 'success',
       content: renderTutorialPage({
