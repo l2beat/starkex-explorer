@@ -97,7 +97,7 @@ function HomePage(props: HomePageProps) {
 }
 
 function Tables(props: HomePageProps) {
-  const tables = [
+  const secondColumnTables = [
     ...(props.context.showL2Transactions
       ? [
           <TablePreview
@@ -147,8 +147,10 @@ function Tables(props: HomePageProps) {
           />
         </TablePreview>
       </Card>
-      <Card className="hidden flex-col gap-[33px] xl:flex">{...tables}</Card>
-      {tables.map((table, i) => {
+      <Card className="hidden flex-col gap-[33px] xl:flex">
+        {...secondColumnTables}
+      </Card>
+      {secondColumnTables.map((table, i) => {
         return (
           <Card className="xl:hidden" key={i}>
             {table}
