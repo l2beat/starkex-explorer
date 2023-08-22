@@ -13,7 +13,16 @@ export class TutorialController {
     slug: string
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const articleContent = getHtmlFromMarkdown(`src/tutorials/${slug}.md`)
+    let articleContent: string
+    try {
+      articleContent = getHtmlFromMarkdown(`src/tutorials/${slug}.md`)
+    } catch {
+      return {
+        type: 'not found',
+        message: 'The tutorial you were looking for does not exist',
+      }
+    }
+
     return {
       type: 'success',
       content: renderTutorialPage({
