@@ -15,7 +15,8 @@ export class TutorialController {
     const context = await this.pageContextService.getPageContext(givenUser)
     let articleContent: string
     try {
-      articleContent = getHtmlFromMarkdown(`src/tutorials/${slug}.md`)
+      const path = this.getTutorialPath(slug)
+      articleContent = getHtmlFromMarkdown(path)
     } catch {
       return {
         type: 'not found',
@@ -31,5 +32,9 @@ export class TutorialController {
         slug,
       }),
     }
+  }
+
+  private getTutorialPath(slug: string): string {
+    return `src/content/tutorials/${slug}.md`
   }
 }
