@@ -9,7 +9,9 @@ export function initCopyButtons() {
     if (!copyContent) {
       return
     }
+    //eslint-disable-next-line @typescript-eslint/no-misused-promises
     copyButton.addEventListener('click', () => onClick(copyContent))
+    //eslint-enable-next-line @typescript-eslint/no-misused-promises
   }
 
   async function onClick(copyContent: string) {

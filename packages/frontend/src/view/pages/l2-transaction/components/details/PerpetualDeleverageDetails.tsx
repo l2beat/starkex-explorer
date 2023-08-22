@@ -6,8 +6,8 @@ import {
   TransactionYesOrNoField,
 } from '../../../transaction/components/TransactionField'
 import {
-  PerpetualTransactionDetailsProps,
   l2TransactionTypeToText,
+  PerpetualTransactionDetailsProps,
 } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
