@@ -7,6 +7,7 @@ import { EtherscanLink } from '../../../components/EtherscanLink'
 import { ExpandableContainer } from '../../../components/ExpandableContainer'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Link } from '../../../components/Link'
+import { LongHash } from '../../../components/LongHash'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
@@ -35,18 +36,18 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   // )
 
   return (
-    <section data-component="StateUpdateStats">
+    <section>
       <PageTitle>State Update #{props.id}</PageTitle>
       <ExpandableContainer
         visible={
-          <div className="flex justify-between gap-6">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row">
             <ValueItem label="Transaction hash">
               <EtherscanLink
                 chainId={props.context.chainId}
                 type="tx"
                 txHash={props.transactionHash.toString()}
               >
-                <InlineEllipsis className="max-w-[250px] lg:max-w-md">
+                <InlineEllipsis className="max-w-[280px] sm:max-w-[250px] lg:max-w-md">
                   {props.transactionHash.toString()}
                 </InlineEllipsis>
               </EtherscanLink>
@@ -60,22 +61,30 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
           <div className="mt-8 flex flex-col gap-4 rounded bg-slate-800 p-6">
             {props.hashes.positionTreeRoot && (
               <ValueItem label="Position tree root">
-                0x{props.hashes.positionTreeRoot.toString()}
+                <LongHash withCopy>
+                  0x{props.hashes.positionTreeRoot.toString()}
+                </LongHash>
               </ValueItem>
             )}
             {props.hashes.onChainVaultTreeRoot && (
               <ValueItem label="On-chain vault tree root">
-                0x{props.hashes.onChainVaultTreeRoot.toString()}
+                <LongHash withCopy>
+                  0x{props.hashes.onChainVaultTreeRoot.toString()}
+                </LongHash>
               </ValueItem>
             )}
             {props.hashes.offChainVaultTreeRoot && (
               <ValueItem label="Off-chain vault tree root">
-                0x{props.hashes.offChainVaultTreeRoot.toString()}
+                <LongHash withCopy>
+                  0x{props.hashes.offChainVaultTreeRoot.toString()}
+                </LongHash>
               </ValueItem>
             )}
             {props.hashes.orderRoot && (
               <ValueItem label="Order root">
-                0x{props.hashes.orderRoot.toString()}
+                <LongHash withCopy>
+                  0x{props.hashes.orderRoot.toString()}
+                </LongHash>
               </ValueItem>
             )}
             {props.rawDataAvailable && (

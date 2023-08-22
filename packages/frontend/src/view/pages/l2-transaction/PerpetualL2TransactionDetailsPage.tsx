@@ -1,4 +1,4 @@
-import { PageContext, PerpetualL2TransactionData } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { AlternativeTransactionIcon } from '../../assets/icons/AlternativeTransactionIcon'
@@ -47,15 +47,8 @@ export function PerpetualL2TransactionDetailsPage(
       <ContentWrapper className="flex flex-col">
         <div className="flex gap-3">
           <PageTitle>
-            {getPageTitle(
-              props.transaction.originalTransaction.type,
-              props.transaction.transactionId,
-              isMultiOrAlt
-            )}
+            {getPageTitle(props.transaction.transactionId, isMultiOrAlt)}
           </PageTitle>
-          <span className="h-min rounded-full bg-fuchsia-400 px-2.5 py-2 text-sm font-bold text-black">
-            L2 TRANSACTION
-          </span>
         </div>
         {(isMultiOrAlt || isReplaced) && (
           <div className="mb-6 flex flex-col gap-1">
@@ -107,12 +100,8 @@ export function PerpetualL2TransactionDetailsPage(
   )
 }
 
-function getPageTitle(
-  type: PerpetualL2TransactionData['type'],
-  transactionId: number,
-  isMultiOrAlt: boolean
-) {
-  const base = `${l2TransactionTypeToText(type)} transaction `
+function getPageTitle(transactionId: number, isMultiOrAlt: boolean) {
+  const base = 'Transaction'
 
   return isMultiOrAlt ? base : `${base} #${transactionId}`
 }

@@ -21,7 +21,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
   return (
     <section>
       <SectionHeading title={props.title} />
-      <div className="flex items-center justify-between gap-8 rounded-lg bg-gray-800 p-6 font-semibold">
+      <div className="flex flex-col justify-between gap-4 rounded-lg bg-gray-800 p-6 font-semibold sm:flex-row sm:items-center sm:gap-8">
         {props.vaultOrPositionId && (
           <TransactionField
             label={props.tradingMode === 'perpetual' ? 'Position' : 'Vault'}
@@ -31,7 +31,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
         )}
         <TransactionField label="Stark key">
           <Link href={`/users/${props.starkKey.toString()}`}>
-            <InlineEllipsis className="max-w-[300px]">
+            <InlineEllipsis className="max-w-[200px]">
               {props.starkKey.toString()}
             </InlineEllipsis>
           </Link>
@@ -43,7 +43,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
               type="address"
               address={props.ethereumAddress.toString()}
             >
-              <InlineEllipsis className="max-w-[300px]">
+              <InlineEllipsis className="max-w-[200px]">
                 {props.ethereumAddress.toString()}
               </InlineEllipsis>
             </EtherscanLink>

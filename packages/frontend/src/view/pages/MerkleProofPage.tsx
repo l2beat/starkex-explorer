@@ -3,6 +3,7 @@ import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
 import { Card } from '../components/Card'
+import { LongHash } from '../components/LongHash'
 import { OrderedList } from '../components/OrderedList'
 import { ContentWrapper } from '../components/page/ContentWrapper'
 import { Page } from '../components/page/Page'
@@ -34,6 +35,7 @@ function MerkleProofPage(props: MerkleProofPageProps) {
     null,
     2
   )
+
   return (
     <Page
       title="Merkle Proof"
@@ -58,13 +60,15 @@ function MerkleProofPage(props: MerkleProofPageProps) {
         <div>
           <span className="text-xl font-semibold">Root Hash</span>
           <Card className="mt-2">
-            <p>{props.merkleProof.rootHash}</p>
+            <LongHash>0x{props.merkleProof.rootHash.toString()}</LongHash>
           </Card>
         </div>
         <div>
           <span className="text-xl font-semibold">Leaf</span>
           <Card className="mt-2">
-            <pre>{formattedLeaf}</pre>
+            <span className="whitespace-pre-line break-words">
+              {formattedLeaf}
+            </span>
           </Card>
         </div>
         <div>
@@ -72,9 +76,9 @@ function MerkleProofPage(props: MerkleProofPageProps) {
           <Card className="mt-2 flex flex-col gap-2">
             <OrderedList
               items={props.merkleProof.path.map((path, index) => (
-                <div key={index}>
-                  <p>Left: {path.left}</p>
-                  <p>Right: {path.right}</p>
+                <div key={index} className="flex flex-col">
+                  <LongHash>Left: 0x{path.left.toString()}</LongHash>
+                  <LongHash>Right: 0x{path.right.toString()}</LongHash>
                 </div>
               ))}
             />

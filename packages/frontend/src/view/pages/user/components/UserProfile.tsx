@@ -3,7 +3,9 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Button } from '../../../components/Button'
+import { Card } from '../../../components/Card'
 import { InfoBanner } from '../../../components/InfoBanner'
+import { LongHash } from '../../../components/LongHash'
 
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
@@ -18,24 +20,32 @@ export function UserProfile({
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
   return (
-    <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
+    <Card>
       <p className="text-sm font-semibold text-zinc-500">Stark key</p>
-      <p className="mt-3 font-semibold text-white">{starkKey.toString()}</p>
+      <LongHash className="mt-3 font-semibold text-white" withCopy>
+        {starkKey.toString()}
+      </LongHash>
       <p className="mt-6 text-sm font-semibold text-zinc-500 ">
         Ethereum address
       </p>
       {ethereumAddress ? (
-        <p className="mt-3 font-semibold text-white ">
+        <LongHash className="mt-3 font-semibold text-white" withCopy>
           {ethereumAddress.toString()}
-        </p>
+        </LongHash>
       ) : (
         <>
-          <div className="mt-3 flex items-center justify-between">
-            <p className="font-semibold">
-              {user?.address && isMine ? user.address.toString() : 'Unknown'}
-            </p>
+          <div className="mt-3 md:flex md:items-center md:justify-between">
+            {user?.address && isMine ? (
+              <LongHash withCopy>{user.address.toString()}</LongHash>
+            ) : (
+              'Unknown'
+            )}
             {isMine && (
-              <Button as="a" href="/users/register">
+              <Button
+                as="a"
+                href="/users/register"
+                className="mt-3 block md:mt-0"
+              >
                 Register
               </Button>
             )}
@@ -48,6 +58,6 @@ export function UserProfile({
           )}
         </>
       )}
-    </section>
+    </Card>
   )
 }

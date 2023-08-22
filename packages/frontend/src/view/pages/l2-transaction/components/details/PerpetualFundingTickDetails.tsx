@@ -5,7 +5,10 @@ import { assetToInfo } from '../../../../../utils/assets'
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { TransactionField } from '../../../transaction/components/TransactionField'
-import { PerpetualTransactionDetailsProps } from '../../common'
+import {
+  l2TransactionTypeToText,
+  PerpetualTransactionDetailsProps,
+} from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
@@ -14,6 +17,9 @@ export function PerpetualFundingTickDetails(
 ) {
   return (
     <L2TransactionDetailsCard transactionId={props.transactionId}>
+      <TransactionField label="Type">
+        {l2TransactionTypeToText(props.data.type)}
+      </TransactionField>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -21,7 +27,7 @@ export function PerpetualFundingTickDetails(
         {formatTimestamp(props.data.globalFundingIndices.timestamp)}
       </TransactionField>
       <TransactionField label="Funding indices">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid gap-6 sm:grid-cols-2">
           {props.data.globalFundingIndices.indices.map((index, i) => {
             return (
               <FundingIndexCard

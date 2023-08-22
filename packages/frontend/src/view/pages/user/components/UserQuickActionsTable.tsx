@@ -6,6 +6,7 @@ import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
+import { Card } from '../../../components/Card'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
 import { FinalizeEscapeForm } from './FinalizeEscapeForm'
@@ -46,7 +47,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   }
 
   return (
-    <section className="flex w-full flex-col gap-6 rounded-lg border border-solid border-brand bg-gray-800 p-6">
+    <Card className="flex flex-col gap-6 border border-brand">
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
       {props.escapableAssets.length > 0 && <EscapableAssets {...props} />}
       {props.context.tradingMode === 'perpetual' &&
@@ -56,7 +57,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
             context={props.context}
           />
         )}
-    </section>
+    </Card>
   )
 }
 
@@ -72,13 +73,16 @@ function EscapableAssets(
       {props.escapableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
         return (
-          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+          <div
+            className="mt-4 flex items-center justify-between gap-2 md:justify-start"
+            key={assetInfo.symbol}
+          >
             <AssetWithLogo
               assetInfo={assetInfo}
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the escape of{' '}
               <strong className="text-white">
                 {formatAmount(asset.asset, asset.amount)}{' '}
@@ -130,13 +134,16 @@ function WithdrawableAssets(
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
         return (
-          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+          <div
+            className="mt-4 flex items-center justify-between gap-4 md:justify-start"
+            key={assetInfo.symbol}
+          >
             <AssetWithLogo
               assetInfo={assetInfo}
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the withdrawal of{' '}
               <strong className="text-white">
                 {formatAmount(asset.asset, asset.amount)}{' '}
@@ -178,7 +185,7 @@ function OffersToFinalize(
         const syntheticAssetInfo = assetToInfo(offer.syntheticAsset)
         return (
           <div
-            className="mt-3 flex items-center gap-2"
+            className="mt-3 flex items-center justify-between gap-4 md:justify-start"
             key={offer.timestamp.toString()}
           >
             <AssetWithLogo
@@ -186,7 +193,7 @@ function OffersToFinalize(
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the offer{' '}
               <strong className="text-white">
                 {formatAmount(offer.syntheticAsset, offer.syntheticAmount)}{' '}

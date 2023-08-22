@@ -5,7 +5,10 @@ import {
   TransactionField,
   TransactionYesOrNoField,
 } from '../../../transaction/components/TransactionField'
-import { PerpetualTransactionDetailsProps } from '../../common'
+import {
+  l2TransactionTypeToText,
+  PerpetualTransactionDetailsProps,
+} from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionDetailsCard } from './TransactionDetailsCard'
@@ -15,6 +18,9 @@ export function PerpetualDeleverageDetails(
 ) {
   return (
     <L2TransactionDetailsCard transactionId={props.transactionId}>
+      <TransactionField label="Type">
+        {l2TransactionTypeToText(props.data.type)}
+      </TransactionField>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -22,7 +28,10 @@ export function PerpetualDeleverageDetails(
         <TransactionField label="Deleverager position">
           #{props.data.deleveragerPositionId.toString()}
         </TransactionField>
-        <TransactionField label="Deleveraged position">
+        <TransactionField
+          label="Deleveraged position"
+          className="text-right md:text-left"
+        >
           #{props.data.deleveragedPositionId.toString()}
         </TransactionField>
       </div>
@@ -31,11 +40,11 @@ export function PerpetualDeleverageDetails(
         value={props.data.isDeleveragerBuyingSynthetic}
       />
       <AssetTradeCard
-        synthetic={{
+        left={{
           asset: { hashOrId: props.data.syntheticAssetId },
           amount: props.data.syntheticAmount,
         }}
-        collateral={{
+        right={{
           asset: { hashOrId: props.collateralAsset.assetId },
           amount: props.data.collateralAmount,
         }}

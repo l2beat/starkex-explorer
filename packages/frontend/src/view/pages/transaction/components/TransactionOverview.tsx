@@ -3,10 +3,11 @@ import React from 'react'
 
 import { Asset } from '../../../../utils/assets'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { AssetAmountCard } from '../../../components/AssetAmountCard'
 import { EtherscanLink } from '../../../components/EtherscanLink'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
+import { AssetTradeCard } from '../../l2-transaction/components/AssetTradeCard'
 import { TransactionField } from './TransactionField'
 
 interface TransactionOverviewProps {
@@ -38,7 +39,7 @@ export function TransactionOverview(props: TransactionOverviewProps) {
   )
   return (
     <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
-      <div className="flex">
+      <div className="flex flex-col gap-4 md:flex-row">
         <TransactionField label="Current status">
           <div className="flex items-center gap-2">
             <StatusBadge type={props.statusType}>
@@ -50,7 +51,7 @@ export function TransactionOverview(props: TransactionOverviewProps) {
         {props.timestamp && (
           <TransactionField
             label={props.timestamp.label}
-            className="text-right"
+            className="md:text-right"
           >
             {formatTimestamp(props.timestamp.timestamp)} UTC{' '}
             <span className="text-zinc-500">
@@ -66,33 +67,34 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             txHash={props.transactionHash.toString()}
             type="tx"
           >
-            {props.transactionHash.toString()}
+            <InlineEllipsis className="max-w-[200px] sm:max-w-[500px] md:max-w-[100%]">
+              {props.transactionHash.toString()}
+            </InlineEllipsis>
           </EtherscanLink>
         </TransactionField>
       )}
       {props.value && (
         <AssetAmountCard
-          className="w-1/2"
+          className="sm:w-1/2"
           amount={props.value.amount}
           asset={props.value.asset}
         />
       )}
       {props.trade && (
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <AssetAmountCard
-            amountLabel="Offered amount"
-            amount={props.trade.offeredAmount}
-            assetLabel="Offered asset"
-            asset={props.trade.offeredAsset}
-          />
-          <ArrowRightIcon className="rounded bg-slate-800 text-zinc-500" />
-          <AssetAmountCard
-            amountLabel="Received amount"
-            amount={props.trade.receivedAmount}
-            assetLabel="Received asset"
-            asset={props.trade.receivedAsset}
-          />
-        </div>
+        <AssetTradeCard
+          left={{
+            asset: props.trade.offeredAsset,
+            amount: props.trade.offeredAmount,
+            amountLabel: 'Offered amount',
+            assetLabel: 'Offered asset',
+          }}
+          right={{
+            asset: props.trade.receivedAsset,
+            amount: props.trade.receivedAmount,
+            amountLabel: 'Received amount',
+            assetLabel: 'Received asset',
+          }}
+        />
       )}
     </div>
   )

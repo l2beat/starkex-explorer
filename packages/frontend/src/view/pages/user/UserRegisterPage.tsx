@@ -23,12 +23,15 @@ function UserRegisterPage(props: UserRegisterPageProps) {
       description="Register your stark key to your ethereum address"
       path="/users/register"
     >
-      <ContentWrapper className="flex gap-12">
-        <div className="flex-1">
-          <div className="text-xxl font-semibold">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
+        <div className="text-xxl font-semibold lg:hidden">
+          Register your Ethereum address
+        </div>
+        <div>
+          <div className="hidden text-xxl font-semibold lg:block">
             Register your Ethereum address
           </div>
-          <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
+          <div className="flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500 lg:mt-6">
             <span>
               Our system doesn't recognize any Ethereum address registered to
               your Stark key.
@@ -42,25 +45,26 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </span>
           </div>
         </div>
-        <Card className="h-min max-w-lg flex-1">
-          <p className="text-sm font-semibold text-zinc-500">
+        <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
+          <p className="mt-3 text-sm font-semibold text-zinc-500">Stark key</p>
+          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
+            {props.context.user.starkKey.toString()}
+          </InlineEllipsis>
+          <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <InlineEllipsis className="max-w-[200px] font-semibold">
+            <InlineEllipsis className="max-w-[120px] font-semibold sm:max-w-full lg:max-w-[250px]">
               {props.context.user.address.toString()}
             </InlineEllipsis>
-            <Button
-              id={REGISTER_STARK_KEY_BUTTON_ID}
-              data-exchange-address={props.exchangeAddress.toString()}
-            >
-              Register
-            </Button>
           </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
-          <InlineEllipsis className="mt-1 max-w-[450px] font-semibold text-white">
-            {props.context.user.starkKey.toString()}
-          </InlineEllipsis>
+          <Button
+            className="mt-3 w-full"
+            id={REGISTER_STARK_KEY_BUTTON_ID}
+            data-exchange-address={props.exchangeAddress.toString()}
+          >
+            Register your Ethereum address
+          </Button>
         </Card>
       </ContentWrapper>
     </Page>

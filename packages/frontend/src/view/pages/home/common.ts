@@ -6,7 +6,7 @@ export const STATE_UPDATE_TABLE_PROPS = {
 }
 
 export const L2_TRANSACTIONS_TABLE_PROPS = {
-  title: 'Live transactions',
+  title: 'Transactions',
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'transactions',
   path: '/l2-transactions',

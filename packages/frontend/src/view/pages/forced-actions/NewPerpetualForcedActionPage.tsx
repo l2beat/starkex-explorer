@@ -3,6 +3,7 @@ import React from 'react'
 
 import { Card } from '../../components/Card'
 import { OrderedList } from '../../components/OrderedList'
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 import { getForcedActionInstructionsParams } from './components/common'
@@ -38,51 +39,49 @@ function NewPerpetualForcedActionPage(
       description="Perform forced actions on your assets"
       context={context}
     >
-      <main className="mx-auto flex-1 p-16">
-        <div className="my-auto flex gap-12">
-          <div className="mt-6 flex max-w-md flex-col">
-            <span className="text-xl font-semibold">
-              {instructionParams.header}
-            </span>
-            <span className="mt-3 text-sm font-semibold text-zinc-500">
-              <strong>
-                The cost of this process is very high, and so should only be
-                used in an emergency.
-              </strong>{' '}
-              For regular usage, you should perform the equivalent standard
-              operation through the exchange.
-            </span>
-            <span className="mt-6 text-sm font-semibold text-zinc-500">
-              {instructionParams.description}
-            </span>
-            <OrderedList items={instructionParams.items} className="mt-3" />
-          </div>
-          <Card className="h-min w-[480px]">
-            <form
-              id={FormId.Form}
-              className="flex flex-col gap-6"
-              data-props={propsJson}
-              data-user={userJson}
-              data-collateral-asset={collateralAssetJson}
-            >
-              {isWithdrawal ? (
-                <NewPerpetualForcedWithdrawalFormContent
-                  positionOrVaultId={props.positionOrVaultId}
-                  asset={props.asset}
-                  starkKey={props.starkKey}
-                />
-              ) : (
-                <NewPerpetualForcedTradeFormContent
-                  positionOrVaultId={props.positionOrVaultId}
-                  asset={props.asset}
-                  starkKey={props.starkKey}
-                  collateralAsset={props.context.collateralAsset}
-                />
-              )}
-            </form>
-          </Card>
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
+        <div className="flex flex-col lg:mt-6">
+          <span className="hidden text-xl font-semibold lg:inline">
+            {instructionParams.header}
+          </span>
+          <span className="text-sm font-semibold text-zinc-500 lg:mt-3">
+            <strong>
+              The cost of this process is very high, and so should only be used
+              in an emergency.
+            </strong>{' '}
+            For regular usage, you should perform the equivalent standard
+            operation through the exchange.
+          </span>
+          <span className="mt-6 text-sm font-semibold text-zinc-500">
+            {instructionParams.description}
+          </span>
+          <OrderedList items={instructionParams.items} className="mt-3" />
         </div>
-      </main>
+        <Card className="row-start-1 h-min lg:col-start-2">
+          <form
+            id={FormId.Form}
+            className="flex flex-col gap-6"
+            data-props={propsJson}
+            data-user={userJson}
+            data-collateral-asset={collateralAssetJson}
+          >
+            {isWithdrawal ? (
+              <NewPerpetualForcedWithdrawalFormContent
+                positionOrVaultId={props.positionOrVaultId}
+                asset={props.asset}
+                starkKey={props.starkKey}
+              />
+            ) : (
+              <NewPerpetualForcedTradeFormContent
+                positionOrVaultId={props.positionOrVaultId}
+                asset={props.asset}
+                starkKey={props.starkKey}
+                collateralAsset={props.context.collateralAsset}
+              />
+            )}
+          </form>
+        </Card>
+      </ContentWrapper>
     </Page>
   )
 }

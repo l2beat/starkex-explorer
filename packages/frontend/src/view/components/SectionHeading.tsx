@@ -1,4 +1,4 @@
-import { default as classNames, default as cx } from 'classnames'
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 interface SectionHeadingProps {
@@ -17,7 +17,7 @@ export function SectionHeading(props: SectionHeadingProps) {
       )}
     >
       <h2
-        className={cx(
+        className={classNames(
           'text-xl font-semibold leading-tight',
           props.children && 'flex-1'
         )}

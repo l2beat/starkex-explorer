@@ -23,10 +23,16 @@ function UserRecoverPage(props: UserRegisterPageProps) {
       description="Recover your stark key from your ethereum address"
       path="/users/recover"
     >
-      <ContentWrapper className="flex gap-12">
-        <div className="flex-1">
-          <div className="text-xxl font-semibold">Recover Stark key</div>
-          <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
+        <div className="text-xxl font-semibold lg:hidden">
+          Recover Stark key
+        </div>
+
+        <div>
+          <div className="hidden text-xxl font-semibold lg:block">
+            Recover Stark key
+          </div>
+          <div className="flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500 lg:mt-6">
             <span>
               Our system doesn't recognize any Stark key associated with your
               Ethereum address.
@@ -53,27 +59,28 @@ function UserRecoverPage(props: UserRegisterPageProps) {
             </span>
           </div>
         </div>
-        <Card className="h-min max-w-lg flex-1">
+        <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
           <p className="text-sm font-semibold text-zinc-500">Stark key</p>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
               <p className="ml-2 font-semibold text-amber-500">Unknown</p>
             </div>
-            <Button
-              id={RECOVER_STARK_KEY_BUTTON_ID}
-              data-instance-name={props.context.instanceName}
-              data-chain-id={props.context.chainId}
-            >
-              Recover
-            </Button>
           </div>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
-          <InlineEllipsis className="mt-1 w-full max-w-[99%] font-semibold text-white ">
+          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[100%] lg:max-w-[95%] ">
             {props.context.user.address.toString()}
           </InlineEllipsis>
+          <Button
+            className="mt-3 w-full"
+            id={RECOVER_STARK_KEY_BUTTON_ID}
+            data-instance-name={props.context.instanceName}
+            data-chain-id={props.context.chainId}
+          >
+            Recover
+          </Button>
         </Card>
       </ContentWrapper>
     </Page>

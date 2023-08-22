@@ -37,7 +37,7 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
           </span>
         </div>
         <Card>
-          <pre className="whitespace-pre-wrap">
+          <pre className="whitespace-pre-wrap break-words">
             {toJsonWithoutBigInts(props.transaction, 2)}
           </pre>
         </Card>
