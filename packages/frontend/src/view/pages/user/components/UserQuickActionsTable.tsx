@@ -73,13 +73,16 @@ function EscapableAssets(
       {props.escapableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
         return (
-          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+          <div
+            className="mt-4 flex items-center justify-between gap-2 md:justify-start"
+            key={assetInfo.symbol}
+          >
             <AssetWithLogo
               assetInfo={assetInfo}
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the escape of{' '}
               <strong className="text-white">
                 {formatAmount(asset.asset, asset.amount)}{' '}
@@ -131,13 +134,16 @@ function WithdrawableAssets(
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
         return (
-          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+          <div
+            className="mt-4 flex items-center justify-between gap-4 md:justify-start"
+            key={assetInfo.symbol}
+          >
             <AssetWithLogo
               assetInfo={assetInfo}
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the withdrawal of{' '}
               <strong className="text-white">
                 {formatAmount(asset.asset, asset.amount)}{' '}
@@ -179,7 +185,7 @@ function OffersToFinalize(
         const syntheticAssetInfo = assetToInfo(offer.syntheticAsset)
         return (
           <div
-            className="mt-3 flex items-center gap-2"
+            className="mt-3 flex items-center justify-between gap-4 md:justify-start"
             key={offer.timestamp.toString()}
           >
             <AssetWithLogo
@@ -187,7 +193,7 @@ function OffersToFinalize(
               type="symbol"
               className="w-48"
             />
-            <p className="flex-1 text-zinc-500">
+            <p className="hidden flex-1 text-zinc-500 md:block">
               Finalize the offer{' '}
               <strong className="text-white">
                 {formatAmount(offer.syntheticAsset, offer.syntheticAmount)}{' '}
