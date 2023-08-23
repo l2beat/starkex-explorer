@@ -94,6 +94,7 @@ function UserPage(props: UserPageProps) {
             <UserProfile
               user={props.context.user}
               starkKey={props.starkKey}
+              chainId={props.context.chainId}
               ethereumAddress={props.ethereumAddress}
             />
             {isMine && (

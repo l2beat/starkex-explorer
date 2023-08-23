@@ -6,6 +6,7 @@ import { Link } from './Link'
 type EtherscanLinkProps = {
   chainId: number
   children: React.ReactNode
+  className?: string
 } & (
   | {
       address: string
@@ -24,7 +25,11 @@ type EtherscanLinkProps = {
 export function EtherscanLink(props: EtherscanLinkProps) {
   const link = getLink(props.chainId)
   const value = getValue(props)
-  return <Link href={`${link}/${props.type}/${value}`}>{props.children}</Link>
+  return (
+    <Link href={`${link}/${props.type}/${value}`} className={props.className}>
+      {props.children}
+    </Link>
+  )
 }
 
 function getLink(chainId: number): `https://${string}` {

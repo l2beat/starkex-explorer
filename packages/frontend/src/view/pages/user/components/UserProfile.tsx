@@ -4,18 +4,21 @@ import React from 'react'
 
 import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
+import { EtherscanLink } from '../../../components/EtherscanLink'
 import { InfoBanner } from '../../../components/InfoBanner'
 import { LongHash } from '../../../components/LongHash'
 
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
   starkKey: StarkKey
+  chainId: number
   ethereumAddress?: EthereumAddress
 }
 
 export function UserProfile({
   user,
   starkKey,
+  chainId,
   ethereumAddress,
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
@@ -29,9 +32,14 @@ export function UserProfile({
         Ethereum address
       </p>
       {ethereumAddress ? (
-        <LongHash className="mt-3 font-semibold text-white" withCopy>
+        <EtherscanLink
+          chainId={chainId}
+          type="address"
+          address={ethereumAddress.toString()}
+          className="break-all font-semibold"
+        >
           {ethereumAddress.toString()}
-        </LongHash>
+        </EtherscanLink>
       ) : (
         <>
           <div className="mt-3 md:flex md:items-center md:justify-between">
