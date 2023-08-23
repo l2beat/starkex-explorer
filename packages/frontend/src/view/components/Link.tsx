@@ -21,14 +21,16 @@ export function Link({
   const rel = isOutLink ? 'noreferrer noopener' : undefined
   const hasHref = href != null
   const classNames = cx(
-    'group inline-flex items-center justify-center gap-2 text-blue-500 fill-blue-500 hover:fill-blue-600 hover:text-blue-600 underline underline-offset-[3.5px] transition-colors',
+    'group inline mx-auto my-auto text-blue-500 fill-blue-500 hover:fill-blue-600 hover:text-blue-600 underline underline-offset-[3.5px] transition-colors',
     className
   )
   return hasHref ? (
     <a href={href} className={classNames} target={target} rel={rel} {...rest}>
       {accessoryLeft}
       {children}
-      {isOutLink && <OutLinkIcon className="group-hover:stroke-blue-600" />}
+      {isOutLink && (
+        <OutLinkIcon className="ml-2 inline group-hover:stroke-blue-600" />
+      )}
       {accessoryRight}
     </a>
   ) : (
