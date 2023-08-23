@@ -15,6 +15,7 @@ export function initCopyButtons() {
   }
 
   async function onClick(copyContent: string) {
+    // This does not work on non HTTPS sites
     await navigator.clipboard.writeText(copyContent)
   }
 }
