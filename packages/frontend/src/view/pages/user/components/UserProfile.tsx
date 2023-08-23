@@ -6,6 +6,7 @@ import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
 import { EtherscanLink } from '../../../components/EtherscanLink'
 import { InfoBanner } from '../../../components/InfoBanner'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { LongHash } from '../../../components/LongHash'
 
 interface UserProfileProps {
@@ -38,13 +39,24 @@ export function UserProfile({
           address={ethereumAddress.toString()}
           className="break-all font-semibold"
         >
-          {ethereumAddress.toString()}
+          <InlineEllipsis className="max-w-[250px] sm:max-w-full">
+            {ethereumAddress.toString()}
+          </InlineEllipsis>
         </EtherscanLink>
       ) : (
         <>
           <div className="mt-3 md:flex md:items-center md:justify-between">
             {user?.address && isMine ? (
-              <LongHash withCopy>{user.address.toString()}</LongHash>
+              <EtherscanLink
+                chainId={chainId}
+                type="address"
+                address={user.address.toString()}
+                className="break-all font-semibold"
+              >
+                <InlineEllipsis className="max-w-[250px] sm:max-w-full">
+                  {user.address.toString()}
+                </InlineEllipsis>
+              </EtherscanLink>
             ) : (
               'Unknown'
             )}

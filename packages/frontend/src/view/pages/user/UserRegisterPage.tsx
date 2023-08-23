@@ -4,6 +4,7 @@ import React from 'react'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { EtherscanLink } from '../../components/EtherscanLink'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -53,11 +54,16 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
-          <div className="mt-3 flex items-center justify-between">
-            <InlineEllipsis className="max-w-[120px] font-semibold sm:max-w-full lg:max-w-[250px]">
+          <EtherscanLink
+            chainId={props.context.chainId}
+            type="address"
+            address={props.context.user.address.toString()}
+            className="mt-1"
+          >
+            <InlineEllipsis className="max-w-[250px] font-semibold sm:max-w-full lg:max-w-[250px]">
               {props.context.user.address.toString()}
             </InlineEllipsis>
-          </div>
+          </EtherscanLink>
           <Button
             className="mt-3 w-full"
             id={REGISTER_STARK_KEY_BUTTON_ID}

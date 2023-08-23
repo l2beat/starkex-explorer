@@ -4,6 +4,7 @@ import React from 'react'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { EtherscanLink } from '../../components/EtherscanLink'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { Link } from '../../components/Link'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -61,7 +62,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
         </div>
         <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
           <p className="text-sm font-semibold text-zinc-500">Stark key</p>
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-1 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
               <p className="ml-2 font-semibold text-amber-500">Unknown</p>
@@ -70,9 +71,17 @@ function UserRecoverPage(props: UserRegisterPageProps) {
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
-          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[100%] lg:max-w-[95%] ">
-            {props.context.user.address.toString()}
-          </InlineEllipsis>
+          <EtherscanLink
+            chainId={props.context.chainId}
+            type="address"
+            address={props.context.user.address.toString()}
+            className="mt-1"
+          >
+            <InlineEllipsis className="w-full max-w-[250px] font-semibold sm:max-w-[100%] lg:max-w-[350px] ">
+              {props.context.user.address.toString()}
+            </InlineEllipsis>
+          </EtherscanLink>
+
           <Button
             className="mt-3 w-full"
             id={RECOVER_STARK_KEY_BUTTON_ID}
