@@ -33,6 +33,7 @@ import {
   renderStateUpdateBalanceChangesPage,
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
+  renderTutorialPage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserOffersPage,
@@ -84,6 +85,7 @@ import {
   randomRecipient,
   userParty,
 } from './data/transactions'
+import { tutorial } from './data/tutorial'
 import {
   randomEscapableEntry,
   randomUserAssetEntry,
@@ -1874,6 +1876,21 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
+  // #region Tutorial
+  {
+    path: '/tutorials/example',
+    description: 'Tutorial page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderTutorialPage({
+        context,
+        articleContent: tutorial,
+        slug: 'example',
       })
     },
     breakAfter: true,

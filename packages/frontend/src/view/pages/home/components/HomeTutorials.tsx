@@ -9,17 +9,17 @@ export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
   {
     title: 'Learn how to use StarkEx Explorer efficiently',
     imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/features',
+    href: '/tutorials/example',
   },
   {
     title: 'All about forced transactions',
     imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/forced-transactions',
+    href: '/tutorials/example',
   },
   {
     title: 'Stark key registration',
     imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/registration',
+    href: '/tutorials/example',
   },
 ]
 

@@ -82,5 +82,8 @@ module.exports = {
       'brand-darker': '#4F4CD7',
     },
   },
-  plugins: [require('@tailwindcss/container-queries')],
+  plugins: [
+    require('@tailwindcss/container-queries'),
+    require('@tailwindcss/typography'),
+  ],
 }
