@@ -68,7 +68,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               <p className="ml-2 font-semibold text-amber-500">Unknown</p>
             </div>
           </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">
+          <p className="mt-3 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
           <EtherscanLink
@@ -83,7 +83,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
           </EtherscanLink>
 
           <Button
-            className="mt-3 w-full"
+            className="mt-6 w-full"
             id={RECOVER_STARK_KEY_BUTTON_ID}
             data-instance-name={props.context.instanceName}
             data-chain-id={props.context.chainId}

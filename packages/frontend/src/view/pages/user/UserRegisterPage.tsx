@@ -51,7 +51,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
             {props.context.user.starkKey.toString()}
           </InlineEllipsis>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">
+          <p className="mt-3 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
           <EtherscanLink
@@ -65,9 +65,10 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </InlineEllipsis>
           </EtherscanLink>
           <Button
-            className="mt-3 w-full"
+            className="mt-6 w-full"
             id={REGISTER_STARK_KEY_BUTTON_ID}
             data-exchange-address={props.exchangeAddress.toString()}
+            size="lg"
           >
             Register your Ethereum address
           </Button>

@@ -105,10 +105,13 @@ function NewSpotForcedWithdrawalPage(props: Props) {
               </ForcedActionCard>
             </div>
             <div className="flex flex-col gap-2">
-              <Button className="w-full">Prepare for withdrawal</Button>
+              <Button className="w-full" size="lg">
+                Prepare for withdrawal
+              </Button>
               <Button
                 as="a"
                 className="w-full"
+                size="lg"
                 variant="outlined"
                 href={`/users/${props.starkKey.toString()}`}
               >

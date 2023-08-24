@@ -78,7 +78,8 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                       entry,
                       isUserRegistered
                     )}
-                    className="block"
+                    className="w-32"
+                    size="sm"
                     disabled={isDisabled}
                   >
                     {getActionButtonLabel(entry.action)}

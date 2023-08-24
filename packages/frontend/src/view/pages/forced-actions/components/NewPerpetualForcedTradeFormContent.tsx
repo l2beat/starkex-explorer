@@ -52,12 +52,13 @@ export function NewPerpetualForcedTradeFormContent(
         </ForcedActionCard>
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" id={FormId.SubmitButton}>
+        <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Create {label} offer
         </Button>
         <Button
           as="a"
           className="w-full"
+          size="lg"
           variant="outlined"
           href={`/users/${props.starkKey.toString()}`}
         >

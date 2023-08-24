@@ -159,7 +159,9 @@ function WithdrawableAssets(
                 starkKey={props.starkKey}
                 exchangeAddress={props.exchangeAddress}
               >
-                <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
+                <Button className="ml-auto w-32 !px-0" size="sm">
+                  Withdraw now
+                </Button>
               </RegularWithdrawalForm>
             )}
           </div>
@@ -216,6 +218,7 @@ function OffersToFinalize(
               as="a"
               href={`/offers/${offer.id}`}
               className="ml-auto w-32 !px-0"
+              size="sm"
             >
               Go to offer
             </Button>

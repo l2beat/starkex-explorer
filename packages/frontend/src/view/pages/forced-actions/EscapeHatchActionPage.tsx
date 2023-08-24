@@ -106,7 +106,9 @@ function EscapeHatchActionPage(props: Props) {
                 </span>
               </span>
             </div>
-            <Button className="w-full">Initiate Escape</Button>
+            <Button className="w-full" size="lg">
+              Initiate Escape
+            </Button>
           </form>
         </Card>
       </ContentWrapper>
