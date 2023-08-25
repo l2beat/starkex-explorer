@@ -1,8 +1,6 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { Card } from '../../components/Card'
-import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
@@ -23,14 +21,10 @@ export function TutorialPage(props: TutorialPageProps) {
       description={`Tutorial explaining ${props.slug}`}
       path={`/tutorials/${props.slug}`}
     >
-      <ContentWrapper>
-        <Card>
-          <article
-            className="prose prose-invert mx-auto lg:prose-xl"
-            dangerouslySetInnerHTML={{ __html: props.articleContent }}
-          ></article>
-        </Card>
-      </ContentWrapper>
+      <article
+        className="prose prose-invert mx-auto mt-16 lg:prose-xl prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-a:prose-headings:text-white prose-a:prose-headings:no-underline hover:prose-a:prose-headings:text-white prose-blockquote:border-slate-800 prose-pre:bg-slate-800 prose-hr:border-slate-800"
+        dangerouslySetInnerHTML={{ __html: props.articleContent }}
+      ></article>
     </Page>
   )
 }

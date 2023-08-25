@@ -69,11 +69,11 @@ function EscapeHatchActionPage(props: Props) {
           <div className="hidden text-xxl font-semibold lg:block">
             Escape your funds
           </div>
-          <span className="text-sm font-semibold text-zinc-500 lg:mt-3">
+          <span className="text-md font-medium text-zinc-500 lg:mt-3">
             The exchange is frozen, preventing it from executing regular
             operations or supporting standard actions.
           </span>
-          <span className="text-sm font-semibold text-zinc-500">
+          <span className="text-md font-medium text-zinc-500">
             You have the option to request a withdrawal of the entire value of
             any position by activating an 'escape hatch.' This process involves
             interacting with an Ethereum contract, which calculates the total
@@ -81,7 +81,7 @@ function EscapeHatchActionPage(props: Props) {
           </span>
           <span>The escape process consists of three steps:</span>
           <OrderedList items={steps} />
-          <span className="text-sm font-semibold text-zinc-500">
+          <span className="text-md font-medium text-zinc-500">
             Please note, the execution of an Escape can be expensive due to
             Ethereum gas cost.
           </span>
@@ -106,7 +106,9 @@ function EscapeHatchActionPage(props: Props) {
                 </span>
               </span>
             </div>
-            <Button className="w-full">Initiate Escape</Button>
+            <Button className="w-full" size="lg">
+              Initiate Escape
+            </Button>
           </form>
         </Card>
       </ContentWrapper>

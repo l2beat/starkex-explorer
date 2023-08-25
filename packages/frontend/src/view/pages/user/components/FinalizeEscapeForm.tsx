@@ -54,7 +54,9 @@ export function FinalizeEscapeForm(props: Props) {
       data-props={formPropsJson}
       data-user={userJson}
     >
-      <Button className="ml-auto w-32 !px-0">Finalize escape</Button>
+      <Button className="ml-auto w-32 !px-0" size="sm">
+        Finalize escape
+      </Button>
     </form>
   )
 }

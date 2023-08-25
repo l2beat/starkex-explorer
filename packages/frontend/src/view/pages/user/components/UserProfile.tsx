@@ -25,11 +25,11 @@ export function UserProfile({
   const isMine = user?.starkKey === starkKey
   return (
     <Card>
-      <p className="text-sm font-semibold text-zinc-500">Stark key</p>
+      <p className="mb-1.5 text-sm font-semibold text-zinc-500">Stark key</p>
       <LongHash className="mt-3 font-semibold text-white" withCopy>
         {starkKey.toString()}
       </LongHash>
-      <p className="mt-6 text-sm font-semibold text-zinc-500 ">
+      <p className="mb-1.5 mt-6 text-sm font-semibold text-zinc-500 ">
         Ethereum address
       </p>
       {ethereumAddress ? (
@@ -45,7 +45,7 @@ export function UserProfile({
         </EtherscanLink>
       ) : (
         <>
-          <div className="mt-3 md:flex md:items-center md:justify-between">
+          <div className="md:flex md:items-center md:justify-between">
             {user?.address && isMine ? (
               <EtherscanLink
                 chainId={chainId}
@@ -65,6 +65,7 @@ export function UserProfile({
                 as="a"
                 href="/users/register"
                 className="mt-3 block md:mt-0"
+                size="sm"
               >
                 Register
               </Button>

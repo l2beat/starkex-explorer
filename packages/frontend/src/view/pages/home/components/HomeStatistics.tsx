@@ -95,5 +95,5 @@ function formatStatisticsCount(count: number) {
     return count.toString()
   }
 
-  return `${(count / 1000000).toFixed(2).replace('.', ',')}M`
+  return `${(count / 1000000).toFixed(2)}M`
 }

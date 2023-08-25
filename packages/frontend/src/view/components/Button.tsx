@@ -3,6 +3,7 @@ import React, { ComponentPropsWithoutRef, ElementType } from 'react'
 
 type ButtonProps<T extends ElementType> = {
   variant?: ButtonVariant
+  size?: ButtonSize
   className?: string
   as?: T
 } & ComponentPropsWithoutRef<T> &
@@ -10,17 +11,23 @@ type ButtonProps<T extends ElementType> = {
   (T extends 'a' ? { disabled?: boolean } : {})
 
 type ButtonVariant = 'contained' | 'outlined'
-const mainClassNames =
-  'py-2.5 text-sm text-center font-semibold disabled:cursor-not-allowed px-8 rounded transition-colors'
-const classNameMap: Record<ButtonVariant, string> = {
+const variantClassNames: Record<ButtonVariant, string> = {
   contained:
     'bg-brand hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
   outlined:
     'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
 }
 
+type ButtonSize = 'sm' | 'md' | 'lg'
+const sizeClassNames: Record<ButtonSize, string> = {
+  sm: 'h-8 text-sm rounded',
+  md: 'h-10 text-md rounded-lg',
+  lg: 'h-12 text-md rounded-lg',
+}
+
 export function Button<T extends ElementType = 'button'>({
   variant = 'contained',
+  size = 'md',
   className,
   children,
   as,
@@ -29,7 +36,12 @@ export function Button<T extends ElementType = 'button'>({
   const Comp = as ?? 'button'
   return (
     <Comp
-      className={cx(mainClassNames, classNameMap[variant], className)}
+      className={cx(
+        'flex items-center justify-center px-8 py-2.5 font-semibold transition-colors disabled:cursor-not-allowed',
+        variantClassNames[variant],
+        sizeClassNames[size],
+        className
+      )}
       {...rest}
     >
       {children}

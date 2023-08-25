@@ -41,7 +41,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
       </SectionHeading>
       {props.children}
       {props.visible === 0 && (
-        <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
+        <div className="-mx-6 flex h-20 items-center justify-center rounded bg-gray-900 text-center text-md text-zinc-500 sm:mx-0">
           {props.total === 'processing'
             ? `${props.entryLongNamePlural} are being processed...`
             : `There are no ${props.entryLongNamePlural} to view.`}
