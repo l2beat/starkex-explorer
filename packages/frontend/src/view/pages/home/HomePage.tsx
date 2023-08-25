@@ -1,7 +1,6 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { HomeTutorialEntry } from '../..'
 import { Card } from '../../components/Card'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -27,7 +26,7 @@ import {
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
 import { HomeStatistics, StatisticsEntry } from './components/HomeStatistics'
-import { HomeTutorials } from './components/HomeTutorials'
+import { HomeTutorialEntry, HomeTutorials } from './components/HomeTutorials'
 
 interface HomePageProps {
   context: PageContext

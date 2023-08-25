@@ -2,8 +2,6 @@ import { HomeTutorialEntry } from '@explorer/frontend'
 import fs from 'fs'
 
 export class TutorialService {
-  constructor() {}
-
   getTutorials(): HomeTutorialEntry[] {
     const files = fs.readdirSync('src/content/tutorials')
 

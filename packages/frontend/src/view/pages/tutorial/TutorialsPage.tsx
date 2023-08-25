@@ -6,12 +6,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { reactToHtml } from '../../reactToHtml'
-
-export interface HomeTutorialEntry {
-  title: string
-  imageUrl: string
-  slug: string
-}
+import { HomeTutorialEntry } from '../home/components/HomeTutorials'
 
 interface TutorialsPageProps {
   context: PageContext

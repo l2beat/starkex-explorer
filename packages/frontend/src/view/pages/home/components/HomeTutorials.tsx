@@ -1,12 +1,16 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { HomeTutorialEntry } from '../../..'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { Card } from '../../../components/Card'
 import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
 
+export interface HomeTutorialEntry {
+  title: string
+  imageUrl: string
+  slug: string
+}
 interface HomeTutorialsProps {
   className?: string
   tutorials: HomeTutorialEntry[]

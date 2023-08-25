@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { HomeTutorialEntry } from '../../..'
 import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
+import { HomeTutorialEntry } from './HomeTutorials'
 
 interface HomeSpotlightArticleProps {
   spotlightArticle: HomeTutorialEntry

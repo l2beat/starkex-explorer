@@ -18,7 +18,7 @@ export class TutorialController {
     const context = await this.pageContextService.getPageContext(givenUser)
     const tutorials = this.tutorialsService.getTutorials()
 
-    if (!tutorials) {
+    if (tutorials.length === 0) {
       return {
         type: 'not found',
         message: 'There are no tutorials available',
