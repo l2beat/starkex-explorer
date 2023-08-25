@@ -10,7 +10,7 @@ export class TutorialService {
     return files.map((filename) => {
       const filenameWithoutExt = filename.replace('.md', '')
       return {
-        title: filenameWithoutExt.replace('-', ' '),
+        title: filenameWithoutExt.replaceAll('-', ' '),
         imageUrl: `/images/${filenameWithoutExt}.jpg`,
         slug: filenameWithoutExt.toLowerCase(),
       }
