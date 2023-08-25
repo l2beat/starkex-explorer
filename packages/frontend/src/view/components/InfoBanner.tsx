@@ -17,7 +17,9 @@ export function InfoBanner({ children, className }: Props) {
       )}
     >
       <InfoIcon className="flex-shrink-0" />
-      <p className="ml-2 text-sm text-white">{children}</p>
+      <p className="ml-2 text-center text-sm text-white sm:text-left">
+        {children}
+      </p>
     </div>
   )
 }
