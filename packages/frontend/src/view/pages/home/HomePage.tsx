@@ -147,7 +147,7 @@ function Tables(props: HomePageProps) {
           />
         </TablePreview>
       </Card>
-      <Card className="hidden flex-col gap-[33px] xl:flex">
+      <Card className="hidden flex-col gap-[30px] xl:flex">
         {...secondColumnTables}
       </Card>
       {secondColumnTables.map((table, i) => {
