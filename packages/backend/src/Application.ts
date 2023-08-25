@@ -65,6 +65,7 @@ import { LiveL2TransactionDownloader } from './core/sync/LiveL2TransactionDownlo
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { TransactionValidator } from './core/TransactionValidator'
+import { TutorialService } from './core/TutorialService'
 import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
@@ -206,6 +207,7 @@ export class Application {
       userTransactionRepository,
       logger
     )
+    const tutorialService = new TutorialService()
 
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
@@ -592,6 +594,7 @@ export class Application {
       pageContextService,
       assetDetailsService,
       forcedTradeOfferViewService,
+      tutorialService,
       userTransactionRepository,
       forcedTradeOfferRepository,
       l2TransactionRepository,
@@ -680,7 +683,10 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    const tutorialController = new TutorialController(pageContextService)
+    const tutorialController = new TutorialController(
+      pageContextService,
+      tutorialService
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [

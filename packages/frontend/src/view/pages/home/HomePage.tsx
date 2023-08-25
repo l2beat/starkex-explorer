@@ -26,15 +26,11 @@ import {
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
 import { HomeStatistics, StatisticsEntry } from './components/HomeStatistics'
-import {
-  DEFAULT_TUTORIALS,
-  HomeTutorialEntry,
-  HomeTutorials,
-} from './components/HomeTutorials'
+import { HomeTutorialEntry, HomeTutorials } from './components/HomeTutorials'
 
 interface HomePageProps {
   context: PageContext
-  tutorials?: HomeTutorialEntry[]
+  tutorials: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   l2Transactions: PerpetualL2TransactionEntry[]
   forcedTransactions: TransactionEntry[]
@@ -46,8 +42,11 @@ export function renderHomePage(props: HomePageProps) {
   return reactToHtml(<HomePage {...props} />)
 }
 
+const MAX_TUTORIALS = 3
+
 function HomePage(props: HomePageProps) {
-  const tutorials = props.tutorials ?? DEFAULT_TUTORIALS
+  const showViewAllTutorials = props.tutorials.length > 3
+  const lastTutorial = props.tutorials[MAX_TUTORIALS - 1]
 
   return (
     <Page
@@ -68,25 +67,30 @@ function HomePage(props: HomePageProps) {
           <div className="grid gap-x-0 gap-y-8 xl:grid-cols-3 xl:gap-x-8">
             <HomeStatistics
               className={
-                tutorials.length > 0 ? 'xl:col-span-2' : 'xl:col-span-3'
+                props.tutorials.length > 0 ? 'xl:col-span-2' : 'xl:col-span-3'
               }
               statistics={props.statistics}
               showL2Transactions={props.context.showL2Transactions}
             />
-            {tutorials.length > 0 && (
+            {props.tutorials.length > 0 && (
               <HomeTutorials
-                tutorials={tutorials.slice(1)}
+                tutorials={props.tutorials.slice(0, MAX_TUTORIALS - 1)}
+                showViewAll={showViewAllTutorials}
                 className="hidden xl:flex"
               />
             )}
           </div>
           <Tables {...props} />
-          {tutorials.length > 0 && (
-            <HomeTutorials tutorials={tutorials} className="xl:hidden" />
+          {props.tutorials.length > 0 && (
+            <HomeTutorials
+              tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
+              showViewAll={showViewAllTutorials}
+              className="xl:hidden"
+            />
           )}
-          {tutorials[0] && (
+          {lastTutorial && (
             <HomeSpotlightArticle
-              spotlightArticle={tutorials[0]}
+              spotlightArticle={lastTutorial}
               className="hidden xl:grid"
             />
           )}

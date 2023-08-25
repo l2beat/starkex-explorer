@@ -6,7 +6,7 @@ import { Card } from '../../../components/Card'
 import { HomeTutorialEntry } from './HomeTutorials'
 
 interface HomeSpotlightArticleProps {
-  spotlightArticle: Omit<HomeTutorialEntry, 'imageUrl'>
+  spotlightArticle: HomeTutorialEntry
   className?: string
 }
 
@@ -18,14 +18,17 @@ export function HomeSpotlightArticle(props: HomeSpotlightArticleProps) {
         <span className="text-xxl">{props.spotlightArticle.title}</span>
         <Button
           as="a"
-          href={props.spotlightArticle.href}
+          href={`/tutorials/${props.spotlightArticle.slug}`}
           variant="outlined"
           className="w-36"
         >
           Read now
         </Button>
       </div>
-      <img src="/images/spotlight-article.png" />
+      <img
+        src={props.spotlightArticle.imageUrl}
+        data-fallback="/images/tutorial.jpg"
+      />
     </Card>
   )
 }
