@@ -45,7 +45,7 @@ export function renderHomePage(props: HomePageProps) {
 
 function HomePage(props: HomePageProps) {
   const showViewAllTutorials = props.tutorials.length > 3
-  console.log(props.tutorials)
+
   return (
     <Page
       path="/"
