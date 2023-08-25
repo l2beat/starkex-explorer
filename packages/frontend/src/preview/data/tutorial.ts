@@ -1,3 +1,5 @@
+import { HomeTutorialEntry } from '../../view'
+
 /* eslint-disable no-useless-escape */
 export const tutorial = `<h1 id="h1-heading-8"><a class="Heading-Title" href="#h1-heading-8">h1 Heading</a></h1>
 <h2 id="h2-heading"><a class="Heading-Title" href="#h2-heading">h2 Heading</a></h2>
@@ -132,3 +134,26 @@ line 3 of code
 <h2 id="images"><a class="Heading-Title" href="#images">Images</a></h2>
 <p><img src="https://octodex.github.com/images/minion.png" alt="Minion">
 `
+
+export const tutorials: HomeTutorialEntry[] = [
+  {
+    title: 'Learn how to use StarkEx Explorer efficiently',
+    imageUrl: '/images/tutorial.jpg',
+    slug: 'learn-how-to-use-starkex-explorer-efficiently',
+  },
+  {
+    title: 'All about forced transactions',
+    imageUrl: '/images/tutorial.jpg',
+    slug: 'all-about-forced-transactions',
+  },
+  {
+    title: 'Stark key registration',
+    imageUrl: '/images/tutorial.jpg',
+    slug: 'stark-key-registration',
+  },
+  {
+    title: 'Escape hatches explained',
+    imageUrl: '/images/tutorial.jpg',
+    slug: 'escape-hatch-explained',
+  },
+]

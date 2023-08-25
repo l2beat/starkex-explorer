@@ -473,6 +473,11 @@ export function createFrontendRouter(
       )
     )
   }
+  router.get('/tutorials', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await tutorialController.getTutorialsPage(givenUser)
+    applyControllerResult(ctx, result)
+  })
 
   router.get(
     '/tutorials/:slug',

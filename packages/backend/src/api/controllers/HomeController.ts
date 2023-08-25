@@ -11,6 +11,7 @@ import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'
+import { TutorialService } from '../../core/TutorialService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
@@ -38,6 +39,7 @@ export class HomeController {
     private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
+    private readonly tutorialService: TutorialService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
@@ -96,6 +98,8 @@ export class HomeController {
         limit: stateUpdatesLimit,
       })
 
+    const tutorials = this.tutorialService.getTutorials()
+
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userTransactions: forcedUserTransactions,
     })
@@ -132,7 +136,7 @@ export class HomeController {
 
     const content = renderHomePage({
       context,
-      tutorials: [], // explicitly no tutorials
+      tutorials,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       statistics,
       stateUpdates: stateUpdateEntries,

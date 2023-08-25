@@ -48,6 +48,7 @@ import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/Free
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
 import { renderInitializeEscapePage } from '../view/pages/transaction/InitializeEscapePage'
+import { renderTutorialsPage } from '../view/pages/tutorial/TutorialsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import { fakeCollateralAsset } from './data/collateralAsset'
@@ -85,7 +86,7 @@ import {
   randomRecipient,
   userParty,
 } from './data/transactions'
-import { tutorial } from './data/tutorial'
+import { tutorial, tutorials } from './data/tutorial'
 import {
   randomEscapableEntry,
   randomUserAssetEntry,
@@ -131,6 +132,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
+        tutorials: tutorials,
         stateUpdates: repeat(10, randomHomeStateUpdateEntry),
         forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         l2Transactions: [],
@@ -155,6 +157,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
+        tutorials: tutorials,
         stateUpdates: repeat(22, randomHomeStateUpdateEntry),
         l2Transactions: repeat(8, randomPerpetualL2TransactionEntry),
         forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
@@ -1062,6 +1065,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
+        tutorials: tutorials,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         l2Transactions: [],
@@ -1105,6 +1109,7 @@ const routes: Route[] = [
         context,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        tutorials: tutorials,
         l2Transactions: [],
         statistics: {
           stateUpdateCount: 6315,
@@ -1883,7 +1888,19 @@ const routes: Route[] = [
   // #endregion
   // #region Tutorial
   {
-    path: '/tutorials/example',
+    path: '/tutorials',
+    description: 'List of all tutorials',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderTutorialsPage({
+        context,
+        tutorials: tutorials,
+      })
+    },
+  },
+  {
+    link: '/tutorials/example',
+    path: '/tutorials/:slug',
     description: 'Tutorial page',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)

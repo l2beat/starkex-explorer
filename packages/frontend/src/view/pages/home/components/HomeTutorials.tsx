@@ -1,37 +1,16 @@
 import classNames from 'classnames'
 import React from 'react'
 
+import { HomeTutorialEntry } from '../../..'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { Card } from '../../../components/Card'
+import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
-
-export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
-  {
-    title: 'Learn how to use StarkEx Explorer efficiently',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/example',
-  },
-  {
-    title: 'All about forced transactions',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/example',
-  },
-  {
-    title: 'Stark key registration',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/example',
-  },
-]
 
 interface HomeTutorialsProps {
   className?: string
   tutorials: HomeTutorialEntry[]
-}
-
-export interface HomeTutorialEntry {
-  title: string
-  imageUrl: string
-  href: string
+  showViewAll?: boolean
 }
 
 export function HomeTutorials(props: HomeTutorialsProps) {
@@ -39,18 +18,25 @@ export function HomeTutorials(props: HomeTutorialsProps) {
     <div className={classNames('flex flex-col', props.className)}>
       <SectionHeading
         title="Tutorials"
-        description="Learn how to use the StarkEx Explorer"
+        description={
+          props.showViewAll ? (
+            <Link href="/tutorials">View all</Link>
+          ) : (
+            'Learn how to use the StarkEx Explorer'
+          )
+        }
       />
-      <Card className="flex flex-grow flex-col gap-4">
+      <Card className="flex h-min flex-col gap-4">
         {props.tutorials.map((tutorial, i) => (
           <a
             key={i}
-            href={tutorial.href}
+            href={`/tutorials/${tutorial.slug}`}
             className="group flex w-full items-center gap-4"
           >
             <img
               className="aspect-video h-[63px] rounded"
               src={tutorial.imageUrl}
+              data-fallback="/images/tutorial.jpg"
             />
             <div className="flex-1">
               <p className="text-base font-semibold leading-tight">
