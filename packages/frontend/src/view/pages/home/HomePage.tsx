@@ -43,8 +43,11 @@ export function renderHomePage(props: HomePageProps) {
   return reactToHtml(<HomePage {...props} />)
 }
 
+const MAX_TUTORIALS = 3
+
 function HomePage(props: HomePageProps) {
   const showViewAllTutorials = props.tutorials.length > 3
+  const lastTutorial = props.tutorials[MAX_TUTORIALS - 1]
 
   return (
     <Page
@@ -72,7 +75,7 @@ function HomePage(props: HomePageProps) {
             />
             {props.tutorials.length > 0 && (
               <HomeTutorials
-                tutorials={props.tutorials.slice(0, 2)}
+                tutorials={props.tutorials.slice(0, MAX_TUTORIALS - 1)}
                 showViewAll={showViewAllTutorials}
                 className="hidden xl:flex"
               />
@@ -81,14 +84,14 @@ function HomePage(props: HomePageProps) {
           <Tables {...props} />
           {props.tutorials.length > 0 && (
             <HomeTutorials
-              tutorials={props.tutorials.slice(0, 3)}
+              tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
               showViewAll={showViewAllTutorials}
               className="xl:hidden"
             />
           )}
-          {props.tutorials[2] && (
+          {lastTutorial && (
             <HomeSpotlightArticle
-              spotlightArticle={props.tutorials[2]}
+              spotlightArticle={lastTutorial}
               className="hidden xl:grid"
             />
           )}
