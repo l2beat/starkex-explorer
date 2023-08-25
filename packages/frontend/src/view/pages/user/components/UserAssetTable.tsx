@@ -50,7 +50,11 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         const isDisabled = entry.balance <= 0n && entry.action === 'WITHDRAW'
         return {
           cells: [
-            <AssetWithLogo type="full" assetInfo={assetToInfo(entry.asset)} />,
+            <AssetWithLogo
+              type="full"
+              assetInfo={assetToInfo(entry.asset)}
+              className="min-w-max"
+            />,
             <div className="flex flex-col">
               <span className="text-lg font-medium text-white">
                 {formatAmount(entry.asset, entry.balance)}
