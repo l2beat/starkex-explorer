@@ -1,3 +1,4 @@
+import { Logger } from '@l2beat/backend-tools'
 import isEmpty from 'lodash/isEmpty'
 
 import { LiveL2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
@@ -9,7 +10,8 @@ import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 export class LiveL2TransactionClient extends BaseClient {
   constructor(
     private readonly options: LiveL2TransactionApiConfig,
-    private readonly fetchClient: FetchClient
+    private readonly fetchClient: FetchClient,
+    private logger: Logger
   ) {
     super(options.auth)
   }
@@ -32,7 +34,7 @@ export class LiveL2TransactionClient extends BaseClient {
     }
 
     const parsed = PerpetualLiveL2TransactionResponse.parse(data)
-    return toPerpetualL2Transactions(parsed)
+    return toPerpetualL2Transactions(parsed, this.logger)
   }
 
   private async getTransactions(

@@ -1,3 +1,4 @@
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import { LiveL2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
@@ -32,7 +33,8 @@ describe(LiveL2TransactionClient.name, () => {
         })
         const transactionClient = new LiveL2TransactionClient(
           options,
-          fetchClient
+          fetchClient,
+          Logger.SILENT
         )
 
         const response = await transactionClient.getPerpetualLiveTransactions(
@@ -49,7 +51,8 @@ describe(LiveL2TransactionClient.name, () => {
           toPerpetualL2Transactions(
             PerpetualLiveL2TransactionResponse.parse(
               EXAMPLE_PERPETUAL_TRANSACTIONS
-            )
+            ),
+            Logger.SILENT
           )
         )
       })
@@ -62,7 +65,8 @@ describe(LiveL2TransactionClient.name, () => {
         })
         const transactionClient = new LiveL2TransactionClient(
           options,
-          fetchClient
+          fetchClient,
+          Logger.SILENT
         )
 
         const response = await transactionClient.getPerpetualLiveTransactions(
@@ -92,7 +96,8 @@ describe(LiveL2TransactionClient.name, () => {
         })
         const transactionClient = new LiveL2TransactionClient(
           options,
-          fetchClient
+          fetchClient,
+          Logger.SILENT
         )
 
         const response = await transactionClient.getThirdPartyIdByTransactionId(
@@ -116,7 +121,8 @@ describe(LiveL2TransactionClient.name, () => {
           })
           const transactionClient = new LiveL2TransactionClient(
             options,
-            fetchClient
+            fetchClient,
+            Logger.SILENT
           )
 
           const response =

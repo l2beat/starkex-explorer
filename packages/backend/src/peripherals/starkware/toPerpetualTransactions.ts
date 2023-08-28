@@ -11,6 +11,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import {
   AssetOraclePrice,
@@ -20,22 +21,39 @@ import {
   SignedOraclePrice,
 } from './schema/PerpetualBatchInfoResponse'
 import { PerpetualLiveL2TransactionResponse } from './schema/PerpetualLiveL2TransactionResponse'
-export interface PerpetualL2Transaction {
-  thirdPartyId: number
-  transactionId: number
-  transaction: PerpetualL2TransactionData
-  timestamp: Timestamp
-}
+
+export type PerpetualL2Transaction =
+  | {
+      parsedSuccessfully: true
+      thirdPartyId: number
+      transactionId: number
+      transaction: PerpetualL2TransactionData
+      timestamp: Timestamp
+    }
+  | {
+      parsedSuccessfully: false
+      thirdPartyId: number
+    }
 
 export function toPerpetualL2Transactions(
-  response: PerpetualLiveL2TransactionResponse
+  response: PerpetualLiveL2TransactionResponse,
+  logger: Logger
 ): PerpetualL2Transaction[] {
   return response.txs.map((tx) => {
-    return {
-      thirdPartyId: tx.apex_id,
-      transactionId: tx.tx_info.tx_id,
-      transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
-      timestamp: Timestamp.fromSeconds(tx.time_created),
+    if (tx.tx_info.parseError !== undefined) {
+      logger.error('Error parsing Live L2 Transaction', tx.tx_info.parseError)
+      return {
+        parsedSuccessfully: false,
+        thirdPartyId: tx.apex_id,
+      }
+    } else {
+      return {
+        parsedSuccessfully: true,
+        thirdPartyId: tx.apex_id,
+        transactionId: tx.tx_info.tx_id,
+        transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
+        timestamp: Timestamp.fromSeconds(tx.time_created),
+      }
     }
   })
 }

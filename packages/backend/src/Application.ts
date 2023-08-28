@@ -276,7 +276,8 @@ export class Application {
       config.starkex.l2Transactions.liveApi
         ? new LiveL2TransactionClient(
             config.starkex.l2Transactions.liveApi,
-            fetchClient
+            fetchClient,
+            logger
           )
         : undefined
 

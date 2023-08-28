@@ -16,6 +16,7 @@ import { LiveL2TransactionDownloader } from './LiveL2TransactionDownloader'
 const fakeL2Transaction = (
   transaction?: Partial<PerpetualL2Transaction>
 ): PerpetualL2Transaction => ({
+  parsedSuccessfully: true,
   thirdPartyId: 1024,
   transactionId: 2048,
   timestamp: Timestamp(4096),
@@ -86,17 +87,19 @@ describe(LiveL2TransactionDownloader.name, () => {
 
       await waitForExpect(() => {
         firstTxs.forEach((tx, i) => {
-          expect(
-            mockL2TransactionRepository.addLiveTransaction
-          ).toHaveBeenNthCalledWith(
-            i + 1,
-            {
-              transactionId: tx.transactionId,
-              timestamp: tx.timestamp,
-              data: tx.transaction,
-            },
-            mockKnexTransaction
-          )
+          if (tx.parsedSuccessfully) {
+            expect(
+              mockL2TransactionRepository.addLiveTransaction
+            ).toHaveBeenNthCalledWith(
+              i + 1,
+              {
+                transactionId: tx.transactionId,
+                timestamp: tx.timestamp,
+                data: tx.transaction,
+              },
+              mockKnexTransaction
+            )
+          }
         })
 
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
@@ -114,26 +117,28 @@ describe(LiveL2TransactionDownloader.name, () => {
       ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
-          expect(
-            mockL2TransactionRepository.addLiveTransaction
-          ).toHaveBeenNthCalledWith(
-            firstTxs.length + i + 1,
-            {
-              data: tx.transaction,
-              timestamp: tx.timestamp,
-              transactionId: tx.transactionId,
-            },
-            mockKnexTransaction
-          )
+          if (tx.parsedSuccessfully) {
+            expect(
+              mockL2TransactionRepository.addLiveTransaction
+            ).toHaveBeenNthCalledWith(
+              firstTxs.length + i + 1,
+              {
+                data: tx.transaction,
+                timestamp: tx.timestamp,
+                transactionId: tx.transactionId,
+              },
+              mockKnexTransaction
+            )
 
-          expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
-            2,
-            {
-              key: 'lastSyncedThirdPartyId',
-              value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
-            },
-            mockKnexTransaction
-          )
+            expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
+              2,
+              {
+                key: 'lastSyncedThirdPartyId',
+                value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
+              },
+              mockKnexTransaction
+            )
+          }
         })
       })
 
