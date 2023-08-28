@@ -32,7 +32,7 @@ export function getApexGoerliConfig(env: Env): StarkexConfig {
       auth: clientAuth,
     },
     l2Transactions: {
-      enabled: true,
+      enabled: env.boolean('L2_TRANSACTIONS_ENABLED', true),
       excludeTypes: ['OraclePricesTick'],
       feederGateway: {
         getUrl: (batchId: number) => {
