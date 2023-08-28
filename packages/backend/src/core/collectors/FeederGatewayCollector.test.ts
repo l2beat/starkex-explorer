@@ -440,7 +440,7 @@ describe(FeederGatewayCollector.name, () => {
 
   describe(FeederGatewayCollector.prototype.discardAfter.name, () => {
     const mockedL2TransactionRepository = mockObject<L2TransactionRepository>({
-      deleteAfterBlock: mockFn().resolvesTo(1),
+      removeStateUpdateIdAfterBlock: mockFn().resolvesTo(1),
     })
     const feederGatewayCollector = new FeederGatewayCollector(
       mockObject<FeederGatewayClient>(),
@@ -455,7 +455,7 @@ describe(FeederGatewayCollector.name, () => {
       await feederGatewayCollector.discardAfter(blockNumber)
 
       expect(
-        mockedL2TransactionRepository.deleteAfterBlock
+        mockedL2TransactionRepository.removeStateUpdateIdAfterBlock
       ).toHaveBeenCalledWith(blockNumber)
     })
   })

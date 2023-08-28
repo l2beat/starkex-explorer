@@ -87,7 +87,9 @@ export class L2TransactionRepository extends BaseRepository {
       this.findOldestByTransactionId
     )
     this.findLatestIncluded = this.wrapFind(this.findLatestIncluded)
-    this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
+    this.removeStateUpdateIdAfterBlock = this.wrapUpdate(
+      this.removeStateUpdateIdAfterBlock
+    )
     this.deleteByTransactionIds = this.wrapDelete(this.deleteByTransactionIds)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.runInTransactionWithLockedTable = this.wrapAny(
@@ -607,11 +609,11 @@ export class L2TransactionRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
-  async deleteAfterBlock(blockNumber: number) {
+  async removeStateUpdateIdAfterBlock(blockNumber: number) {
     const knex = await this.knex()
     return knex('l2_transactions')
       .where('block_number', '>', blockNumber)
-      .delete()
+      .update({ state_update_id: null })
   }
 
   async deleteByTransactionIds(

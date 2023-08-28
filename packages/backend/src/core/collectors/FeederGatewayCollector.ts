@@ -151,6 +151,8 @@ export class FeederGatewayCollector {
   }
 
   async discardAfter(blockNumber: number) {
-    await this.l2TransactionRepository.deleteAfterBlock(blockNumber)
+    await this.l2TransactionRepository.removeStateUpdateIdAfterBlock(
+      blockNumber
+    )
   }
 }
