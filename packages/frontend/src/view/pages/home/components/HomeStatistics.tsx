@@ -84,7 +84,7 @@ function StatisticsItem({
         {formatStatisticsCount(value)}
       </span>
       <span className="hidden text-sm font-semibold text-zinc-500 md:inline">
-        # of all current {title.toLowerCase()}
+        # of all {title.toLowerCase()}
       </span>
     </div>
   )
