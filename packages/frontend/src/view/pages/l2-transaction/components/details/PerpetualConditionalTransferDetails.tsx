@@ -40,14 +40,14 @@ export function PerpetualConditionalTransferDetails(
         </TransactionField>
       </div>
       <div className="grid gap-y-6 md:grid-cols-2 md:gap-x-2">
-        <TransactionField label="Sender stark key">
+        <TransactionField label="Sender Stark key">
           <Link href={`/users/${props.data.senderStarkKey.toString()}`}>
             <InlineEllipsis className="max-w-[250px] md:max-w-[400px]">
               {props.data.senderStarkKey.toString()}
             </InlineEllipsis>
           </Link>
         </TransactionField>
-        <TransactionField label="Receiver stark key">
+        <TransactionField label="Receiver Stark key">
           <Link href={`/users/${props.data.receiverStarkKey.toString()}`}>
             <InlineEllipsis className="max-w-[250px] md:max-w-[400px]">
               {props.data.receiverStarkKey.toString()}

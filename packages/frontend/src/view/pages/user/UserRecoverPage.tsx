@@ -21,7 +21,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
   return (
     <Page
       context={props.context}
-      description="Recover your stark key from your ethereum address"
+      description="Recover your Stark key from your ethereum address"
       path="/users/recover"
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">

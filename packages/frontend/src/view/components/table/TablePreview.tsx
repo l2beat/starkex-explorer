@@ -7,7 +7,6 @@ import { SectionHeading } from '../SectionHeading'
 
 type TablePreviewProps = {
   path: string
-  entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
   children: ReactNode
@@ -30,13 +29,10 @@ export function TablePreview(props: TablePreviewProps) {
           description={
             <>
               <Link
-                className="hidden !gap-0.5 sm:flex"
+                className="flex !gap-0.5"
                 href={props.path}
                 accessoryRight={<ArrowRightIcon className="scale-90" />}
               >
-                View all {props.entryShortNamePlural}
-              </Link>
-              <Link className="!gap-0.5 sm:hidden" href={props.path}>
                 View all
               </Link>
             </>

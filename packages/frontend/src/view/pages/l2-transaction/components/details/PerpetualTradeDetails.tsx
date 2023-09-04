@@ -46,7 +46,7 @@ export function PerpetualTradeDetails(
         </TransactionField>
       </div>
       <div className="grid gap-y-6 md:grid-cols-3 md:gap-x-2">
-        <TransactionField label="Synthetic seller stark key">
+        <TransactionField label="Synthetic seller Stark key">
           <Link href={`/users/${syntheticSeller.starkKey.toString()}`}>
             <InlineEllipsis className="max-w-[250px]">
               {syntheticSeller.starkKey.toString()}
@@ -54,7 +54,7 @@ export function PerpetualTradeDetails(
           </Link>
         </TransactionField>
         <TransactionField
-          label="Synthetic buyer stark key"
+          label="Synthetic buyer Stark key"
           className="md:col-start-3"
         >
           <Link href={`/users/${syntheticBuyer.starkKey.toString()}`}>
