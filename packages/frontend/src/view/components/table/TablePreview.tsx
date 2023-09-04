@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 
-import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
@@ -28,11 +27,7 @@ export function TablePreview(props: TablePreviewProps) {
           title={props.title}
           description={
             <>
-              <Link
-                className="flex !gap-0.5"
-                href={props.path}
-                accessoryRight={<ArrowRightIcon className="scale-90" />}
-              >
+              <Link className="flex !gap-0.5" href={props.path}>
                 View all
               </Link>
             </>
