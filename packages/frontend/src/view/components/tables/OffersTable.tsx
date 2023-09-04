@@ -20,7 +20,7 @@ interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
   showRole?: boolean
-  showTradeDetails?: boolean
+  showInfoColumn?: boolean
 }
 
 export interface OfferEntry {
@@ -47,14 +47,14 @@ export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
     { header: 'Id' },
     { header: 'Type' },
-    ...(props.showTradeDetails
-      ? [{ header: 'Trade', align: 'center' as const }]
+    ...(props.showInfoColumn
+      ? [{ header: 'Info', align: 'center' as const }]
       : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Status' },
     { header: 'Age' },
   ]
-  if (props.showTradeDetails) {
+  if (props.showInfoColumn) {
     props.offers
   }
   return (
@@ -64,9 +64,9 @@ export function OffersTable(props: OffersTableProps) {
         const cells: ReactNode[] = [
           <Link>#{offer.id}</Link>,
           <span className="capitalize">{offer.type.toLowerCase()}</span>,
-          ...(props.showTradeDetails
+          ...(props.showInfoColumn
             ? [
-                <TradeColumn
+                <InfoColumn
                   offer={offer}
                   collateralAsset={props.context.collateralAsset}
                 />,
@@ -95,7 +95,7 @@ interface Props {
   collateralAsset: CollateralAsset
 }
 
-function TradeColumn({ offer, collateralAsset }: Props) {
+function InfoColumn({ offer, collateralAsset }: Props) {
   const trade =
     offer.type === 'SELL'
       ? {
