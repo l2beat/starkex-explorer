@@ -5,18 +5,34 @@ import { PerpetualL2Transaction } from './PerpetualBatchInfoResponse'
 const PerpetualLiveL2TransactionResponseTransactionInfo = z.object({
   tx: PerpetualL2Transaction,
   tx_id: z.number(),
-  parseError: z.undefined(),
 })
+
+// A discriminated union of a properly parsed transaction and a parse error.
+// Discriminated by `parseError` field
+type ParsedL2TransactionInfo =
+  | {
+      tx: PerpetualL2Transaction
+      tx_id: number
+      parseError: undefined
+    }
+  | {
+      parseError: {
+        errors: z.ZodIssue[]
+        payload: string
+      }
+    }
 
 const PerpetualLiveL2TransactionResponseTransaction = z.object({
   apex_id: z.number(),
   tx_info: z.string().transform((payload) => {
-    const result = PerpetualLiveL2TransactionResponseTransactionInfo.safeParse(
+    const parsed = PerpetualLiveL2TransactionResponseTransactionInfo.safeParse(
       JSON.parse(payload)
     )
-    return result.success
-      ? result.data
-      : { parseError: { errors: result.error.errors, payload } }
+    return (
+      parsed.success
+        ? { ...parsed.data, parseError: undefined }
+        : { parseError: { errors: parsed.error.errors, payload } }
+    ) as ParsedL2TransactionInfo
   }),
   time_created: z.number(),
 })
