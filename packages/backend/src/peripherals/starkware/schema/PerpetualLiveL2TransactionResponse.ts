@@ -7,6 +7,11 @@ const PerpetualLiveL2TransactionResponseTransactionInfo = z.object({
   tx_id: z.number(),
 })
 
+export interface L2TransactionParseError {
+  errors: z.ZodIssue[]
+  payload: string
+}
+
 // A discriminated union of a properly parsed transaction and a parse error.
 // Discriminated by `parseError` field
 type ParsedL2TransactionInfo =
@@ -16,10 +21,7 @@ type ParsedL2TransactionInfo =
       parseError: undefined
     }
   | {
-      parseError: {
-        errors: z.ZodIssue[]
-        payload: string
-      }
+      parseError: L2TransactionParseError
     }
 
 const PerpetualLiveL2TransactionResponseTransaction = z.object({

@@ -11,7 +11,6 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { Logger } from '@l2beat/backend-tools'
 
 import {
   AssetOraclePrice,
@@ -20,42 +19,47 @@ import {
   SignatureResponse,
   SignedOraclePrice,
 } from './schema/PerpetualBatchInfoResponse'
-import { PerpetualLiveL2TransactionResponse } from './schema/PerpetualLiveL2TransactionResponse'
+import {
+  L2TransactionParseError,
+  PerpetualLiveL2TransactionResponse,
+} from './schema/PerpetualLiveL2TransactionResponse'
 
 export type PerpetualL2Transaction =
-  | {
-      parsedSuccessfully: true
-      thirdPartyId: number
-      transactionId: number
-      transaction: PerpetualL2TransactionData
-      timestamp: Timestamp
-    }
-  | {
-      parsedSuccessfully: false
-      thirdPartyId: number
-    }
+  | SuccessfullyParsedL2Transaction
+  | UnsuccessfullyParsedL2Transaction
+
+export interface SuccessfullyParsedL2Transaction {
+  parsedSuccessfully: true // discriminating field
+  thirdPartyId: number
+  transactionId: number
+  transaction: PerpetualL2TransactionData
+  timestamp: Timestamp
+}
+
+export interface UnsuccessfullyParsedL2Transaction {
+  parsedSuccessfully: false // discriminating field
+  thirdPartyId: number
+  parseError: L2TransactionParseError
+}
 
 export function toPerpetualL2Transactions(
-  response: PerpetualLiveL2TransactionResponse,
-  logger: Logger
+  response: PerpetualLiveL2TransactionResponse
 ): PerpetualL2Transaction[] {
-  return response.txs.map((tx) => {
-    if (tx.tx_info.parseError !== undefined) {
-      logger.error('Error parsing Live L2 Transaction', tx.tx_info.parseError)
-      return {
-        parsedSuccessfully: false,
-        thirdPartyId: tx.apex_id,
-      }
-    } else {
-      return {
-        parsedSuccessfully: true,
-        thirdPartyId: tx.apex_id,
-        transactionId: tx.tx_info.tx_id,
-        transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
-        timestamp: Timestamp.fromSeconds(tx.time_created),
-      }
-    }
-  })
+  return response.txs.map((tx) =>
+    tx.tx_info.parseError === undefined
+      ? ({
+          parsedSuccessfully: true,
+          thirdPartyId: tx.apex_id,
+          transactionId: tx.tx_info.tx_id,
+          transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
+          timestamp: Timestamp.fromSeconds(tx.time_created),
+        } as SuccessfullyParsedL2Transaction)
+      : ({
+          parsedSuccessfully: false,
+          thirdPartyId: tx.apex_id,
+          parseError: tx.tx_info.parseError,
+        } as UnsuccessfullyParsedL2Transaction)
+  )
 }
 
 export function toPerpetualL2TransactionData(

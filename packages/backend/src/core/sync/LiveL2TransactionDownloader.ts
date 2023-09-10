@@ -149,6 +149,11 @@ export class LiveL2TransactionDownloader {
         }
 
         await this.l2TransactionRepository.addLiveTransaction(record, trx)
+      } else {
+        this.logger.error(
+          'Error parsing Live L2 Transaction',
+          transaction.parseError
+        )
       }
     }
   }
