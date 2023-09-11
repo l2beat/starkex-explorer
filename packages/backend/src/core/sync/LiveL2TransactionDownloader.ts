@@ -118,7 +118,7 @@ export class LiveL2TransactionDownloader {
       transactions[transactions.length - 1]?.thirdPartyId !==
       lastSyncedThirdPartyId
     ) {
-      throw new Error('ThirdPartyId should come in sequentional order')
+      throw new Error('ThirdPartyId should come in sequential order')
     }
 
     await this.l2TransactionRepository.runInTransactionWithLockedTable(
@@ -141,13 +141,20 @@ export class LiveL2TransactionDownloader {
     trx: Knex.Transaction
   ) {
     for (const transaction of transactions) {
-      const record = {
-        transactionId: transaction.transactionId,
-        data: transaction.transaction,
-        timestamp: transaction.timestamp,
-      }
+      if (transaction.parsedSuccessfully) {
+        const record = {
+          transactionId: transaction.transactionId,
+          data: transaction.transaction,
+          timestamp: transaction.timestamp,
+        }
 
-      await this.l2TransactionRepository.addLiveTransaction(record, trx)
+        await this.l2TransactionRepository.addLiveTransaction(record, trx)
+      } else {
+        this.logger.error(
+          'Error parsing Live L2 Transaction',
+          transaction.parseError
+        )
+      }
     }
   }
 
