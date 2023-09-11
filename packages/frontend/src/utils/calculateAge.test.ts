@@ -23,7 +23,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('10 secs ago')
+      expect(result).toEqual('10 secs')
     })
   })
 
@@ -34,7 +34,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('10 mins ago')
+      expect(result).toEqual('10 mins')
     })
 
     it('should not pluralize min', () => {
@@ -43,7 +43,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('1 min ago')
+      expect(result).toEqual('1 min')
     })
   })
 
@@ -54,7 +54,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('10 hours ago')
+      expect(result).toEqual('10 hours')
     })
 
     it('should not pluralize hour', () => {
@@ -63,7 +63,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('1 hour ago')
+      expect(result).toEqual('1 hour')
     })
   })
 
@@ -74,7 +74,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('10 days ago')
+      expect(result).toEqual('10 days')
     })
 
     it('should not pluralize day', () => {
@@ -83,7 +83,7 @@ describe(calculateAge.name, () => {
 
       const result = calculateAge(timestamp)
 
-      expect(result).toEqual('1 day ago')
+      expect(result).toEqual('1 day')
     })
   })
 })
