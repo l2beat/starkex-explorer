@@ -9,13 +9,18 @@ import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { LiveL2TransactionClient } from '../../peripherals/starkware/LiveL2TransactionClient'
-import { PerpetualL2Transaction } from '../../peripherals/starkware/toPerpetualTransactions'
+import {
+  PerpetualL2Transaction,
+  SuccessfullyParsedL2Transaction,
+  UnsuccessfullyParsedL2Transaction,
+} from '../../peripherals/starkware/toPerpetualTransactions'
 import { Clock } from './Clock'
 import { LiveL2TransactionDownloader } from './LiveL2TransactionDownloader'
 
 const fakeL2Transaction = (
-  transaction?: Partial<PerpetualL2Transaction>
+  transaction: Partial<SuccessfullyParsedL2Transaction>
 ): PerpetualL2Transaction => ({
+  parsedSuccessfully: true,
   thirdPartyId: 1024,
   transactionId: 2048,
   timestamp: Timestamp(4096),
@@ -28,16 +33,46 @@ const fakeL2Transaction = (
   ...transaction,
 })
 
+const fakeParseError: UnsuccessfullyParsedL2Transaction = {
+  parsedSuccessfully: false,
+  thirdPartyId: 1024,
+  parseError: {
+    errors: [
+      {
+        code: 'invalid_type',
+        expected: 'object',
+        received: 'undefined',
+        path: ['tx'],
+        message: 'Required',
+      },
+      {
+        code: 'invalid_type',
+        expected: 'number',
+        received: 'undefined',
+        path: ['tx_id'],
+        message: 'Required',
+      },
+    ],
+    payload: 'Parse Error payload',
+  },
+}
+
 describe(LiveL2TransactionDownloader.name, () => {
   describe(LiveL2TransactionDownloader.prototype.start.name, () => {
-    it('should initialize, start and sync', async () => {
+    it('should initialize, start and sync, logging parse errors', async () => {
       const thirdPartyId = 1200005
       const firstTxs = range(100).map((i) =>
         fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 1 })
       )
-      const secondTxs = range(99).map((i) =>
+      const secondTxs = range(98).map((i) =>
         fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 100 })
       )
+      // Sprinkle in a single mis-parsed transaction
+      const parseErrorTx = {
+        ...fakeParseError,
+        thirdPartyId: thirdPartyId + 98 + 100,
+      }
+      secondTxs.push(parseErrorTx)
 
       const mockKnexTransaction = mockObject<Knex.Transaction>({})
       const mockClock = mockObject<Clock>({
@@ -60,6 +95,11 @@ describe(LiveL2TransactionDownloader.name, () => {
           }
         ),
       })
+      const mockLogger = Logger.SILENT
+      const mockLoggerError = mockFn(
+        (_message: string, _parameters?: unknown) => {}
+      )
+      mockLogger.error = mockLoggerError
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
         mockLiveL2TransactionClient,
@@ -67,7 +107,10 @@ describe(LiveL2TransactionDownloader.name, () => {
         mockObject<StateUpdateRepository>(),
         mockKeyValueStore,
         mockClock,
-        Logger.SILENT
+        mockObject<Logger>({
+          for: () => mockLogger,
+        })
+        // Logger.SILENT
       )
 
       await liveL2TransactionDownloader.start()
@@ -86,17 +129,19 @@ describe(LiveL2TransactionDownloader.name, () => {
 
       await waitForExpect(() => {
         firstTxs.forEach((tx, i) => {
-          expect(
-            mockL2TransactionRepository.addLiveTransaction
-          ).toHaveBeenNthCalledWith(
-            i + 1,
-            {
-              transactionId: tx.transactionId,
-              timestamp: tx.timestamp,
-              data: tx.transaction,
-            },
-            mockKnexTransaction
-          )
+          if (tx.parsedSuccessfully) {
+            expect(
+              mockL2TransactionRepository.addLiveTransaction
+            ).toHaveBeenNthCalledWith(
+              i + 1,
+              {
+                transactionId: tx.transactionId,
+                timestamp: tx.timestamp,
+                data: tx.transaction,
+              },
+              mockKnexTransaction
+            )
+          }
         })
 
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
@@ -114,28 +159,40 @@ describe(LiveL2TransactionDownloader.name, () => {
       ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
-          expect(
-            mockL2TransactionRepository.addLiveTransaction
-          ).toHaveBeenNthCalledWith(
-            firstTxs.length + i + 1,
-            {
-              data: tx.transaction,
-              timestamp: tx.timestamp,
-              transactionId: tx.transactionId,
-            },
-            mockKnexTransaction
-          )
-
-          expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
-            2,
-            {
-              key: 'lastSyncedThirdPartyId',
-              value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
-            },
-            mockKnexTransaction
-          )
+          if (tx.parsedSuccessfully) {
+            expect(
+              mockL2TransactionRepository.addLiveTransaction
+            ).toHaveBeenNthCalledWith(
+              firstTxs.length + i + 1,
+              {
+                data: tx.transaction,
+                timestamp: tx.timestamp,
+                transactionId: tx.transactionId,
+              },
+              mockKnexTransaction
+            )
+          } else {
+            expect(mockLoggerError).toHaveBeenCalledWith(
+              'Error parsing Live L2 Transaction',
+              parseErrorTx.parseError
+            )
+          }
         })
+
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(
+          2,
+          {
+            key: 'lastSyncedThirdPartyId',
+            value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
+          },
+          mockKnexTransaction
+        )
       })
+
+      // Called with one exception of parseErrorTx (hence -1)
+      expect(
+        mockL2TransactionRepository.addLiveTransaction
+      ).toHaveBeenCalledTimes(firstTxs.length + secondTxs.length - 1)
 
       expect(
         mockLiveL2TransactionClient.getPerpetualLiveTransactions
