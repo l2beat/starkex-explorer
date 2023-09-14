@@ -26,7 +26,7 @@ export function PerpetualLiquidateDetails(
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
-      <TransactionField label="Liquidator stark key">
+      <TransactionField label="Liquidator Stark key">
         <Link href={`/users/${props.data.liquidatorOrder.starkKey.toString()}`}>
           <InlineEllipsis className="max-w-[250px] sm:max-w-[550px] md:max-w-full">
             {props.data.liquidatorOrder.starkKey.toString()}

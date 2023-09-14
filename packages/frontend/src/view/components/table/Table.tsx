@@ -18,7 +18,7 @@ export function Table(props: TableProps) {
     <div
       className={cx(
         'overflow-x-auto rounded-lg bg-gray-800 group-[.Card]/card:-mx-6 sm:w-full sm:group-[.Card]/card:mx-0',
-        props.rows.length > 0 && 'pb-3 group-[.Card]/card:pb-0'
+        props.rows.length > 0 && 'pb-2 group-[.Card]/card:pb-0'
       )}
     >
       <table

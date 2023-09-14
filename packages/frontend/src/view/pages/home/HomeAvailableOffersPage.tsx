@@ -38,7 +38,7 @@ function HomeAvailableOffersPage(props: HomeOffersPageProps) {
           <OffersTable
             offers={props.offers}
             context={props.context}
-            showTradeDetails
+            showInfoColumn
           />
         </TableWithPagination>
       </ContentWrapper>

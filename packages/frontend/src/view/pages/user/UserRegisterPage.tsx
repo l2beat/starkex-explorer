@@ -21,7 +21,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
       context={props.context}
-      description="Register your stark key to your ethereum address"
+      description="Register your Stark key to your ethereum address"
       path="/users/register"
     >
       <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">

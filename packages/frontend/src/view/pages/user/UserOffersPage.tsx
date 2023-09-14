@@ -44,7 +44,7 @@ function UserOffersPage(props: UserOffersPageProps) {
             offers={props.offers}
             context={props.context}
             showRole
-            showTradeDetails
+            showInfoColumn
           />
         </TableWithPagination>
       </ContentWrapper>

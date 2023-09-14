@@ -1,13 +1,11 @@
 import React, { ReactNode } from 'react'
 
-import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
 type TablePreviewProps = {
   path: string
-  entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
   children: ReactNode
@@ -29,14 +27,7 @@ export function TablePreview(props: TablePreviewProps) {
           title={props.title}
           description={
             <>
-              <Link
-                className="hidden !gap-0.5 sm:flex"
-                href={props.path}
-                accessoryRight={<ArrowRightIcon className="scale-90" />}
-              >
-                View all {props.entryShortNamePlural}
-              </Link>
-              <Link className="!gap-0.5 sm:hidden" href={props.path}>
+              <Link className="flex !gap-0.5" href={props.path}>
                 View all
               </Link>
             </>

@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
+import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { Card } from '../../../components/Card'
 import { SectionHeading } from '../../../components/SectionHeading'
 
@@ -84,7 +85,7 @@ function StatisticsItem({
         {formatStatisticsCount(value)}
       </span>
       <span className="hidden text-sm font-semibold text-zinc-500 md:inline">
-        # of all current {title.toLowerCase()}
+        # of all {title.toLowerCase()}
       </span>
     </div>
   )
@@ -92,7 +93,7 @@ function StatisticsItem({
 
 function formatStatisticsCount(count: number) {
   if (count < 1000000) {
-    return count.toString()
+    return formatInt(count)
   }
 
   return `${(count / 1000000).toFixed(2)}M`
