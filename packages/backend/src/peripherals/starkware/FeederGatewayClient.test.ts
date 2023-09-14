@@ -46,7 +46,7 @@ describe(FeederGatewayClient.name, () => {
       )
     })
 
-    it('should return undefined if fetch fails', async () => {
+    it('should throw if fetch fails', async () => {
       const fetchClient = mockObject<FetchClient>({
         fetchRetry: mockFn().resolvesTo({
           json: mockFn().throws(new Error('fetch error')),
@@ -59,12 +59,12 @@ describe(FeederGatewayClient.name, () => {
         Logger.SILENT
       )
 
-      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
-
-      expect(response).toBeNullish()
+      await expect(() =>
+        feederGatewayClient.getPerpetualBatchInfo(0)
+      ).toBeRejected()
     })
 
-    it('should return undefined if response is custom starkex error response (contains code field)', async () => {
+    it('should throw if response is custom starkex error response (contains code field)', async () => {
       const fetchClient = mockObject<FetchClient>({
         fetchRetry: mockFn().resolvesTo({
           json: mockFn().resolvesTo({ code: 'any code' }),
@@ -77,9 +77,9 @@ describe(FeederGatewayClient.name, () => {
         Logger.SILENT
       )
 
-      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
-
-      expect(response).toBeNullish()
+      await expect(() =>
+        feederGatewayClient.getPerpetualBatchInfo(0)
+      ).toBeRejected()
     })
   })
 })

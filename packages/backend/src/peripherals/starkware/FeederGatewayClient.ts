@@ -19,10 +19,6 @@ export class FeederGatewayClient extends BaseClient {
   async getPerpetualBatchInfo(batchId: number) {
     const data = await this.getBatchInfo(batchId)
 
-    if (data === undefined) {
-      return undefined
-    }
-
     const parsed = PerpetualBatchInfoResponse.parse(data)
     return toPerpetualBatchInfo(parsed)
   }
@@ -30,31 +26,22 @@ export class FeederGatewayClient extends BaseClient {
   private async getBatchInfo(batchId: number): Promise<unknown> {
     const url = this.options.getUrl(batchId)
 
-    try {
-      const res = await this.fetchClient.fetchRetry(url, {
-        ...this.requestInit,
-        // Some of the requests can take a long time to complete e.g. batchId = 1914
-        timeout: 60_000,
-      })
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const data = await res.json()
-      // Starkex instead of 404 returns 200 with code and message, thats why we need to handle it this way.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (data.code) {
-        this.logger.error(
-          `Failed to fetch batch info from FeederGateway for batchId: ${batchId} | ${JSON.stringify(
-            data
-          )}`
-        )
-        return undefined
-      }
-      return data as unknown
-    } catch (err) {
-      this.logger.error(
-        `Failed to fetch batch info from FeederGateway for batchId: ${batchId}`,
-        err
+    const res = await this.fetchClient.fetchRetry(url, {
+      ...this.requestInit,
+      // Some of the requests can take a long time to complete e.g. batchId = 1914
+      timeout: 60_000,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data = await res.json()
+    // Starkex instead of 404 returns 200 with code and message, thats why we need to handle it this way.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (data.code) {
+      throw new Error(
+        `Failed to fetch batch info from FeederGateway for batchId: ${batchId} | ${JSON.stringify(
+          data
+        )}`
       )
-      return undefined
     }
+    return data as unknown
   }
 }
