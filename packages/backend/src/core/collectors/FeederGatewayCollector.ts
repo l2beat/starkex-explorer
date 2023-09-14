@@ -24,19 +24,19 @@ export class FeederGatewayCollector {
     const latestSyncedTransactionStateUpdateId =
       await this.l2TransactionRepository.findLatestStateUpdateId()
 
-    await this.l2TransactionRepository.runInTransactionWithLockedTable(
-      async (trx) => {
-        for (
-          let stateUpdateId = latestSyncedTransactionStateUpdateId
-            ? latestSyncedTransactionStateUpdateId + 1
-            : 1;
-          stateUpdateId <= latestStateUpdate.id;
-          stateUpdateId++
-        ) {
+    for (
+      let stateUpdateId = latestSyncedTransactionStateUpdateId
+        ? latestSyncedTransactionStateUpdateId + 1
+        : 1;
+      stateUpdateId <= latestStateUpdate.id;
+      stateUpdateId++
+    ) {
+      await this.l2TransactionRepository.runInTransactionWithLockedTable(
+        async (trx) => {
           await this.collectForStateUpdate(stateUpdateId, trx)
         }
-      }
-    )
+      )
+    }
   }
 
   async collectForStateUpdate(stateUpdateId: number, trx: Knex.Transaction) {

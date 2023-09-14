@@ -46,7 +46,7 @@ describe(FeederGatewayCollector.name, () => {
       ).toHaveBeenCalledTimes(1)
       expect(
         mockL2TransactionRepository.runInTransactionWithLockedTable
-      ).toHaveBeenCalledTimes(1)
+      ).toHaveBeenCalledTimes(5)
 
       for (const i of [1, 2, 3, 4, 5]) {
         expect(mockCollectForStateUpdate).toHaveBeenCalledWith(
@@ -88,7 +88,7 @@ describe(FeederGatewayCollector.name, () => {
 
       expect(
         mockL2TransactionRepository.runInTransactionWithLockedTable
-      ).toHaveBeenCalledTimes(1)
+      ).toHaveBeenCalledTimes(4)
 
       for (const i of [7, 8, 9, 10]) {
         expect(mockCollectForStateUpdate).toHaveBeenCalledWith(
