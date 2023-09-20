@@ -62,7 +62,7 @@ export class PageContextService {
   ): Promise<PageContextWithUserAndStarkKey | undefined> {
     const context = await this.getPageContextWithUser(givenUser)
 
-    if (!context || !context.user.starkKey) {
+    if (!context?.user.starkKey) {
       return undefined
     }
 

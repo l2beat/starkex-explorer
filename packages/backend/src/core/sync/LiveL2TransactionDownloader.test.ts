@@ -60,17 +60,18 @@ const fakeParseError: UnsuccessfullyParsedL2Transaction = {
 describe(LiveL2TransactionDownloader.name, () => {
   describe(LiveL2TransactionDownloader.prototype.start.name, () => {
     it('should initialize, start and sync, logging parse errors', async () => {
-      const thirdPartyId = 1200005
+      const lastSyncedThirdPartyId = 1200005
+      const thirdPartyIdToSync = lastSyncedThirdPartyId + 1
       const firstTxs = range(100).map((i) =>
-        fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 1 })
+        fakeL2Transaction({ thirdPartyId: thirdPartyIdToSync + i })
       )
       const secondTxs = range(98).map((i) =>
-        fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 100 })
+        fakeL2Transaction({ thirdPartyId: thirdPartyIdToSync + i + 100 })
       )
       // Sprinkle in a single mis-parsed transaction
       const parseErrorTx = {
         ...fakeParseError,
-        thirdPartyId: thirdPartyId + 98 + 100,
+        thirdPartyId: thirdPartyIdToSync + 98 + 100,
       }
       secondTxs.push(parseErrorTx)
 
@@ -79,7 +80,7 @@ describe(LiveL2TransactionDownloader.name, () => {
         onEvery: mockFn((_, cb) => cb()),
       })
       const mockKeyValueStore = mockObject<KeyValueStore>({
-        findByKey: mockFn().resolvesTo(thirdPartyId),
+        findByKey: mockFn().resolvesTo(lastSyncedThirdPartyId),
         addOrUpdate: mockFn().resolvesTo('lastSyncedThirdPartyId'),
       })
       const mockLiveL2TransactionClient = mockObject<LiveL2TransactionClient>({
@@ -125,7 +126,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       )
       expect(
         mockLiveL2TransactionClient.getPerpetualLiveTransactions
-      ).toHaveBeenNthCalledWith(1, thirdPartyId + 1, 100)
+      ).toHaveBeenNthCalledWith(1, thirdPartyIdToSync, 100)
 
       await waitForExpect(() => {
         firstTxs.forEach((tx, i) => {
@@ -148,7 +149,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           1,
           {
             key: 'lastSyncedThirdPartyId',
-            value: thirdPartyId + firstTxs.length,
+            value: thirdPartyIdToSync + firstTxs.length - 1,
           },
           mockKnexTransaction
         )
@@ -156,7 +157,7 @@ describe(LiveL2TransactionDownloader.name, () => {
 
       expect(
         mockLiveL2TransactionClient.getPerpetualLiveTransactions
-      ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length, 100)
+      ).toHaveBeenNthCalledWith(2, thirdPartyIdToSync + firstTxs.length, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
           if (tx.parsedSuccessfully) {
@@ -183,7 +184,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           2,
           {
             key: 'lastSyncedThirdPartyId',
-            value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
+            value: thirdPartyIdToSync + firstTxs.length + secondTxs.length - 1,
           },
           mockKnexTransaction
         )
