@@ -449,8 +449,7 @@ export class L2TransactionRepository extends BaseRepository {
       .whereNotIn('type', excludeL2TransactionTypes)
       // We filter out the multi transactions because we show the child transactions instead
       .andWhereNot({ type: 'MultiTransaction' })
-      .orderBy('state_update_id', 'desc')
-      .orderBy('id', 'desc')
+      .orderBy('transaction_id', 'desc')
       .offset(offset)
       .limit(limit)
 
@@ -476,8 +475,7 @@ export class L2TransactionRepository extends BaseRepository {
             stark_key_b: starkKey.toString(),
           })
       )
-      .orderBy('state_update_id', 'desc')
-      .orderBy('id', 'desc')
+      .orderBy('transaction_id', 'desc')
       .limit(limit)
       .offset(offset)
     return rows.map(toRecord)
@@ -494,8 +492,7 @@ export class L2TransactionRepository extends BaseRepository {
       .andWhere({ state_update_id: stateUpdateId })
       // We filter out the multi transactions because we show the child transactions instead
       .andWhereNot({ type: 'MultiTransaction' })
-      .orderBy('state_update_id', 'desc')
-      .orderBy('id', 'desc')
+      .orderBy('transaction_id', 'desc')
       .offset(offset)
       .limit(limit)
 
