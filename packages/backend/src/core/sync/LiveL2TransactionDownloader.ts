@@ -95,44 +95,44 @@ export class LiveL2TransactionDownloader {
     } catch (error) {
       // Ignoring the error - we don't want to kill the server
       this.logger.error(error)
-      this.isRunning = false
     }
+    this.isRunning = false
   }
 
   private async downloadAndAddTransactions(thirdPartyId: number) {
     this.logger.info(`Downloading live transactions from ${thirdPartyId}`)
+    let lastSyncedThirdPartyId: number = thirdPartyId
 
-    const transactions =
-      await this.l2TransactionClient.getPerpetualLiveTransactions(
-        thirdPartyId,
-        this.PAGE_SIZE
+    while (true) {
+      const transactions =
+        await this.l2TransactionClient.getPerpetualLiveTransactions(
+          lastSyncedThirdPartyId,
+          this.PAGE_SIZE
+        )
+
+      if (!transactions) {
+        break
+      }
+
+      lastSyncedThirdPartyId = thirdPartyId + transactions.length - 1
+      if (
+        transactions[transactions.length - 1]?.thirdPartyId !==
+        lastSyncedThirdPartyId
+      ) {
+        throw new Error('ThirdPartyId should come in sequential order')
+      }
+
+      await this.l2TransactionRepository.runInTransactionWithLockedTable(
+        async (trx) => {
+          await this.addTransactions(transactions, trx)
+
+          await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId, trx)
+        }
       )
 
-    if (!transactions) {
-      this.isRunning = false
-      return
-    }
-
-    const lastSyncedThirdPartyId = thirdPartyId + transactions.length - 1
-    if (
-      transactions[transactions.length - 1]?.thirdPartyId !==
-      lastSyncedThirdPartyId
-    ) {
-      throw new Error('ThirdPartyId should come in sequential order')
-    }
-
-    await this.l2TransactionRepository.runInTransactionWithLockedTable(
-      async (trx) => {
-        await this.addTransactions(transactions, trx)
-
-        await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId, trx)
+      if (transactions.length < this.PAGE_SIZE) {
+        break
       }
-    )
-
-    if (transactions.length >= this.PAGE_SIZE) {
-      await this.downloadAndAddTransactions(lastSyncedThirdPartyId)
-    } else {
-      this.isRunning = false
     }
   }
 
