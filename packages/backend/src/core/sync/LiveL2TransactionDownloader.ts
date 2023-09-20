@@ -100,11 +100,13 @@ export class LiveL2TransactionDownloader {
   }
 
   private async downloadAndAddTransactions(thirdPartyId: number) {
-    this.logger.info(`Downloading live transactions from ${thirdPartyId}`)
     let thirdPartyIdToSync: number = thirdPartyId
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
+      this.logger.info(
+        `Downloading live transactions from thirdPartyId ${thirdPartyIdToSync}`
+      )
       const transactions =
         await this.l2TransactionClient.getPerpetualLiveTransactions(
           thirdPartyIdToSync,
@@ -114,6 +116,19 @@ export class LiveL2TransactionDownloader {
       if (!transactions) {
         break
       }
+
+      // Log some information of received data
+      const firstTransaction = transactions[0]
+      if (firstTransaction) {
+        this.logger.info(
+          firstTransaction.parsedSuccessfully
+            ? `Received ${transactions.length} L2 txs. First id is ${firstTransaction.transactionId}`
+            : `Received ${transactions.length} L2 txs. First one is a parse error`
+        )
+      } else {
+        this.logger.info('Received no L2 txs')
+      }
+
       thirdPartyIdToSync = thirdPartyIdToSync + transactions.length
       const lastSyncedThirdPartyId = thirdPartyIdToSync - 1
       if (
