@@ -105,7 +105,7 @@ export class LiveL2TransactionDownloader {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
       this.logger.info(
-        `Downloading live transactions from ${thirdPartyIdToSync}`
+        `Downloading live transactions from thirdPartyId ${thirdPartyIdToSync}`
       )
       const transactions =
         await this.l2TransactionClient.getPerpetualLiveTransactions(
