@@ -114,7 +114,7 @@ export class LiveL2TransactionDownloader {
         break
       }
 
-      lastSyncedThirdPartyId = thirdPartyId + transactions.length - 1
+      lastSyncedThirdPartyId = lastSyncedThirdPartyId + transactions.length - 1
       if (
         transactions[transactions.length - 1]?.thirdPartyId !==
         lastSyncedThirdPartyId
