@@ -101,21 +101,21 @@ export class LiveL2TransactionDownloader {
 
   private async downloadAndAddTransactions(thirdPartyId: number) {
     this.logger.info(`Downloading live transactions from ${thirdPartyId}`)
-    let lastSyncedThirdPartyId: number = thirdPartyId
+    let thirdPartyIdToSync: number = thirdPartyId
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
       const transactions =
         await this.l2TransactionClient.getPerpetualLiveTransactions(
-          lastSyncedThirdPartyId,
+          thirdPartyIdToSync,
           this.PAGE_SIZE
         )
 
       if (!transactions) {
         break
       }
-
-      lastSyncedThirdPartyId = lastSyncedThirdPartyId + transactions.length - 1
+      thirdPartyIdToSync = thirdPartyIdToSync + transactions.length
+      const lastSyncedThirdPartyId = thirdPartyIdToSync - 1
       if (
         transactions[transactions.length - 1]?.thirdPartyId !==
         lastSyncedThirdPartyId
