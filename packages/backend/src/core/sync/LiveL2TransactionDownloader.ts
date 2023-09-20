@@ -105,7 +105,7 @@ export class LiveL2TransactionDownloader {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
       this.logger.info(
-        `Downloading live transactions from thirdPartyId ${thirdPartyIdToSync}`
+        `Downloading live transactions from ${thirdPartyIdToSync}`
       )
       const transactions =
         await this.l2TransactionClient.getPerpetualLiveTransactions(
@@ -126,7 +126,7 @@ export class LiveL2TransactionDownloader {
             : `Received ${transactions.length} L2 txs. First one is a parse error`
         )
       } else {
-        this.logger.info('Received no L2 txs')
+        this.logger.info('Received no Live L2 txs')
       }
 
       thirdPartyIdToSync = thirdPartyIdToSync + transactions.length
