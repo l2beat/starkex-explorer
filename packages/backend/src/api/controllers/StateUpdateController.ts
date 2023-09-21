@@ -67,7 +67,9 @@ export class StateUpdateController {
       l2Transactions,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
-      this.preprocessedStateDetailsRepository.findById(stateUpdateId),
+      this.preprocessedStateDetailsRepository.findByStateUpdateId(
+        stateUpdateId
+      ),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
         paginationOpts
