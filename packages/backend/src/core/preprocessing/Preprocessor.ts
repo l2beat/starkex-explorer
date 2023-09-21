@@ -133,13 +133,19 @@ export class Preprocessor<T extends AssetHash | AssetId> {
         )
 
         if (this.l2TransactionsEnabled) {
+          const preprocessL2TransactionTo =
+            await this.getStateUpdateIdToCatchUpL2TransactionsTo(
+              trx,
+              lastProcessedStateUpdate.stateUpdateId
+            )
+
           await this.stateDetailsPreprocessor.catchUpL2Transactions(
             trx,
-            lastProcessedStateUpdate.stateUpdateId
+            preprocessL2TransactionTo
           )
           await this.userL2TransactionsPreprocessor.catchUp(
             trx,
-            lastProcessedStateUpdate.stateUpdateId
+            preprocessL2TransactionTo
           )
         }
       }
