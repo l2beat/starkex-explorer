@@ -1,4 +1,5 @@
 import { CollateralAsset } from '@explorer/shared'
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 import { AlternativeTransactionIcon } from '../../../../assets/icons/AlternativeTransactionIcon'
@@ -21,17 +22,23 @@ export interface PerpetualL2TransactionsTableProps {
   transactions: PerpetualL2TransactionEntry[]
   collateralAsset: CollateralAsset
   showInfo: boolean
+  isHomePage?: boolean
 }
 
 export function PerpetualL2TransactionsTable(
   props: PerpetualL2TransactionsTableProps
 ) {
   const columns: Column[] = [
-    { header: 'ID' },
+    { header: 'ID', className: classNames(props.isHomePage && 'w-[130px]') },
     { header: 'Type' },
-    ...(props.showInfo ? [{ header: 'Info' }] : []),
-    { header: 'Status' },
-    { header: 'Age' },
+    ...(props.showInfo
+      ? [{ header: 'Info', className: classNames(props.isHomePage && 'w-max') }]
+      : []),
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    { header: 'Age', className: classNames(props.isHomePage && 'w-[90px]') },
   ]
 
   return (

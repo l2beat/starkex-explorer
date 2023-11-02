@@ -26,7 +26,11 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
       shortenOnMobile={props.shortenOnMobile}
       columns={[
         { header: 'Id' },
-        { header: 'Tx Hash', className: '@container/tx-hash' },
+        {
+          header: 'Tx Hash',
+          className: '@container/tx-hash',
+          excludeClassNameFromHeader: true,
+        },
         { header: 'Updates', numeric: true },
         {
           header: (

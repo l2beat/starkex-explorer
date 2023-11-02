@@ -127,7 +127,7 @@ export function randomPerpetualL2TransactionEntry(
   data?: PerpetualL2TransactionEntry['data']
 ): PerpetualL2TransactionEntry {
   return {
-    transactionId: randomInt(0, 100000),
+    transactionId: randomInt(0, 999999999),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
     timestamp: randomTimestamp(),
     data: data ? data : perpetualL2TransactionsBucket.pick(),

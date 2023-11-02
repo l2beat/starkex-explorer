@@ -4,6 +4,7 @@ import {
   PageContext,
 } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
+import classNames from 'classnames'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -19,6 +20,7 @@ import { TimeAgeCell } from '../TimeAgeCell'
 interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
+  isHomePage?: boolean
   showRole?: boolean
   showInfoColumn?: boolean
 }
@@ -45,14 +47,23 @@ export interface OfferEntry {
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Id' },
+    { header: 'Id', className: classNames(props.isHomePage && 'w-[130px]') },
     { header: 'Type' },
     ...(props.showInfoColumn
-      ? [{ header: 'Info', align: 'center' as const }]
+      ? [
+          {
+            header: 'Info',
+            align: 'center' as const,
+            className: classNames(props.isHomePage && 'w-max'),
+          },
+        ]
       : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
-    { header: 'Status' },
-    { header: 'Age' },
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    { header: 'Age', className: classNames(props.isHomePage && 'w-[90px]') },
   ]
   if (props.showInfoColumn) {
     props.offers
