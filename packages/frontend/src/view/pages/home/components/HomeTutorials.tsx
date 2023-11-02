@@ -40,7 +40,7 @@ export function HomeTutorials(props: HomeTutorialsProps) {
             <img
               className="aspect-video h-[63px] rounded"
               src={tutorial.imageUrl}
-              data-fallback="/images/tutorial.jpg"
+              data-fallback="/images/introduction.jpg"
             />
             <div className="flex-1">
               <p className="text-base font-semibold leading-tight">
