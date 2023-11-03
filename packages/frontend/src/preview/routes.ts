@@ -201,7 +201,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
 
       ctx.body = renderHomeL2TransactionsPage({
-        context: getPerpetualPageContext(ctx),
+        context: getPerpetualPageContext(ctx, { showL2Transactions: true }),
         l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
         total: total,
         limit: limit,

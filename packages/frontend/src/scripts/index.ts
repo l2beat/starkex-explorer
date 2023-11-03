@@ -8,6 +8,7 @@ import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
 import { initMetamask } from './metamask'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'
+import { initExpandableSearchBar } from './searchBar'
 import { initTabs } from './tabs'
 import { initTooltips } from './tooltips'
 
@@ -17,6 +18,7 @@ initCopyButtons()
 initTooltips()
 initPagination()
 initExpandableContainers()
+initExpandableSearchBar()
 // #endregion
 // #region Forms
 initStarkKeyRecovery()
