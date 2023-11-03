@@ -17,7 +17,7 @@ export function Table(props: TableProps) {
   return (
     <div
       className={cx(
-        'overflow-x-auto rounded-lg bg-gray-800 group-[.Card]/card:-mx-6 sm:w-full sm:group-[.Card]/card:mx-0',
+        'overflow-x-auto bg-gray-800 group-[.Card]/card:-mx-6 sm:w-full sm:group-[.Card]/card:mx-0',
         props.rows.length > 0 && 'pb-2 group-[.Card]/card:pb-0'
       )}
     >
@@ -38,7 +38,8 @@ export function Table(props: TableProps) {
                   column.numeric && 'text-right',
                   column.align === 'center' && 'text-center',
                   column.minimalWidth && 'w-0',
-                  alignLastColumnRight && 'last:w-0'
+                  alignLastColumnRight && 'last:w-0',
+                  !column.excludeClassNameFromHeader && column.className
                 )}
               >
                 {column.header}

@@ -1,4 +1,5 @@
 import { Hash256, Timestamp } from '@explorer/types'
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -13,6 +14,7 @@ import { TimeAgeCell } from '../TimeAgeCell'
 
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
+  isHomePage?: boolean
   hideAge?: boolean
   hideInfo?: boolean
 }
@@ -35,11 +37,26 @@ export interface TransactionEntry {
 
 export function TransactionsTable(props: TransactionsTableProps) {
   const columns: Column[] = [
-    { header: 'Tx Hash' },
+    {
+      header: 'Tx Hash',
+      className: classNames(props.isHomePage && 'w-[130px]'),
+    },
     { header: 'Type' },
-    ...(!props.hideInfo ? [{ header: 'Info' }] : []),
-    { header: 'Status' },
-    ...(!props.hideAge ? [{ header: 'Age' }] : []),
+    ...(!props.hideInfo
+      ? [{ header: 'Info', className: classNames(props.isHomePage && 'w-max') }]
+      : []),
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    ...(!props.hideAge
+      ? [
+          {
+            header: 'Age',
+            className: classNames(props.isHomePage && 'w-[90px]'),
+          },
+        ]
+      : []),
   ]
 
   return (
