@@ -139,6 +139,7 @@ function Tables(props: HomePageProps) {
             <OffersTable
               offers={props.offers}
               context={props.context}
+              showTypeColumn
               isHomePage
             />
           </TablePreview>,
