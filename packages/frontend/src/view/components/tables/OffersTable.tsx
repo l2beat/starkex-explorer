@@ -4,6 +4,7 @@ import {
   PageContext,
 } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
+import classNames from 'classnames'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -19,8 +20,10 @@ import { TimeAgeCell } from '../TimeAgeCell'
 interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
+  isHomePage?: boolean
   showRole?: boolean
-  showInfoColumn?: boolean
+  showOfferMatchColumn?: boolean
+  showTypeColumn?: boolean
 }
 
 export interface OfferEntry {
@@ -39,34 +42,49 @@ export interface OfferEntry {
     | 'INCLUDED'
     | 'EXPIRED'
     | 'REVERTED'
-  type: 'BUY' | 'SELL'
+  type?: 'BUY' | 'SELL'
   role?: 'MAKER' | 'TAKER'
 }
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Id' },
-    { header: 'Type' },
-    ...(props.showInfoColumn
-      ? [{ header: 'Info', align: 'center' as const }]
+    { header: 'Id', className: classNames(props.isHomePage && 'w-[130px]') },
+    ...(props.showTypeColumn ? [{ header: 'Type' }] : []),
+    ...(props.showOfferMatchColumn
+      ? [
+          {
+            header: (
+              <span className="flex items-center justify-center">
+                OFFER
+                <ArrowRightIcon className="flex-inline mx-1" />
+                MATCH
+              </span>
+            ),
+            align: 'center' as const,
+            className: classNames(props.isHomePage && 'w-max'),
+          },
+        ]
       : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
-    { header: 'Status' },
-    { header: 'Age' },
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    { header: 'Age', className: classNames(props.isHomePage && 'w-[90px]') },
   ]
-  if (props.showInfoColumn) {
-    props.offers
-  }
+
   return (
     <Table
       columns={columns}
       rows={props.offers.map((offer) => {
         const cells: ReactNode[] = [
           <Link>#{offer.id}</Link>,
-          <span className="capitalize">{offer.type.toLowerCase()}</span>,
-          ...(props.showInfoColumn
+          ...(props.showTypeColumn
+            ? [<span className="capitalize">{offer.type?.toLowerCase()}</span>]
+            : []),
+          ...(props.showOfferMatchColumn
             ? [
-                <InfoColumn
+                <OfferMatchColumn
                   offer={offer}
                   collateralAsset={props.context.collateralAsset}
                 />,
@@ -95,7 +113,7 @@ interface Props {
   collateralAsset: CollateralAsset
 }
 
-function InfoColumn({ offer, collateralAsset }: Props) {
+function OfferMatchColumn({ offer, collateralAsset }: Props) {
   const trade =
     offer.type === 'SELL'
       ? {
