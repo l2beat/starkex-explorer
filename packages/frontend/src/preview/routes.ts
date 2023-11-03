@@ -299,12 +299,7 @@ const routes: Route[] = [
         context,
         id: randomId(),
         transactionHash: Hash256.fake(),
-        hashes: {
-          positionTreeRoot: PedersenHash.fake(),
-          onChainVaultTreeRoot: PedersenHash.fake(),
-          offChainVaultTreeRoot: PedersenHash.fake(),
-          orderRoot: PedersenHash.fake(),
-        },
+        balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
           Math.floor(
@@ -334,12 +329,7 @@ const routes: Route[] = [
         context,
         id: randomId(),
         transactionHash: Hash256.fake(),
-        hashes: {
-          positionTreeRoot: PedersenHash.fake(),
-          onChainVaultTreeRoot: PedersenHash.fake(),
-          offChainVaultTreeRoot: PedersenHash.fake(),
-          orderRoot: PedersenHash.fake(),
-        },
+        balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
           Math.floor(

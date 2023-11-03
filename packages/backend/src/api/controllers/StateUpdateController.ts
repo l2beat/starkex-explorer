@@ -119,13 +119,7 @@ export class StateUpdateController {
       context,
       id: stateUpdateId.toString(),
       transactionHash: stateUpdate.stateTransitionHash,
-      hashes: {
-        positionTreeRoot: stateUpdate.rootHash,
-        // TODO - extract this data:
-        onChainVaultTreeRoot: undefined,
-        offChainVaultTreeRoot: undefined,
-        orderRoot: undefined,
-      },
+      balancesTreeRootHash: stateUpdate.rootHash,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,

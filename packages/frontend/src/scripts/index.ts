@@ -1,5 +1,4 @@
 import { initCopyButtons } from './copyButtons'
-import { initExpandableContainers } from './expandableContainers'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
 import { initImageFallback } from './imageFallback'
@@ -17,7 +16,6 @@ initTabs()
 initCopyButtons()
 initTooltips()
 initPagination()
-initExpandableContainers()
 initExpandableSearchBar()
 // #endregion
 // #region Forms
