@@ -1,4 +1,5 @@
 import { PageContext } from '@explorer/shared'
+import classNames from 'classnames'
 import React from 'react'
 
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
@@ -10,13 +11,15 @@ import { SearchBar } from '../SearchBar'
 interface NavbarProps {
   readonly context: PageContext
   readonly showSearchBar: boolean
-  readonly showNavLinks?: boolean
+  readonly path: string
+  readonly isPreview: boolean
 }
 
 export function Navbar({
   showSearchBar = true,
-  showNavLinks = false,
   context,
+  path,
+  isPreview,
 }: NavbarProps) {
   const { user, instanceName, tradingMode, chainId } = context
   const isMainnet = chainId === 1
@@ -35,14 +38,17 @@ export function Navbar({
             {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
-        {showNavLinks && (
-          <NavLinks showL2Transactions={context.showL2Transactions} />
-        )}
+        <NavLinks
+          showL2Transactions={context.showL2Transactions}
+          path={path}
+          isPreview={isPreview}
+        />
         <div className="flex gap-x-4 gap-y-2">
           {showSearchBar && (
             <SearchBar
               tradingMode={tradingMode}
-              className="hidden w-auto min-w-[515px] lg:flex"
+              className="hidden lg:flex"
+              expandable
             />
           )}
           {!user && (
@@ -87,11 +93,16 @@ export function Navbar({
   )
 }
 
-function NavLinks({ showL2Transactions }: { showL2Transactions: boolean }) {
-  const navItems = [
-    ...(showL2Transactions
-      ? [{ href: '/l2-transactions', title: 'Transactions' }]
-      : []),
+export type NavItem =
+  | 'Home'
+  | 'Transactions'
+  | 'State updates'
+  | 'Forced transactions'
+  | 'Offers'
+
+const getNavItems = (showL2Transactions: boolean) => {
+  const items: { href: string; title: NavItem; previewHref?: string }[] = [
+    { href: '/', title: 'Home', previewHref: '/home/with-l2-transactions' },
     { href: '/state-updates', title: 'State updates' },
     {
       href: '/forced-transactions',
@@ -100,10 +111,37 @@ function NavLinks({ showL2Transactions }: { showL2Transactions: boolean }) {
     { href: '/offers', title: 'Offers' },
   ]
 
+  if (showL2Transactions) {
+    items.push({ href: '/l2-transactions', title: 'Transactions' })
+  }
+
+  return items
+}
+
+function NavLinks({
+  showL2Transactions,
+  path,
+  isPreview,
+}: {
+  showL2Transactions: boolean
+  path: string
+  isPreview: boolean
+}) {
+  const navItems = getNavItems(showL2Transactions)
+
   return (
-    <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform items-center xl:flex">
+    <div className="NavLinks absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform items-center transition-opacity xl:flex">
       {navItems.map((item) => {
-        return <NavLink key={item.title} href={item.href} title={item.title} />
+        const href = isPreview ? item.previewHref ?? item.href : item.href
+        const isSelected = item.previewHref === path || item.href === path
+        return (
+          <NavLink
+            key={item.title}
+            href={href}
+            title={item.title}
+            isSelected={isSelected}
+          />
+        )
       })}
     </div>
   )
@@ -111,14 +149,16 @@ function NavLinks({ showL2Transactions }: { showL2Transactions: boolean }) {
 interface NavLinkProps {
   href: string
   title: string
+  isSelected: boolean
 }
 
-function NavLink({ href, title }: NavLinkProps) {
+function NavLink({ href, title, isSelected }: NavLinkProps) {
   return (
     <a
-      className={
-        'px-3 py-2 text-md font-semibold transition-colors hover:text-brand'
-      }
+      className={classNames(
+        'px-3 py-2 text-md font-semibold transition-colors hover:text-brand-darker',
+        isSelected && 'text-brand'
+      )}
       href={href}
     >
       {title}

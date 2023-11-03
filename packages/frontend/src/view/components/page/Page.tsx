@@ -11,7 +11,6 @@ import { Navbar } from './Navbar'
 interface Props {
   context: PageContext | PageContextWithUser
   withoutSearch?: boolean
-  showNavLinks?: boolean
   description: string
   image?: string
   baseTitle?: string
@@ -55,8 +54,9 @@ export function Page(props: Props) {
         {isPreview && <BreakpointIndicator />}
         <Navbar
           showSearchBar={!props.withoutSearch}
-          showNavLinks={props.showNavLinks}
           context={props.context}
+          path={props.path}
+          isPreview={isPreview}
         />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         <GradientBackground />
