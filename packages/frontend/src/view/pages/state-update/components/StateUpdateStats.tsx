@@ -3,25 +3,18 @@ import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
+import { Card } from '../../../components/Card'
 import { EtherscanLink } from '../../../components/EtherscanLink'
-import { ExpandableContainer } from '../../../components/ExpandableContainer'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
-import { Link } from '../../../components/Link'
 import { LongHash } from '../../../components/LongHash'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
   transactionHash: Hash256
-  hashes: {
-    positionTreeRoot?: PedersenHash
-    onChainVaultTreeRoot?: PedersenHash
-    offChainVaultTreeRoot?: PedersenHash
-    orderRoot?: PedersenHash
-  }
+  balancesTreeRootHash: PedersenHash
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
-  rawDataAvailable?: boolean
   context: PageContext
 }
 
@@ -38,8 +31,8 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   return (
     <section>
       <PageTitle>State Update #{props.id}</PageTitle>
-      <ExpandableContainer
-        visible={
+      <Card>
+        <div>
           <div className="flex flex-col justify-between gap-6 sm:flex-row">
             <ValueItem label="Transaction hash">
               <EtherscanLink
@@ -56,49 +49,15 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
               {formatTimestamp(props.ethereumTimestamp)} UTC
             </ValueItem>
           </div>
-        }
-        expandedContent={
-          <div className="mt-8 flex flex-col gap-4 rounded bg-slate-800 p-6">
-            {props.hashes.positionTreeRoot && (
-              <ValueItem label="Position tree root">
-                <LongHash withCopy>
-                  0x{props.hashes.positionTreeRoot.toString()}
-                </LongHash>
-              </ValueItem>
-            )}
-            {props.hashes.onChainVaultTreeRoot && (
-              <ValueItem label="On-chain vault tree root">
-                <LongHash withCopy>
-                  0x{props.hashes.onChainVaultTreeRoot.toString()}
-                </LongHash>
-              </ValueItem>
-            )}
-            {props.hashes.offChainVaultTreeRoot && (
-              <ValueItem label="Off-chain vault tree root">
-                <LongHash withCopy>
-                  0x{props.hashes.offChainVaultTreeRoot.toString()}
-                </LongHash>
-              </ValueItem>
-            )}
-            {props.hashes.orderRoot && (
-              <ValueItem label="Order root">
-                <LongHash withCopy>
-                  0x{props.hashes.orderRoot.toString()}
-                </LongHash>
-              </ValueItem>
-            )}
-            {props.rawDataAvailable && (
-              <Link
-                href={`/state-updates/${props.id}/raw`}
-                className="text-lg font-semibold"
-              >
-                View raw data
-              </Link>
-            )}
+          <div className="mt-8 flex flex-col">
+            <ValueItem label="Balances tree root">
+              <LongHash withCopy>
+                0x{props.balancesTreeRootHash.toString()}
+              </LongHash>
+            </ValueItem>
           </div>
-        }
-        subject="advanced data"
-      />
+        </div>
+      </Card>
     </section>
   )
 }
