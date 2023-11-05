@@ -30,9 +30,8 @@ export function TutorialsPage(props: TutorialsPageProps) {
           {props.tutorials.map((tutorial, i) => (
             <div key={i} className="group flex w-full gap-11">
               <img
-                className="aspect-video w-[195px] rounded-lg"
-                src={tutorial.imageUrl}
-                data-fallback="/images/tutorial.jpg"
+                className="w-[100px] rounded-lg"
+                src="/images/starkex-logo.png"
               />
               <div className="flex flex-col justify-between">
                 <p className="text-xl font-semibold leading-tight">

@@ -26,8 +26,7 @@ export function HomeSpotlightArticle(props: HomeSpotlightArticleProps) {
         </Button>
       </div>
       <img
-        src={props.spotlightArticle.imageUrl}
-        data-fallback="/images/tutorial.jpg"
+        src="/images/starkex-logo.png"
       />
     </Card>
   )

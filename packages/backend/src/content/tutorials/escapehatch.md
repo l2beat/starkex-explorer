@@ -1,4 +1,4 @@
-# Escape Hatch functionality
+# Escape Hatch explained
 
 For introduction to StarkEx explorer, see this guide:
 

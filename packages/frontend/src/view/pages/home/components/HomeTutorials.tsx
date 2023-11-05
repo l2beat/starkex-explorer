@@ -8,7 +8,6 @@ import { SectionHeading } from '../../../components/SectionHeading'
 
 export interface HomeTutorialEntry {
   title: string
-  imageUrl: string
   slug: string
 }
 interface HomeTutorialsProps {
@@ -38,9 +37,8 @@ export function HomeTutorials(props: HomeTutorialsProps) {
             className="group flex w-full items-center gap-4"
           >
             <img
-              className="aspect-video h-[63px] rounded"
-              src={tutorial.imageUrl}
-              data-fallback="/images/introduction.jpg"
+              className="h-[63px] rounded"
+              src="/images/starkex-logo.png"
             />
             <div className="flex-1">
               <p className="text-base font-semibold leading-tight">

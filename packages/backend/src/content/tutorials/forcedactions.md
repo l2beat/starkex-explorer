@@ -1,4 +1,4 @@
-# Forced Actions
+# All about Forced Actions
 
 For introduction to StarkEx explorer, see this guide:
 
