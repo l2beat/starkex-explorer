@@ -54,7 +54,6 @@ function HomePage(props: HomePageProps) {
       description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
       context={props.context}
       withoutSearch
-      showNavLinks
     >
       <ContentWrapper className="!max-w-[1340px] !pt-0 sm:!pt-8 xl:!pt-16">
         <div className="flex flex-col gap-8">
@@ -113,6 +112,7 @@ function Tables(props: HomePageProps) {
               transactions={props.l2Transactions}
               context={props.context}
               showInfo={false}
+              isHomePage
             />
           </TablePreview>,
         ]
@@ -122,7 +122,11 @@ function Tables(props: HomePageProps) {
       visible={props.forcedTransactions.length}
       {...FORCED_TRANSACTION_TABLE_PROPS}
     >
-      <TransactionsTable transactions={props.forcedTransactions} hideInfo />
+      <TransactionsTable
+        transactions={props.forcedTransactions}
+        hideInfo
+        isHomePage
+      />
     </TablePreview>,
     ...(props.offers && props.context.tradingMode === 'perpetual'
       ? [
@@ -131,7 +135,12 @@ function Tables(props: HomePageProps) {
             visible={props.offers.length}
             {...OFFER_TABLE_PROPS}
           >
-            <OffersTable offers={props.offers} context={props.context} />
+            <OffersTable
+              offers={props.offers}
+              context={props.context}
+              showTypeColumn
+              isHomePage
+            />
           </TablePreview>,
         ]
       : []),

@@ -67,7 +67,9 @@ export class StateUpdateController {
       l2Transactions,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
-      this.preprocessedStateDetailsRepository.findById(stateUpdateId),
+      this.preprocessedStateDetailsRepository.findByStateUpdateId(
+        stateUpdateId
+      ),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
         paginationOpts
@@ -117,13 +119,7 @@ export class StateUpdateController {
       context,
       id: stateUpdateId.toString(),
       transactionHash: stateUpdate.stateTransitionHash,
-      hashes: {
-        positionTreeRoot: stateUpdate.rootHash,
-        // TODO - extract this data:
-        onChainVaultTreeRoot: undefined,
-        offChainVaultTreeRoot: undefined,
-        orderRoot: undefined,
-      },
+      balancesTreeRootHash: stateUpdate.rootHash,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,

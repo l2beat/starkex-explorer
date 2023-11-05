@@ -211,9 +211,10 @@ function UserPage(props: UserPageProps) {
                         {...offerTablePropsWithoutTitle}
                       >
                         <OffersTable
-                          showRole
                           offers={props.offers}
                           context={props.context}
+                          showTypeColumn
+                          showRole
                         />
                       </TablePreview>
                     ),

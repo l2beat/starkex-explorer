@@ -74,6 +74,7 @@ describe(Preprocessor.name, () => {
     it('catches up', async () => {
       const mockKnexTransaction = mockObject<Knex.Transaction>()
       const lastPreprocessedStateUpdateId = 10
+      const preprocessL2TransactionTo = 5
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           catchUp: mockFn().resolvesTo(undefined),
@@ -110,6 +111,12 @@ describe(Preprocessor.name, () => {
         true
       )
 
+      const mockGetStateUpdateIdToCatchUpL2TransactionsTo = mockFn().resolvesTo(
+        preprocessL2TransactionTo
+      )
+      preprocessor.getStateUpdateIdToCatchUpL2TransactionsTo =
+        mockGetStateUpdateIdToCatchUpL2TransactionsTo
+
       await preprocessor.catchUp()
 
       expect(
@@ -125,10 +132,10 @@ describe(Preprocessor.name, () => {
       )
       expect(
         mockStateDetailsPreprocessor.catchUpL2Transactions
-      ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
-      expect(mockUserStatisticsPreprocessor.catchUp).toHaveBeenCalledWith(
+      ).toHaveBeenCalledWith(mockKnexTransaction, preprocessL2TransactionTo)
+      expect(mockUserL2TransactionsPreprocessor.catchUp).toHaveBeenCalledWith(
         mockKnexTransaction,
-        lastPreprocessedStateUpdateId
+        preprocessL2TransactionTo
       )
     })
 

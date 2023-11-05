@@ -8,12 +8,14 @@ export interface L2TransactionsTableProps {
   context: PageContext
   transactions: PerpetualL2TransactionEntry[]
   showInfo?: boolean
+  isHomePage?: boolean
 }
 
 export function L2TransactionsTable({
   context,
   transactions,
   showInfo = true,
+  isHomePage,
 }: L2TransactionsTableProps) {
   switch (context.tradingMode) {
     case 'perpetual':
@@ -22,6 +24,7 @@ export function L2TransactionsTable({
           transactions={transactions}
           collateralAsset={context.collateralAsset}
           showInfo={showInfo}
+          isHomePage={isHomePage}
         />
       )
     case 'spot':
