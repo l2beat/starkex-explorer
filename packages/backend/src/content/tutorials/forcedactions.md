@@ -1,63 +1,54 @@
 # All about Forced Actions
 
-For introduction to StarkEx explorer, see this guide:
+For an introduction to the StarkEx Explorer, see this guide:
 
 * [Introduction to StarkEx Explorer](/tutorials/introduction)
 
-Forced Actions are special operations initiated via Ethereum blockchain. They are special emergency measures that should not be used under normal conditions due to their high cost and slow time of execution. They are useful when:
+Forced Actions are special operations initiated via the Ethereum blockchain. They are emergency measures that **should not be used under normal conditions** due to their high cost and slow execution time. They are useful when:
 
-* the StarkEx system (e.g. exchange) is operating normally,
-* but user is not able to access system's native interface (e.g. Exchange's website) for example due to censorship
+* the StarkEx system (e.g., an exchange) is operating normally,
+* but the user cannot access the system's native interface (e.g., the exchange's website), for example, due to censorship.
 
-In such scenario, forced actions provide an emergency exit route to withdraw user's assets to Ethereum.
+In such scenarios, forced actions provide an emergency exit route for users to withdraw their assets to Ethereum.
 
-If the StarkEx system is not operating normally (e.g. operator's servers have been shut down completely), user will need to use an Escape Hatch, which is an expensive, last resort solution.
+If the StarkEx system is not operating normally (e.g., the operator's servers have been shut down completely), users will need to use the Escape Hatch, which is an expensive last-resort solution.
 
 ### Forced Withdrawal
 
-Forced Withdrawals can be used to withdraw user assets, except for "perpetuals". If there are any perpetual positions open, they should be closed via "Forced Trade" before a Forced Withdrawal is attempted.
+Forced Withdrawals are used to withdraw user assets, except for "perpetual assets". If any perpetual positions are open, they must be closed via a "Forced Trade" before attempting a Forced Withdrawal.
 
-To initiate a Forced Withdrawal, user should:
+To initiate a Forced Withdrawal, users should:
 
-1. Open their User Page
+1. Open their User Page.
+2. Click on the "Withdraw" button next to their token (collateral) entry in the "Assets" table.
+3. Optional: If the user's Ethereum address has not been registered on Ethereum (meaning that Ethereum contracts do not recognize which StarkKey belongs to that Ethereum address), they will be prompted to do so via an Ethereum transaction.
+4. Enter the requested amount to withdraw. StarkEx in Spot trading mode will only allow the withdrawal of the full balance.
+5. Click on the "Prepare for withdrawal" button and send the requested transaction to Ethereum.
 
-1. Click on the "Withdraw" button next to their token (collateral) entry in "Assets" table.
+The created Forced Withdrawal request will be visible on the User Page in the "Forced transactions" panel.
 
-1. Optional: if user's Ethereum address has not been registered on Ethereum (which means that Ethereum contracts don't know which StarkKey belongs to that Ethereum address), they will be asked to do it via an Ethereum transaction.
+After initiating a Forced Withdrawal, StarkEx operators have a predefined amount of time (usually 7 or 14 days) to process the requested withdrawal. When they do, the User Page will display a "Withdrawable assets" section with a "Withdraw now" button to trigger the final transfer of funds to the user's Ethereum account.
 
-1. Enter requested amount to withdraw. StarkEx in a Spot trading mode will only allow to withdraw the full balance.
+If the StarkEx Operator does not honor the user's Forced Withdrawal request within the given time, the user will be able to trigger an Exchange Freeze and engage the Escape Hatch functionality, described in a separate guide ([Escape Hatch explained](/tutorials/escapehatch)).
 
-1. Click on "Prepare for withdrawal" button and send the requested transaction to Ethereum.
-
-Created Forced Withdrawal request will be visible on User Page in "Forced transactions" panel.
-
-After initiating Forced Withdrawal, StarkEx operators have a predefined amount of time (usually 7 or 14 days) to perform requested withdrawal. When they do, User Page will display a "Withdrawable assets" section with a "Withdraw now" button to trigger the final transfer of funds to user's Ethereum account.
-
-If StarkEx Operator doesn't honor user's Forced Withdrawal request if given time, user will be able to trigger Exchange Freeze and trigger Escape Hatch functionality, described in a separate guide ([Escape Hatch explained](/tutorials/escapehatch)).
-
-It's important to notice that nothing stops users from manually triggering Forced Withdrawals with incorrect amounts. Such requests will still be processed by StarkEx system, but due to their invalid data they will not trigger the final withdrawal.
+It is important to note that users can manually initiate Forced Withdrawals with incorrect amounts. Such requests will be processed by the StarkEx system, but due to their invalid data, they will not trigger the final withdrawal.
 
 ### Forced Trades
 
-Forced Trades are special actions required to close open perpetual positions. 
+Forced Trades are required to close open perpetual positions.
 
-To initiate a Forced Trade, user should:
+To initiate a Forced Trade, users should:
 
-1. Open their User Page
+1. Open their User Page.
+2. Click on the "Close" button next to their perpetual asset entry in the "Assets" table. If the user's position is "long", this would trigger a "Sell" trade, or a "Buy" if the position is "short".
+3. Optional: If the user's Ethereum address has not been registered on Ethereum (meaning that Ethereum contracts do not recognize which StarkKey belongs to that Ethereum address), they will be prompted to do so via an Ethereum transaction.
+4. Enter the desired trade data (perpetual amount and price).
+5. Click on the "Create buy/sell offer" button, which will require the user to sign with their MetaMask wallet.
 
-1. Click on the "Close" button next to their perpetual asset entry in "Assets" table. If user's position is "long", it would trigger a "Sell" trade, or "Buy" in case of a "short" position.
+Such a trade will be visible on the StarkEx Explorer Home Page and on the user's User Page in the "Offers" panel.
 
-1. Optional: if user's Ethereum address has not been registered on Ethereum (which means that Ethereum contracts don't know which StarkKey belongs to that Ethereum address), they will be asked to do it via an Ethereum transaction.
+Offers are internal to the StarkEx Explorer and are not visible on Ethereum or within the StarkEx system.
 
-1. Enter desired trade data (perpetual amount and price)
+An offer needs to be accepted by a counterpart via interaction with the offer on the Explorer. When a user "Accepts" the offer, the original creator can either cancel or approve it by sending a Forced Withdrawal transaction to Ethereum.
 
-1. Click on "Create buy/sell offer" button, which will require a user to sign with their Metamask wallet.
-
-
-Such trade will be visible on the StarkEx Explorer Home Page and on user's User Page in the "Offers" panel.
-
-Offers are internal to StarkEx explorer and are not visible neither on Ethereum nor on the StarkEx system.
-
-Offer needs to be accepted by a counterpart via interaction with the offer on the Explorer. When some user "Accepts" the offer, original creator can either cancel or approve it by sending a Forced Withdrawal transaction to Ethereum.
-
-Just like the Forced Withdrawal process, StarkEx Operator has limited time to honor this trade. If they do, the position will disappear from user's User Page and collateral asset balance will be updated accordingly. Otherwise, user will be able to use Escape Hatch Functionality.
+Just like with the Forced Withdrawal process, the StarkEx Operator has limited time to honor this trade. If they do, the position will disappear from the user's User Page, and the collateral asset balance will be updated accordingly. Otherwise, the user will be able to use the Escape Hatch functionality.
