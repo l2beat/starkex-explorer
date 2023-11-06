@@ -2,7 +2,7 @@
 
 For introduction to StarkEx explorer, see this guide:
 
-* Introduction
+* [Introduction to StarkEx Explorer](/tutorials/introduction)
 
 Accessing user page is possible in multiple ways. 
 

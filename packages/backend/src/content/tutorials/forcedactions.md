@@ -2,7 +2,7 @@
 
 For introduction to StarkEx explorer, see this guide:
 
-* Introduction
+* [Introduction to StarkEx Explorer](/tutorials/introduction)
 
 Forced Actions are special operations initiated via Ethereum blockchain. They are special emergency measures that should not be used under normal conditions due to their high cost and slow time of execution. They are useful when:
 
@@ -33,7 +33,7 @@ Created Forced Withdrawal request will be visible on User Page in "Forced transa
 
 After initiating Forced Withdrawal, StarkEx operators have a predefined amount of time (usually 7 or 14 days) to perform requested withdrawal. When they do, User Page will display a "Withdrawable assets" section with a "Withdraw now" button to trigger the final transfer of funds to user's Ethereum account.
 
-If StarkEx Operator doesn't honor user's Forced Withdrawal request if given time, user will be able to trigger Exchange Freeze and trigger Escape Hatch functionality, described in a separate guide.
+If StarkEx Operator doesn't honor user's Forced Withdrawal request if given time, user will be able to trigger Exchange Freeze and trigger Escape Hatch functionality, described in a separate guide ([Escape Hatch explained](/tutorials/escapehatch)).
 
 It's important to notice that nothing stops users from manually triggering Forced Withdrawals with incorrect amounts. Such requests will still be processed by StarkEx system, but due to their invalid data they will not trigger the final withdrawal.
 

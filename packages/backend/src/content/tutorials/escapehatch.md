@@ -2,11 +2,11 @@
 
 For introduction to StarkEx explorer, see this guide:
 
-* Introduction
+* [Introduction to StarkEx Explorer](/tutorials/introduction)
 
 Escape Hatch is a functionality available as the last resort for a user to withdraw their funds from StarkEx system to Ethereum.
 
-When the StarkEx system is operating normally but user is unable to use regular interface (e.g. Exchange's web page), they should trigger a Forced Action request, described in a separate guide, to attempt withdrawal of their funds. When such Forced Action is not honored in a predefined amount of time (configured by StarkEx, usually 7 or 14 days), either due to inaction or because the operator is not functioning at all, StarkEx Explorer will detect this state and show an option in the website header to "Request Freeze" of the exchange.
+When the StarkEx system is operating normally but user is unable to use regular interface (e.g. Exchange's web page), they should trigger a Forced Action request, described in a separate guide ([All about Forced Actions](/tutorials/forcedactions)), to attempt withdrawal of their funds. When such Forced Action is not honored in a predefined amount of time (configured by StarkEx, usually 7 or 14 days), either due to inaction or because the operator is not functioning at all, StarkEx Explorer will detect this state and show an option in the website header to "Request Freeze" of the exchange.
 
 ## Exchange Freeze
 
