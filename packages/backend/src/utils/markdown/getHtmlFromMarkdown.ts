@@ -12,7 +12,6 @@ export function getHtmlFromMarkdown(filePath: string) {
   $('a').each(function () {
     const $el = $(this)
     $el.attr('rel', 'noopener noreferrer')
-    $el.attr('target', '_blank')
   })
   $('h1, h2, h3, h4, h5, h6').each(function () {
     const $el = $(this)
