@@ -36,10 +36,7 @@ export function HomeTutorials(props: HomeTutorialsProps) {
             href={`/tutorials/${tutorial.slug}`}
             className="group flex w-full items-center gap-4"
           >
-            <img
-              className="h-[63px] rounded"
-              src="/images/starkex-logo.png"
-            />
+            <img className="h-[63px] rounded" src="/images/starkex-logo.png" />
             <div className="flex-1">
               <p className="text-base font-semibold leading-tight">
                 {tutorial.title}

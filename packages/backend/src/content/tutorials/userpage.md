@@ -2,13 +2,13 @@
 
 For an introduction to StarkEx Explorer, see this guide:
 
-* [Introduction to StarkEx Explorer](/tutorials/introduction)
+- [Introduction to StarkEx Explorer](/tutorials/introduction)
 
 Accessing the user page is possible in multiple ways:
 
-* If the user knows their StarkKey, they can simply search for it using the search box.
-* If the user knows their Ethereum address, they can also search for it, but only if that address was previously **registered as an owner of a StarkKey**. On some exchanges, this process happens automatically, but due to its high cost, it is currently discouraged.
-* Connecting via MetaMask to calculate their StarkKey using their Ethereum account.
+- If the user knows their StarkKey, they can simply search for it using the search box.
+- If the user knows their Ethereum address, they can also search for it, but only if that address was previously **registered as an owner of a StarkKey**. On some exchanges, this process happens automatically, but due to its high cost, it is currently discouraged.
+- Connecting via MetaMask to calculate their StarkKey using their Ethereum account.
 
 ## Connecting via MetaMask
 

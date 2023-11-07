@@ -1,7 +1,6 @@
 import { HomeTutorialEntry } from '@explorer/frontend'
 
 export class TutorialService {
-
   getTutorials(): HomeTutorialEntry[] {
     const tutorials: HomeTutorialEntry[] = [
       {

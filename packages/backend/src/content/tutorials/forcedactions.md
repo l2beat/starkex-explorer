@@ -2,12 +2,12 @@
 
 For an introduction to the StarkEx Explorer, see this guide:
 
-* [Introduction to StarkEx Explorer](/tutorials/introduction)
+- [Introduction to StarkEx Explorer](/tutorials/introduction)
 
 Forced Actions are special operations initiated via the Ethereum blockchain. They are emergency measures that **should not be used under normal conditions** due to their high cost and slow execution time. They are useful when:
 
-* the StarkEx system (e.g., an exchange) is operating normally,
-* but the user cannot access the system's native interface (e.g., the exchange's website), for example, due to censorship.
+- the StarkEx system (e.g., an exchange) is operating normally,
+- but the user cannot access the system's native interface (e.g., the exchange's website), for example, due to censorship.
 
 In such scenarios, forced actions provide an emergency exit route for users to withdraw their assets to Ethereum.
 

@@ -25,9 +25,7 @@ export function HomeSpotlightArticle(props: HomeSpotlightArticleProps) {
           Read now
         </Button>
       </div>
-      <img
-        src="/images/starkex-logo.png"
-      />
+      <img src="/images/starkex-logo.png" />
     </Card>
   )
 }
