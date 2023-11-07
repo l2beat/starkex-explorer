@@ -137,23 +137,19 @@ line 3 of code
 
 export const tutorials: HomeTutorialEntry[] = [
   {
-    title: 'Learn how to use StarkEx Explorer efficiently',
-    imageUrl: '/images/tutorial.jpg',
-    slug: 'learn-how-to-use-starkex-explorer-efficiently',
+    title: 'Introduction to StarkEx Explorer',
+    slug: 'introduction',
   },
   {
-    title: 'All about forced transactions',
-    imageUrl: '/images/tutorial.jpg',
-    slug: 'all-about-forced-transactions',
+    title: 'Accessing User Page',
+    slug: 'userpage',
   },
   {
-    title: 'Stark key registration',
-    imageUrl: '/images/tutorial.jpg',
-    slug: 'stark-key-registration',
+    title: 'All about Forced Actions',
+    slug: 'forcedactions',
   },
   {
-    title: 'Escape hatches explained',
-    imageUrl: '/images/tutorial.jpg',
-    slug: 'escape-hatch-explained',
+    title: 'Escape Hatch explained',
+    slug: 'escapehatch',
   },
 ]
