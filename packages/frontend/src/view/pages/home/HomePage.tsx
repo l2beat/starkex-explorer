@@ -41,10 +41,10 @@ export function renderHomePage(props: HomePageProps) {
   return reactToHtml(<HomePage {...props} />)
 }
 
-const MAX_TUTORIALS = 3
+const MAX_TUTORIALS = 2
 
 function HomePage(props: HomePageProps) {
-  const showViewAllTutorials = props.tutorials.length > 3
+  const showViewAllTutorials = props.tutorials.length > 2
 
   return (
     <Page
@@ -71,7 +71,7 @@ function HomePage(props: HomePageProps) {
             />
             {props.tutorials.length > 0 && (
               <HomeTutorials
-                tutorials={props.tutorials.slice(0, MAX_TUTORIALS - 1)}
+                tutorials={props.tutorials.slice(0, MAX_TUTORIALS )}
                 showViewAll={showViewAllTutorials}
                 className="hidden xl:flex"
               />
