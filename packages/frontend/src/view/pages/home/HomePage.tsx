@@ -20,7 +20,6 @@ import {
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
-import { HomeSpotlightArticle } from './components/HomeSpotlightArticle'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
@@ -42,11 +41,10 @@ export function renderHomePage(props: HomePageProps) {
   return reactToHtml(<HomePage {...props} />)
 }
 
-const MAX_TUTORIALS = 3
+const MAX_TUTORIALS = 2
 
 function HomePage(props: HomePageProps) {
-  const showViewAllTutorials = props.tutorials.length > 3
-  const lastTutorial = props.tutorials[MAX_TUTORIALS - 1]
+  const showViewAllTutorials = props.tutorials.length > MAX_TUTORIALS
 
   return (
     <Page
@@ -73,7 +71,7 @@ function HomePage(props: HomePageProps) {
             />
             {props.tutorials.length > 0 && (
               <HomeTutorials
-                tutorials={props.tutorials.slice(0, MAX_TUTORIALS - 1)}
+                tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
                 showViewAll={showViewAllTutorials}
                 className="hidden xl:flex"
               />
@@ -85,12 +83,6 @@ function HomePage(props: HomePageProps) {
               tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
               showViewAll={showViewAllTutorials}
               className="xl:hidden"
-            />
-          )}
-          {lastTutorial && (
-            <HomeSpotlightArticle
-              spotlightArticle={lastTutorial}
-              className="hidden xl:grid"
             />
           )}
         </div>
