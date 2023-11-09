@@ -71,7 +71,7 @@ function HomePage(props: HomePageProps) {
             />
             {props.tutorials.length > 0 && (
               <HomeTutorials
-                tutorials={props.tutorials.slice(0, MAX_TUTORIALS )}
+                tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
                 showViewAll={showViewAllTutorials}
                 className="hidden xl:flex"
               />
