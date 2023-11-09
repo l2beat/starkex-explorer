@@ -20,7 +20,6 @@ import {
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
-import { HomeSpotlightArticle } from './components/HomeSpotlightArticle'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
@@ -46,7 +45,6 @@ const MAX_TUTORIALS = 3
 
 function HomePage(props: HomePageProps) {
   const showViewAllTutorials = props.tutorials.length > 3
-  const lastTutorial = props.tutorials[MAX_TUTORIALS - 1]
 
   return (
     <Page
@@ -85,12 +83,6 @@ function HomePage(props: HomePageProps) {
               tutorials={props.tutorials.slice(0, MAX_TUTORIALS)}
               showViewAll={showViewAllTutorials}
               className="xl:hidden"
-            />
-          )}
-          {lastTutorial && (
-            <HomeSpotlightArticle
-              spotlightArticle={lastTutorial}
-              className="hidden xl:grid"
             />
           )}
         </div>
