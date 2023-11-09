@@ -44,7 +44,7 @@ export function renderHomePage(props: HomePageProps) {
 const MAX_TUTORIALS = 2
 
 function HomePage(props: HomePageProps) {
-  const showViewAllTutorials = props.tutorials.length > 2
+  const showViewAllTutorials = props.tutorials.length > MAX_TUTORIALS
 
   return (
     <Page
