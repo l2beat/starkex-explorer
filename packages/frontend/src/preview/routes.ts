@@ -1135,8 +1135,8 @@ const routes: Route[] = [
         withdrawableAssets: [],
         finalizableOffers: [],
         assets: [
-          randomUserAssetEntry('WITHDRAW', { hashOrId: AssetId('USDC-6') }),
-          ...repeat(7, () => randomUserAssetEntry('CLOSE')),
+          randomUserAssetEntry('ESCAPE', { hashOrId: AssetId('USDC-6') }),
+          ...repeat(7, () => randomUserAssetEntry('USE_COLLATERAL_ESCAPE')),
         ],
         totalAssets: 18,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
