@@ -7,7 +7,7 @@ const getWithdrawalInstructions = () => [
     Using this form you request a withdrawal of your funds. This is achieved
     through a mechanism called{' '}
     <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
-      forced withdrawals
+      forced trades
     </Link>
     . Note that you can only withdraw USDC, so to fully exit all funds you
     should first close all open positions.
