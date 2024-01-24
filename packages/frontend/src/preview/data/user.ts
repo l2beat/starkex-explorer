@@ -69,7 +69,12 @@ export function randomUserTransactionEntry(): TransactionEntry {
 
 const actionBucket = new Bucket(['WITHDRAW', 'CLOSE'] as const)
 export function randomUserAssetEntry(
-  action?: 'WITHDRAW' | 'CLOSE',
+  action?:
+    | 'WITHDRAW'
+    | 'CLOSE'
+    | 'NO_ACTION'
+    | 'ESCAPE'
+    | 'USE_COLLATERAL_ESCAPE',
   asset?: { hashOrId: AssetId }
 ): UserAssetEntry {
   return {
