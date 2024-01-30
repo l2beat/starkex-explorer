@@ -52,17 +52,12 @@ export function Navbar({
             />
           )}
           {!user && (
-            <>
-              <Button id="connect-with-metamask" className="sm:hidden">
-                Connect
-              </Button>
-              <Button
-                id="connect-with-metamask"
-                className="hidden whitespace-nowrap sm:block"
-              >
+            <Button id="connect-with-metamask">
+              <span className="sm:hidden">Connect</span>
+              <span className="hidden whitespace-nowrap sm:block">
                 Connect wallet
-              </Button>
-            </>
+              </span>
+            </Button>
           )}
           {user && (
             <a
