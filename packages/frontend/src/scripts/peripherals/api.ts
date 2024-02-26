@@ -9,12 +9,6 @@ import {
 import { Hash256, StarkKey } from '@explorer/types'
 
 export const Api = {
-  async getDydxTvl() {
-    const res = await fetch('https://api.l2beat.com/api/dydx')
-    const tvl = Number(await res.json())
-    return Number.isNaN(tvl) ? undefined : tvl
-  },
-
   async submitPerpetualForcedWithdrawal(hash: Hash256) {
     await fetch('/forced/exits', {
       method: 'POST',
@@ -36,17 +30,6 @@ export const Api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: serializeFinalizeOfferBody({ offerId, hash }),
-    })
-  },
-
-  async submitOldWithdrawal(hash: Hash256) {
-    await fetch('/forced/exits/finalize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        exitHash: Hash256.fake(),
-        finalizeHash: hash,
-      }),
     })
   },
 
