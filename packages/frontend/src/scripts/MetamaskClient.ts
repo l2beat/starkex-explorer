@@ -5,21 +5,21 @@ export class MetamaskClient {
   ) {}
 
   async getChainId(): Promise<string> {
-    return (await this.provider.request({ method: 'eth_chainId' })) as string
+    return this.provider.request({ method: 'eth_chainId' }) as Promise<string>
   }
 
   async switchToInstanceNetwork() {
-    return await this.switchToNetwork(`0x${this.instanceChainId.toString(16)}`)
+    return this.switchToNetwork(`0x${this.instanceChainId.toString(16)}`)
   }
 
   async switchToNetwork(chainId: `0x${string}`) {
-    return await this.provider.request({
+    return this.provider.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId }],
     })
   }
 
   async requestAccounts() {
-    return await this.provider.request({ method: 'eth_requestAccounts' })
+    return this.provider.request({ method: 'eth_requestAccounts' }) as Promise<string[]>
   }
 }

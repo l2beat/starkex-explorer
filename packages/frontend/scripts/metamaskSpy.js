@@ -6,7 +6,7 @@
 const oldRequest = window.ethereum.request
 window.ethereum.request = function (...args) {
   console.log('[REQUEST] args', args)
-  return Promise.resolve(olDRequest.apply(this, args)).then((value) => {
+  return Promise.resolve(oldRequest.apply(this, args)).then((value) => {
     console.log('[REQUEST] result', value)
     return value
   })
