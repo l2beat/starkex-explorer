@@ -20,6 +20,8 @@ export class MetamaskClient {
   }
 
   async requestAccounts() {
-    return this.provider.request({ method: 'eth_requestAccounts' }) as Promise<string[]>
+    return this.provider.request({ method: 'eth_requestAccounts' }) as Promise<
+      string[]
+    >
   }
 }
