@@ -1,6 +1,7 @@
 import { stringAs } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import Cookie from 'js-cookie'
+import isEmpty from 'lodash/isEmpty'
 import { z } from 'zod'
 
 import { Registration } from './keys/keys'
@@ -48,7 +49,8 @@ export function initMetamask() {
       return
     }
 
-    await metamaskClient.requestAccounts()
+    const result = await metamaskClient.requestAccounts()
+    updateAccounts(result)
   })
 
   provider.on('accountsChanged', (accounts) => updateAccounts(accounts))
@@ -75,24 +77,23 @@ function updateAccounts(accounts: string[]) {
   const connectedAccount = accounts.at(0)
   const currentAccount = Cookie.get('account')
 
-  const accountsMap = getUsersInfo()
+  if (connectedAccount === currentAccount) return
 
-  if (connectedAccount !== currentAccount) {
-    if (connectedAccount) {
-      Cookie.set('account', connectedAccount.toString())
-      const accountMap = accountsMap[connectedAccount]
-      if (accountMap?.starkKey) {
-        Cookie.set('starkKey', accountMap.starkKey.toString())
-      } else {
-        Cookie.remove('starkKey')
-      }
+  if (connectedAccount) {
+    const accountsMap = getUsersInfo()
+    Cookie.set('account', connectedAccount.toString())
+    const accountMap = accountsMap[connectedAccount]
+    if (accountMap?.starkKey) {
+      Cookie.set('starkKey', accountMap.starkKey.toString())
     } else {
-      localStorage.removeItem('accountsMap')
-      Cookie.remove('account')
       Cookie.remove('starkKey')
     }
-    location.reload()
+  } else {
+    localStorage.removeItem('accountsMap')
+    Cookie.remove('account')
+    Cookie.remove('starkKey')
   }
+  location.reload()
 }
 
 function deleteDisconnectedAccountsFromUsersInfo(connectedAccounts: string[]) {
@@ -103,6 +104,11 @@ function deleteDisconnectedAccountsFromUsersInfo(connectedAccounts: string[]) {
       delete usersInfo[userAccount]
     }
   })
+
+  if (isEmpty(usersInfo)) {
+    localStorage.removeItem('accountsMap')
+    return
+  }
 
   localStorage.setItem('accountsMap', JSON.stringify(usersInfo))
 }
