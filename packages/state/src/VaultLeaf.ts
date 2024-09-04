@@ -44,13 +44,6 @@ export class VaultLeaf extends MerkleValue {
     return MerkleProofPrefix.finalHash
   }
 
-  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
-    return {
-      nodes: [], // TODO: implement
-      finalHash: await this.hash(),
-    }
-  }
-
   getData() {
     return {
       starkKey: this.starkKey,
