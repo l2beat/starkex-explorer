@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 
 import {
   OfferEntry,
@@ -6,8 +6,11 @@ import {
   UserAssetEntry,
   UserBalanceChangeEntry,
 } from '../../view'
-import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
-import { Bucket } from './bucket'
+import {
+  EscapableAssetEntry,
+  WithdrawableAssetEntry,
+} from '../../view/pages/user/components/UserQuickActionsTable'
+import { Bucket } from './Bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'
 
@@ -65,12 +68,20 @@ export function randomUserTransactionEntry(): TransactionEntry {
 }
 
 const actionBucket = new Bucket(['WITHDRAW', 'CLOSE'] as const)
-export function randomUserAssetEntry(): UserAssetEntry {
+export function randomUserAssetEntry(
+  action?:
+    | 'WITHDRAW'
+    | 'CLOSE'
+    | 'NO_ACTION'
+    | 'ESCAPE'
+    | 'USE_COLLATERAL_ESCAPE',
+  asset?: { hashOrId: AssetId }
+): UserAssetEntry {
   return {
-    asset: assetBucket.pick(),
+    asset: asset ?? assetBucket.pick(),
     balance: amountBucket.pick(),
     value: amountBucket.pick(),
-    action: actionBucket.pick(),
+    action: action ?? actionBucket.pick(),
     vaultOrPositionId: randomId(),
   }
 }
@@ -83,8 +94,9 @@ const offerStatusBucket = new Bucket([
   'EXPIRED',
 ] as const)
 const offerTypeBucket = new Bucket(['BUY', 'SELL'] as const)
+const roleBucket = new Bucket(['MAKER', 'TAKER'] as const)
 
-export function randomUserOfferEntry(): OfferEntry {
+export function randomUserOfferEntry(withRole?: boolean): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),
@@ -92,6 +104,7 @@ export function randomUserOfferEntry(): OfferEntry {
     syntheticAmount: amountBucket.pick(),
     collateralAmount: amountBucket.pick(),
     status: offerStatusBucket.pick(),
+    role: withRole ? roleBucket.pick() : undefined,
     type: offerTypeBucket.pick(),
   }
 }
@@ -99,6 +112,14 @@ export function randomUserOfferEntry(): OfferEntry {
 export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
   return {
     asset: assetBucket.pick(),
+    amount: amountBucket.pick(),
+  }
+}
+
+export function randomEscapableEntry(): EscapableAssetEntry {
+  return {
+    asset: { hashOrId: AssetId('USDC-6') },
+    positionOrVaultId: 12345n,
     amount: amountBucket.pick(),
   }
 }

@@ -1,15 +1,19 @@
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { ApiServer } from './api/ApiServer'
+import { EscapeHatchController } from './api/controllers/EscapeHatchController'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
+import { L2TransactionController } from './api/controllers/L2TransactionController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
+import { TutorialController } from './api/controllers/TutorialController'
 import { UserController } from './api/controllers/UserController'
 import { frontendErrorMiddleware } from './api/middleware/frontendErrorMiddleware'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
@@ -35,6 +39,7 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
+import { FreezeCheckService } from './core/FreezeCheckService'
 import { IDataSyncService } from './core/IDataSyncService'
 import { IStateTransitionCollector } from './core/IStateTransitionCollector'
 import { StateUpdateWithBatchIdMigrator } from './core/migrations/StateUpdateWithBatchIdMigrator'
@@ -49,13 +54,18 @@ import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHist
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './core/preprocessing/UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './core/preprocessing/UserStatisticsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
+import { Clock } from './core/sync/Clock'
+import { LiveL2TransactionDownloader } from './core/sync/LiveL2TransactionDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { TransactionValidator } from './core/TransactionValidator'
+import { TutorialService } from './core/TutorialService'
 import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
@@ -69,12 +79,11 @@ import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from './peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -86,8 +95,12 @@ import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
-import { handleServerError, reportError } from './tools/ErrorReporter'
-import { Logger } from './tools/Logger'
+import { LiveL2TransactionClient } from './peripherals/starkware/LiveL2TransactionClient'
+import {
+  handleServerError,
+  reportCriticalError,
+  reportError,
+} from './tools/ErrorReporter'
 
 export class Application {
   start: () => Promise<void>
@@ -98,7 +111,10 @@ export class Application {
     const logger = new Logger({
       ...config.logger,
       reportError,
+      reportCriticalError,
     })
+
+    const clock = new Clock()
 
     // #endregion tools
     // #region peripherals
@@ -111,11 +127,6 @@ export class Application {
         : undefined
 
     const kvStore = new KeyValueStore(database, logger)
-    const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
-    const softwareMigrationRepository = new SoftwareMigrationRepository(
-      kvStore,
-      logger
-    )
 
     const verifierEventRepository = new VerifierEventRepository(
       database,
@@ -136,7 +147,11 @@ export class Application {
       logger
     )
     const userService = new UserService(userRegistrationEventRepository)
-    const pageContextService = new PageContextService(config, userService)
+    const pageContextService = new PageContextService(
+      config,
+      userService,
+      kvStore
+    )
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger
@@ -155,6 +170,11 @@ export class Application {
     )
     const assetRepository = new AssetRepository(database, logger)
     const withdrawableAssetRepository = new WithdrawableAssetRepository(
+      database,
+      logger
+    )
+
+    const l2TransactionRepository = new L2TransactionRepository(
       database,
       logger
     )
@@ -180,6 +200,15 @@ export class Application {
     const statusService = new StatusService({
       blockDownloader,
     })
+    const freezeCheckService = new FreezeCheckService(
+      config.starkex.contracts.perpetual,
+      ethereumClient,
+      kvStore,
+      userTransactionRepository,
+      logger
+    )
+    const tutorialService = new TutorialService()
+
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
@@ -189,7 +218,11 @@ export class Application {
       ethereumClient,
       userTransactionRepository,
       withdrawableAssetRepository,
-      config.starkex.contracts.perpetual,
+      {
+        perpetualAddress: config.starkex.contracts.perpetual,
+        escapeVerifierAddress: config.starkex.contracts.escapeVerifier,
+      },
+      freezeCheckService,
       collateralAsset
     )
 
@@ -208,6 +241,8 @@ export class Application {
     const withdrawalAllowedCollector = new WithdrawalAllowedCollector(
       ethereumClient,
       withdrawableAssetRepository,
+      userTransactionRepository,
+      kvStore,
       config.starkex.contracts.perpetual
     )
 
@@ -218,7 +253,43 @@ export class Application {
       | PerpetualRollupUpdater
     let stateTransitionCollector: IStateTransitionCollector
 
-    let feederGatewayCollector: FeederGatewayCollector | undefined
+    const feederGatewayClient = config.starkex.l2Transactions.enabled
+      ? new FeederGatewayClient(
+          config.starkex.l2Transactions.feederGateway,
+          fetchClient,
+          logger
+        )
+      : undefined
+
+    const feederGatewayCollector = feederGatewayClient
+      ? new FeederGatewayCollector(
+          feederGatewayClient,
+          l2TransactionRepository,
+          stateUpdateRepository,
+          logger,
+          config.starkex.l2Transactions.enabled
+        )
+      : undefined
+
+    const liveL2TransactionClient =
+      config.starkex.l2Transactions.enabled &&
+      config.starkex.l2Transactions.liveApi
+        ? new LiveL2TransactionClient(
+            config.starkex.l2Transactions.liveApi,
+            fetchClient
+          )
+        : undefined
+
+    const liveL2TransactionDownloader = liveL2TransactionClient
+      ? new LiveL2TransactionDownloader(
+          liveL2TransactionClient,
+          l2TransactionRepository,
+          stateUpdateRepository,
+          kvStore,
+          clock,
+          logger
+        )
+      : undefined
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -234,25 +305,6 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
-        const transactionRepository = new L2TransactionRepository(
-          database,
-          logger
-        )
-        const feederGatewayClient = config.starkex.feederGateway
-          ? new FeederGatewayClient(
-              config.starkex.feederGateway,
-              fetchClient,
-              logger
-            )
-          : undefined
-        feederGatewayCollector = feederGatewayClient
-          ? new FeederGatewayCollector(
-              feederGatewayClient,
-              transactionRepository,
-              stateUpdateRepository,
-              logger
-            )
-          : undefined
 
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient,
@@ -281,6 +333,7 @@ export class Application {
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
           feederGatewayCollector,
+          liveL2TransactionDownloader,
           logger
         )
       } else {
@@ -384,8 +437,7 @@ export class Application {
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
@@ -395,8 +447,7 @@ export class Application {
     )
 
     const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       userTransactionCollector,
@@ -404,9 +455,8 @@ export class Application {
     )
 
     const stateUpdateWithBatchIdMigrator = new StateUpdateWithBatchIdMigrator(
-      softwareMigrationRepository,
+      kvStore,
       stateUpdateRepository,
-      syncStatusRepository,
       stateTransitionCollector,
       logger
     )
@@ -419,6 +469,16 @@ export class Application {
 
     const preprocessedUserStatisticsRepository =
       new PreprocessedUserStatisticsRepository(database, logger)
+
+    const preprocessedUserL2TransactionsStatisticsRepository =
+      new PreprocessedUserL2TransactionsStatisticsRepository(database, logger)
+
+    const userL2TransactionsPreprocessor =
+      new UserL2TransactionsStatisticsPreprocessor(
+        preprocessedUserL2TransactionsStatisticsRepository,
+        l2TransactionRepository,
+        logger
+      )
 
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
@@ -449,26 +509,29 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
+        config.starkex.l2Transactions.enabled,
         isPreprocessorEnabled
       )
     } else {
@@ -485,35 +548,39 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
+        config.starkex.l2Transactions.enabled,
         isPreprocessorEnabled
       )
     }
 
     const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
+      kvStore,
       blockDownloader,
       syncService,
       preprocessor,
+      freezeCheckService,
       logger,
       {
         earliestBlock: config.starkex.blockchain.minBlockNumber,
@@ -527,9 +594,12 @@ export class Application {
       pageContextService,
       assetDetailsService,
       forcedTradeOfferViewService,
+      tutorialService,
       userTransactionRepository,
       forcedTradeOfferRepository,
-      preprocessedStateDetailsRepository
+      l2TransactionRepository,
+      preprocessedStateDetailsRepository,
+      config.starkex.l2Transactions.excludeTypes
     )
 
     const userController = new UserController(
@@ -539,19 +609,25 @@ export class Application {
       sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
+      l2TransactionRepository,
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual,
-      collateralAsset
+      preprocessedUserL2TransactionsStatisticsRepository,
+      vaultRepository,
+      config.starkex.l2Transactions.excludeTypes,
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
       assetDetailsService,
       stateUpdateRepository,
       userTransactionRepository,
-      preprocessedAssetHistoryRepository
+      l2TransactionRepository,
+      preprocessedAssetHistoryRepository,
+      preprocessedStateDetailsRepository,
+      config.starkex.l2Transactions.excludeTypes
     )
     const transactionController = new TransactionController(
       pageContextService,
@@ -573,14 +649,31 @@ export class Application {
         : vaultRepository,
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository,
+      l2TransactionRepository,
       config.starkex.tradingMode
     )
 
+    const l2TransactionController = new L2TransactionController(
+      pageContextService,
+      l2TransactionRepository
+    )
+
+    const escapeHatchController = new EscapeHatchController(
+      pageContextService,
+      freezeCheckService,
+      stateUpdater,
+      stateUpdateRepository,
+      config.starkex.contracts.perpetual,
+      config.starkex.contracts.escapeVerifier
+    )
+
+    const transactionValidator = new TransactionValidator(ethereumClient)
+
     const userTransactionController = new TransactionSubmitController(
-      ethereumClient,
+      transactionValidator,
       sentTransactionRepository,
       forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual,
+      config.starkex.contracts,
       collateralAsset
     )
     const forcedActionsController = new ForcedActionController(
@@ -588,6 +681,11 @@ export class Application {
       preprocessedAssetHistoryRepository,
       assetRepository,
       config.starkex.contracts.perpetual
+    )
+
+    const tutorialController = new TutorialController(
+      pageContextService,
+      tutorialService
     )
 
     const apiServer = new ApiServer(config.port, logger, {
@@ -601,9 +699,11 @@ export class Application {
           forcedActionsController,
           forcedTradeOfferController,
           merkleProofController,
-          collateralAsset,
-          config.starkex.tradingMode,
-          searchController
+          searchController,
+          l2TransactionController,
+          escapeHatchController,
+          tutorialController,
+          config
         ),
         createTransactionRouter(
           forcedTradeOfferController,
@@ -616,6 +716,7 @@ export class Application {
       ],
       forceHttps: config.forceHttps,
       handleServerError,
+      basicAuth: config.basicAuth,
     })
 
     // #endregion api
@@ -623,8 +724,8 @@ export class Application {
 
     this.start = async () => {
       logger.for(this).info('Starting')
-
       await apiServer.listen()
+
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
       await preprocessor.catchUp()
@@ -639,6 +740,7 @@ export class Application {
       if (config.enableSync) {
         transactionStatusService.start()
         await syncScheduler.start()
+        await liveL2TransactionDownloader?.start()
         await blockDownloader.start()
       }
 

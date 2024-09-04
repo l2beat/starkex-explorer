@@ -1,10 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  CollateralAsset,
-  PageContext,
-  PageContextWithUser,
-  UserDetails,
-} from '@explorer/shared'
+import { PageContext, PageContextWithUser, UserDetails } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -20,7 +15,10 @@ import Koa from 'koa'
 
 import {
   renderErrorPage,
-  renderHomeOffersPage,
+  renderFinalizeEscapeDetailsPage,
+  renderFreezeRequestDetailsPage,
+  renderHomeAvailableOffersPage,
+  renderHomeL2TransactionsPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
@@ -29,11 +27,13 @@ import {
   renderNewSpotForcedWithdrawPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
+  renderRawL2TransactionPage,
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
   renderStateUpdateBalanceChangesPage,
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
+  renderTutorialPage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserOffersPage,
@@ -43,12 +43,38 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderEscapeHatchActionPage } from '../view/pages/forced-actions/EscapeHatchActionPage'
+import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/FreezeRequestActionPage'
+import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
+import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
+import { renderInitializeEscapePage } from '../view/pages/transaction/InitializeEscapePage'
+import { renderTutorialsPage } from '../view/pages/tutorial/TutorialsPage'
+import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
+import { fakeCollateralAsset } from './data/collateralAsset'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
+import {
+  perpetualL2TransactionsBucket,
+  randomAggregatedPerpetualL2TransactionEntry,
+  randomPerpetualL2ConditionalTransferTransaction,
+  randomPerpetualL2DeleverageTransaction,
+  randomPerpetualL2DepositTransaction,
+  randomPerpetualL2ForcedTradeTransaction,
+  randomPerpetualL2ForcedWithdrawalTransaction,
+  randomPerpetualL2FundingTickTransaction,
+  randomPerpetualL2LiquidateTransaction,
+  randomPerpetualL2MultiTransaction,
+  randomPerpetualL2OraclePricesTickTransaction,
+  randomPerpetualL2TradeTransaction,
+  randomPerpetualL2TransactionEntry,
+  randomPerpetualL2TransferTransaction,
+  randomPerpetualL2WithdrawalToAddressTransaction,
+  randomPerpetualUserL2TransactionEntry,
+} from './data/l2Transactions'
 import {
   randomStateUpdateBalanceChangeEntry,
   randomStateUpdatePriceEntry,
@@ -60,7 +86,9 @@ import {
   randomRecipient,
   userParty,
 } from './data/transactions'
+import { tutorial, tutorials } from './data/tutorial'
 import {
+  randomEscapableEntry,
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
@@ -104,12 +132,42 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
-        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
-        totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
-        totalForcedTransactions: 68,
-        offers: repeat(6, randomHomeOfferEntry),
-        totalOffers: 7,
+        tutorials,
+        stateUpdates: repeat(10, randomHomeStateUpdateEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
+        l2Transactions: [],
+        statistics: {
+          stateUpdateCount: 6315,
+          l2TransactionCount: 3255123,
+          forcedTransactionCount: 68,
+          offerCount: 6,
+        },
+        offers: repeat(3, randomHomeOfferEntry),
+      })
+    },
+  },
+  {
+    path: '/home/with-l2-transactions',
+    description:
+      'The home page for project that shared feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
+
+      ctx.body = renderHomePage({
+        context,
+        tutorials,
+        stateUpdates: repeat(22, randomHomeStateUpdateEntry),
+        l2Transactions: repeat(8, randomPerpetualL2TransactionEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
+        statistics: {
+          stateUpdateCount: 6315,
+          l2TransactionCount: 3255123,
+          forcedTransactionCount: 68,
+          offerCount: 6,
+        },
+        offers: repeat(4, randomHomeOfferEntry),
       })
     },
   },
@@ -121,12 +179,33 @@ const routes: Route[] = [
       ctx.body = renderHomePage({
         context,
         tutorials: [],
-        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
-        totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
-        totalForcedTransactions: 68,
-        offers: repeat(6, randomHomeOfferEntry),
-        totalOffers: 7,
+        stateUpdates: repeat(10, randomHomeStateUpdateEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
+        l2Transactions: [],
+        statistics: {
+          stateUpdateCount: 6315,
+          l2TransactionCount: 3255123,
+          forcedTransactionCount: 68,
+          offerCount: 6,
+        },
+        offers: repeat(3, randomHomeOfferEntry),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions',
+    link: '/l2-transactions',
+    description: 'L2 transaction list. Supports pagination.',
+    render: (ctx) => {
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+
+      ctx.body = renderHomeL2TransactionsPage({
+        context: getPerpetualPageContext(ctx, { showL2Transactions: true }),
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
       })
     },
   },
@@ -166,12 +245,13 @@ const routes: Route[] = [
   },
   {
     path: '/offers',
-    description: 'Offer list accessible from home page. Supports pagination.',
+    description:
+      'Available offer list accessible from home page. Supports pagination.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeOffersPage({
+      ctx.body = renderHomeAvailableOffersPage({
         context,
         offers: repeat(visible, randomHomeOfferEntry),
         limit,
@@ -218,14 +298,38 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
-        hashes: {
-          factHash: Hash256.fake(),
-          positionTreeRoot: PedersenHash.fake(),
-          onChainVaultTreeRoot: PedersenHash.fake(),
-          offChainVaultTreeRoot: PedersenHash.fake(),
-          orderRoot: PedersenHash.fake(),
-        },
-        blockNumber: randomInt(14_000_000, 17_000_000),
+        transactionHash: Hash256.fake(),
+        balancesTreeRootHash: PedersenHash.fake(),
+        ethereumTimestamp,
+        starkExTimestamp: Timestamp(
+          Math.floor(
+            Number(ethereumTimestamp) - Math.random() * 12 * 60 * 60 * 1000
+          )
+        ),
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        totalBalanceChanges: 1200,
+        priceChanges: repeat(15, randomStateUpdatePriceEntry),
+        transactions: repeat(10, randomStateUpdateTransactionEntry),
+        totalTransactions: 123,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/with-l2-transactions',
+    link: '/state-updates/xyz/with-l2-transactions',
+    description: 'State update page with l2 transacitons.',
+    render: (ctx) => {
+      const ethereumTimestamp = randomTimestamp()
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
+      ctx.body = renderStateUpdatePage({
+        context,
+        id: randomId(),
+        transactionHash: Hash256.fake(),
+        balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
           Math.floor(
@@ -233,10 +337,31 @@ const routes: Route[] = [
           )
         ),
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        totalBalanceChanges: 1000,
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
-        totalBalanceChanges: 231,
-        transactions: repeat(5, randomStateUpdateTransactionEntry),
-        totalTransactions: 5,
+        l2Transactions: repeat(10, randomPerpetualL2TransactionEntry),
+        totalL2Transactions: 150000,
+        transactions: repeat(10, randomStateUpdateTransactionEntry),
+        totalTransactions: 150,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/l2-transactions',
+    link: '/state-updates/xyz/l2-transactions',
+    description:
+      'L2 transactions list included in specific state update. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 231
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderStateUpdateL2TransactionsPage({
+        context,
+        id: '1534',
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
       })
     },
   },
@@ -285,7 +410,9 @@ const routes: Route[] = [
     path: '/users/recover',
     description: 'Stark key recovery page, the stark key is not known.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderUserRecoverPage({
         context,
       })
@@ -296,7 +423,9 @@ const routes: Route[] = [
     description:
       'Stark key register page, the stark key is known but not registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
 
       ctx.body = renderUserRegisterPage({
         context: {
@@ -315,8 +444,11 @@ const routes: Route[] = [
     description:
       'My user page, the stark key is known, but it’s not registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const starkKey = context.user.starkKey ?? StarkKey.fake()
+
       ctx.body = renderUserPage({
         context: {
           ...context,
@@ -330,13 +462,16 @@ const routes: Route[] = [
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         finalizableOffers: [],
         assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
+        totalAssets: 18,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
+        totalBalanceChanges: 6999,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
-        offers: repeat(6, randomUserOfferEntry),
+        l2Transactions: [],
+        totalL2Transactions: 1643000,
+        offers: repeat(6, () => randomUserOfferEntry(true)),
         totalOffers: 6,
+        escapableAssets: [],
       })
     },
   },
@@ -344,7 +479,9 @@ const routes: Route[] = [
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const starkKey = context.user.starkKey ?? StarkKey.fake()
 
       ctx.body = renderUserPage({
@@ -361,13 +498,16 @@ const routes: Route[] = [
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         finalizableOffers: repeat(2, randomUserOfferEntry),
         assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
+        totalAssets: 18,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
+        totalBalanceChanges: 6999,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
-        offers: repeat(6, randomUserOfferEntry),
-        totalOffers: 6,
+        l2Transactions: [],
+        totalL2Transactions: 3643000,
+        offers: repeat(6, () => randomUserOfferEntry(true)),
+        totalOffers: 7,
+        escapableAssets: [],
       })
     },
     breakAfter: true,
@@ -387,13 +527,47 @@ const routes: Route[] = [
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         finalizableOffers: repeat(2, randomUserOfferEntry),
         assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
+        totalAssets: 18,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
+        totalBalanceChanges: 123000,
         transactions: repeat(10, randomUserTransactionEntry),
-        totalTransactions: 48,
-        offers: repeat(6, randomUserOfferEntry),
-        totalOffers: 6,
+        totalTransactions: 23,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, () => randomUserOfferEntry(true)),
+        totalOffers: 12,
+        escapableAssets: [],
+      })
+    },
+  },
+  {
+    path: '/users/:starkKey/with-l2-transactions',
+    link: '/users/someone/with-l2-transactions',
+    description:
+      'Someone else’s user page for project that feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
+
+      ctx.body = renderUserPage({
+        context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        finalizableOffers: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 18,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 123000,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 99,
+        l2Transactions: repeat(6, randomPerpetualUserL2TransactionEntry),
+        totalL2Transactions: 123000000,
+        offers: repeat(6, () => randomUserOfferEntry(true)),
+        totalOffers: 12,
+        escapableAssets: [],
       })
     },
   },
@@ -411,7 +585,27 @@ const routes: Route[] = [
       ctx.body = renderUserAssetsPage({
         context,
         starkKey: StarkKey.fake(),
+        ethereumAddress: undefined,
         assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
+  },
+  {
+    path: '/users/:starkKey/l2-transactions',
+    link: '/users/someone/l2-transactions',
+    description:
+      'L2 transaction list accessible from someone else’s user page. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserL2TransactionsPage({
+        context,
+        starkKey: StarkKey.fake(),
+        l2Transactions: repeat(visible, randomPerpetualUserL2TransactionEntry),
         limit,
         offset,
         total,
@@ -467,10 +661,302 @@ const routes: Route[] = [
       ctx.body = renderUserOffersPage({
         context,
         starkKey: StarkKey.fake(),
-        offers: repeat(visible, randomUserOfferEntry),
+        offers: repeat(visible, () => randomUserOfferEntry(true)),
         limit,
         offset,
         total,
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
+  // #region L2 transactions
+  {
+    path: '/l2-transactions/:id',
+    link: '/l2-transactions/random',
+    description: 'Perpetual L2 random transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/with-alternatives',
+    link: '/l2-transactions/perpetual/random/with-alternatives',
+    description:
+      'Perpetual L2 random transaction details with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            timestamp: randomTimestamp(),
+            ...perpetualL2TransactionsBucket.pick(),
+          })),
+        },
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative',
+    link: '/l2-transactions/perpetual/random/as-alternative',
+    description:
+      'Perpetual L2 random transaction details as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        altIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi transaction that is alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+        altIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/deposit',
+    link: '/l2-transactions/perpetual/deposit',
+    description: 'Perpetual L2 deposit transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2DepositTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/forced-withdrawal',
+    link: '/l2-transactions/perpetual/forced-withdrawal',
+    description: 'Perpetual L2 forced withdrawal transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedWithdrawalTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/transfer',
+    link: '/l2-transactions/perpetual/transfer',
+    description: 'Perpetual L2 transfer transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2TransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/conditional-transfer',
+    link: '/l2-transactions/perpetual/conditional-transfer',
+    description: 'Perpetual L2 conditional transfer transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ConditionalTransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/trade',
+    link: '/l2-transactions/perpetual/trade',
+    description: 'Perpetual L2 trade transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2TradeTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/forced-trade',
+    link: '/l2-transactions/perpetual/forced-trade',
+    description: 'Perpetual L2 forced trade transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedTradeTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/withdraw-to-address',
+    link: '/l2-transactions/perpetual/withdraw-to-address',
+    description: 'Perpetual L2 withdraw to address transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2WithdrawalToAddressTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/deleverage',
+    link: '/l2-transactions/perpetual/deleverage',
+    description: 'Perpetual L2 deleverage transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2DeleverageTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/liquidate',
+    link: '/l2-transactions/perpetual/liquidate',
+    description: 'Perpetual L2 liquidate transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2LiquidateTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/funding-tick',
+    link: '/l2-transactions/perpetual/funding-tick',
+    description: 'Perpetual L2 funding tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2FundingTickTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/oracle-prices-tick',
+    link: '/l2-transactions/perpetual/oracle-prices-tick',
+    description: 'Perpetual L2 oracle prices tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2OraclePricesTickTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi',
+    link: '/l2-transactions/perpetual/multi',
+    description: 'Perpetual L2 multi transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/with-alternatives',
+    link: '/l2-transactions/perpetual/multi/with-alternatives',
+    description:
+      'Perpetual L2 multi transaction with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(
+            randomPerpetualL2MultiTransaction()
+          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            ...perpetualL2TransactionsBucket.pick(),
+            timestamp: randomTimestamp(),
+          })),
+        },
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/as-alternative',
+    link: '/l2-transactions/perpetual/multi/as-alternative',
+    description: 'Perpetual L2 multi transaction as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+        altIndex: randomInt(0, 10),
+      })
+    },
+  },
+  {
+    path: '/raw-l2-transactions/:transactionId',
+    link: '/raw-l2-transactions/random',
+    description: 'Raw L2 transaction details page.',
+    render: (ctx) => {
+      ctx.body = renderRawL2TransactionPage({
+        context: getPerpetualPageContext(ctx),
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
       })
     },
     breakAfter: true,
@@ -481,7 +967,9 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const context = getSpotPageContext(ctx, true)
+      const context = getSpotPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewSpotForcedWithdrawPage({
         context,
         starkKey: StarkKey.fake(),
@@ -499,7 +987,9 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/withdraw',
     description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -517,7 +1007,9 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/buy',
     description: 'Form to create a new perpetual forced buy.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -536,7 +1028,9 @@ const routes: Route[] = [
     description: 'Form to create a new perpetual forced sell.',
     breakAfter: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -550,6 +1044,351 @@ const routes: Route[] = [
       })
     },
   },
+  // #endregion
+  // #region Freeze and escape
+  {
+    path: '/home/freezable',
+    description: 'The home page when exchange can be frozen',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      context.freezeStatus = 'freezable'
+
+      ctx.body = renderHomePage({
+        context,
+        tutorials,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        l2Transactions: [],
+        statistics: {
+          stateUpdateCount: 6315,
+          l2TransactionCount: 3255123,
+          forcedTransactionCount: 68,
+          offerCount: 6,
+        },
+        offers: repeat(6, randomHomeOfferEntry),
+      })
+    },
+  },
+  {
+    path: '/freeze',
+    description: 'Request to freeze the exchange.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'freezable'
+      ctx.body = renderFreezeRequestActionPage({
+        context,
+        transactionHash: Hash256.fake(),
+        type: 'ForcedWithdrawal',
+        starkExAddress: EthereumAddress.fake(),
+        starkKey: StarkKey.fake(),
+        positionId: 12345n,
+        quantizedAmount: 1000000000000000n,
+      })
+    },
+  },
+  {
+    path: '/home/frozen',
+    description: 'The home page when exchange is frozen',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      context.freezeStatus = 'frozen'
+
+      ctx.body = renderHomePage({
+        context,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        tutorials,
+        l2Transactions: [],
+        statistics: {
+          stateUpdateCount: 6315,
+          l2TransactionCount: 3255123,
+          forcedTransactionCount: 68,
+          offerCount: 6,
+        },
+        offers: repeat(6, randomHomeOfferEntry),
+      })
+    },
+  },
+  {
+    path: '/users/me/exchange-frozen',
+    description: 'My user page with ESCAPE button, the exchange is frozen.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
+      ctx.body = renderUserPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
+        starkKey: starkKey,
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [
+          randomUserAssetEntry('ESCAPE', { hashOrId: AssetId('USDC-6') }),
+          ...repeat(7, () => randomUserAssetEntry('USE_COLLATERAL_ESCAPE')),
+        ],
+        totalAssets: 18,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 6999,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+        escapableAssets: [],
+      })
+    },
+  },
+  {
+    path: '/escape/:positionOrVaultId',
+    link: '/escape/12345',
+    description:
+      'Initiate withdrawal via Escape Hatch of position or vault 12345',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      ctx.body = renderEscapeHatchActionPage({
+        context,
+        starkKey: StarkKey.fake(),
+        tradingMode: 'perpetual',
+        escapeVerifierAddress: EthereumAddress.fake(),
+        positionOrVaultId: 12345n,
+        serializedMerkleProof: [],
+        assetCount: 0,
+        serializedState: [],
+      })
+    },
+  },
+  {
+    path: '/users/me/finalizable-escape',
+    description: 'My user page, the stark key is known and registered.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
+      ctx.body = renderUserPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
+        starkKey: starkKey,
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [],
+        totalAssets: 0,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 6999,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 10,
+        escapableAssets: [randomEscapableEntry()],
+      })
+    },
+  },
+  {
+    path: '/transactions/freeze-request/sent',
+    description: 'Transaction view of a sent freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/freeze-request/mined',
+    description: 'Transaction view of a mined freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/freeze-request/reverted',
+    description: 'Transaction view of a reverted freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/sent',
+    description: 'Transaction view of a sent initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/mined',
+    description: 'Transaction view of a mined initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/reverted',
+    description:
+      'Transaction view of a reverted initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/sent',
+    description: 'Transaction view of a sent finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/mined',
+    description: 'Transaction view of a mined finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/reverted',
+    description: 'Transaction view of a mined finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
+    breakAfter: true,
+  },
+
   // #endregion
   // #region Offers and transactions
   {
@@ -737,7 +1576,9 @@ const routes: Route[] = [
       'Offer view of a created perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
         context,
@@ -758,7 +1599,9 @@ const routes: Route[] = [
     isOfferPage: true,
     render: (ctx) => {
       const offer = randomOfferDetails()
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const taker = {
         ethereumAddress: context.user.address,
         starkKey: context.user.starkKey,
@@ -795,7 +1638,9 @@ const routes: Route[] = [
       'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const maker = userParty(context.user)
       const taker = randomParty()
       const offer = randomOfferDetails()
@@ -1031,6 +1876,33 @@ const routes: Route[] = [
     breakAfter: true,
   },
   // #endregion
+  // #region Tutorial
+  {
+    path: '/tutorials',
+    description: 'List of all tutorials',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderTutorialsPage({
+        context,
+        tutorials,
+      })
+    },
+  },
+  {
+    link: '/tutorials/example',
+    path: '/tutorials/:slug',
+    description: 'Tutorial page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderTutorialPage({
+        context,
+        articleContent: tutorial,
+        slug: 'example',
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
   // #region Error pages
   {
     path: '/error/not-found',
@@ -1112,51 +1984,71 @@ function getFakeUser() {
   }
 }
 
-const fakeCollateralAsset: CollateralAsset = {
-  assetId: AssetId('USDC-6'),
-  assetHash: AssetHash.fake(),
-  price: 1_000_000n,
-}
-
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser: true
+  options?: {
+    fallbackToFakeUser?: true
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: false
+  options?: {
+    fallbackToFakeUser?: false
+    showL2Transactions?: boolean
+  }
 ): PageContext<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: boolean
+  options?: {
+    fallbackToFakeUser?: boolean
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'perpetual'> | PageContext<'perpetual'> {
-  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+  const user =
+    getUser(ctx) ?? (options?.fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {
     user,
+    showL2Transactions: options?.showL2Transactions ?? false,
     instanceName: 'dYdX',
+    chainId: 1,
     tradingMode: 'perpetual',
     collateralAsset: fakeCollateralAsset,
+    freezeStatus: 'not-frozen',
   } as const
 }
 
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser: true
+  options?: {
+    fallbackToFakeUser?: true
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: false
+  options?: {
+    fallbackToFakeUser?: false
+    showL2Transactions?: boolean
+  }
 ): PageContext<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: boolean
+  options?: {
+    fallbackToFakeUser?: boolean
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'spot'> | PageContext<'spot'> {
-  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+  const user =
+    getUser(ctx) ?? (options?.fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {
     user,
+    showL2Transactions: options?.showL2Transactions ?? false,
     instanceName: 'Myria',
+    chainId: 1,
     tradingMode: 'spot',
+    freezeStatus: 'not-frozen',
   } as const
 }

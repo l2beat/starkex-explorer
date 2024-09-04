@@ -1,48 +1,52 @@
 import React, { ReactNode } from 'react'
 
-import { formatInt } from '../../../utils/formatting/formatAmount'
-import { LinkButton } from '../Button'
+import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
-interface TablePreviewProps {
-  title: ReactNode
+type TablePreviewProps = {
   path: string
-  entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
-  total: number
   children: ReactNode
-}
+} & (
+  | {
+      title: string
+      viewAllPosition: 'top'
+    }
+  | {
+      viewAllPosition: 'bottom'
+    }
+)
 
 export function TablePreview(props: TablePreviewProps) {
   return (
-    <section>
-      <SectionHeading
-        title={props.title}
-        description={
-          props.total > 0 && (
+    <div>
+      {props.viewAllPosition === 'top' && (
+        <SectionHeading
+          title={props.title}
+          description={
             <>
-              You're viewing {formatInt(props.visible)} out of{' '}
-              <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
-              {props.entryShortNamePlural}
+              <Link className="flex !gap-0.5" href={props.path}>
+                View all
+              </Link>
             </>
-          )
-        }
-      />
+          }
+        />
+      )}
       {props.children}
       {props.visible === 0 && (
-        <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
+        <div className="-mx-6 flex h-20 items-center justify-center rounded bg-gray-900 text-center text-md text-zinc-500 sm:mx-0">
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-      {props.total > props.visible && (
+      {props.viewAllPosition === 'bottom' && props.visible !== 0 && (
         <div className="mt-6 flex items-center justify-center">
-          <LinkButton variant="outlined" href={props.path}>
+          <Button as="a" variant="outlined" href={props.path}>
             View all {props.entryLongNamePlural}
-          </LinkButton>
+          </Button>
         </div>
       )}
-    </section>
+    </div>
   )
 }

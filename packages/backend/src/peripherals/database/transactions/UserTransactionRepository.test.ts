@@ -6,10 +6,10 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../../test/database'
-import { Logger } from '../../../tools/Logger'
 import {
   ForcedTradeData,
   ForcedWithdrawalData,
@@ -948,4 +948,58 @@ describe(UserTransactionRepository.name, () => {
       })
     }
   )
+
+  describe(
+    UserTransactionRepository.prototype.findOldestNotIncluded.name,
+    () => {
+      it('returns a forced withdrawal', async () => {
+        const transactionHash = Hash256.fake()
+        await repository.add({
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        const transactionHash2 = Hash256.fake()
+        const id2 = await repository.add({
+          transactionHash: transactionHash2,
+          blockNumber: 124,
+          timestamp: Timestamp(124000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        await repository.addManyIncluded([
+          {
+            transactionHash: transactionHash,
+            blockNumber: 123,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 1,
+          },
+        ])
+
+        const record = await repository.findOldestNotIncluded([
+          'ForcedWithdrawal',
+        ])
+        expect(record?.id).toEqual(id2)
+      })
+    }
+  )
+
+  describe(UserTransactionRepository.prototype.freezeRequestExists.name, () => {
+    it('returns false if no freeze request in db', async () => {
+      expect(await repository.freezeRequestExists()).toEqual(false)
+    })
+
+    it('returns true if freeze request in db', async () => {
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: { type: 'FreezeRequest' },
+      })
+
+      expect(await repository.freezeRequestExists()).toEqual(true)
+    })
+  })
 })

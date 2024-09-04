@@ -54,9 +54,13 @@ describe(ForcedTradeOfferController.name, () => {
   const pageContext: PageContext = {
     user: undefined,
     tradingMode: 'perpetual',
+    showL2Transactions: true,
+    chainId: 1,
     instanceName: 'dYdX',
     collateralAsset: fakeCollateralAsset,
+    freezeStatus: 'not-frozen',
   }
+
   describe(
     ForcedTradeOfferController.prototype.getOfferDetailsPage.name,
     () => {
@@ -495,7 +499,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.cancelOffer(1, '123')).toEqual({
         type: 'not found',
-        message: `Offer #1 does not exist`,
+        message: 'Offer #1 does not exist',
       })
     })
 

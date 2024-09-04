@@ -1,9 +1,9 @@
-import { AssetHash } from '@explorer/types'
+import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../CollateralAsset'
 
-export function getCollateralAssetIdFromHash(
-  hash: string,
+export function validateCollateralAssetIdByHash(
+  hash: string | AssetHash,
   collateralAsset: CollateralAsset
 ) {
   if (AssetHash(hash.toString()) !== collateralAsset.assetHash) {
@@ -11,4 +11,15 @@ export function getCollateralAssetIdFromHash(
   }
 
   return collateralAsset.assetId
+}
+
+export function validateCollateralAssetHashById(
+  id: string | AssetId,
+  collateralAsset: CollateralAsset
+) {
+  if (AssetId(id.toString()) !== collateralAsset.assetId) {
+    throw new Error(`Invalid collateral asset id: ${id.toString()}`)
+  }
+
+  return collateralAsset.assetHash
 }

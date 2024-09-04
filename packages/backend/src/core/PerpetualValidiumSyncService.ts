@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { Logger } from '../tools/Logger'
 import { FeederGatewayCollector } from './collectors/FeederGatewayCollector'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
@@ -13,6 +14,7 @@ import {
   PerpetualValidiumUpdater,
   ValidiumStateTransition,
 } from './PerpetualValidiumUpdater'
+import { LiveL2TransactionDownloader } from './sync/LiveL2TransactionDownloader'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
@@ -24,12 +26,15 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private readonly feederGatewayCollector: FeederGatewayCollector | undefined,
+    private readonly L2TransactionDownloader:
+      | LiveL2TransactionDownloader
+      | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
   }
 
-  async sync(blockRange: BlockRange) {
+  async sync(blockRange: BlockRange, isTip: boolean) {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
@@ -48,11 +53,14 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     })
 
     await this.processStateTransitions(stateTransitions)
+    await this.feederGatewayCollector?.collect()
+
+    if (isTip) {
+      await this.L2TransactionDownloader?.enableSync()
+    }
   }
 
   async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
-    let lastStateUpdateId: number | undefined
-
     for (const stateTransition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(
@@ -66,17 +74,11 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       if (!batch) {
         throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
-      const stateUpdate =
-        await this.perpetualValidiumUpdater.processValidiumStateTransition(
-          stateTransition,
-          perpetualCairoOutput,
-          batch
-        )
-      lastStateUpdateId = stateUpdate.id
-    }
-
-    if (lastStateUpdateId) {
-      await this.feederGatewayCollector?.collect(lastStateUpdateId)
+      await this.perpetualValidiumUpdater.processValidiumStateTransition(
+        stateTransition,
+        perpetualCairoOutput,
+        batch
+      )
     }
   }
 

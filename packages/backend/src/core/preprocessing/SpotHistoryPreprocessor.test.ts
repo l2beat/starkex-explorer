@@ -5,6 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -14,7 +15,6 @@ import {
   VaultRecord,
   VaultRepository,
 } from '../../peripherals/database/VaultRepository'
-import { Logger } from '../../tools/Logger'
 import { SpotHistoryPreprocessor } from './SpotHistoryPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {

@@ -1,9 +1,9 @@
 import { PedersenHash } from '@explorer/types'
 
 export interface MerkleProofPrefix {
-  nodes: { 
-    left: PedersenHash, 
-    right: PedersenHash 
+  nodes: {
+    left: PedersenHash
+    right: PedersenHash
   }[]
   finalHash: PedersenHash
 }

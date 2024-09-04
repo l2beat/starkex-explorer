@@ -1,27 +1,21 @@
+import { PageContext } from '@explorer/shared'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
-import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
-import { Button } from '../../../components/Button'
-import { Link } from '../../../components/Link'
+import { Card } from '../../../components/Card'
+import { EtherscanLink } from '../../../components/EtherscanLink'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { LongHash } from '../../../components/LongHash'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
-  hashes: {
-    factHash: Hash256
-    positionTreeRoot?: PedersenHash
-    onChainVaultTreeRoot?: PedersenHash
-    offChainVaultTreeRoot?: PedersenHash
-    orderRoot?: PedersenHash
-  }
-  blockNumber: number
+  transactionHash: Hash256
+  balancesTreeRootHash: PedersenHash
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
-  rawDataAvailable?: boolean
+  context: PageContext
 }
 
 export function StateUpdateStats(props: StateUpdateStatsProps) {
@@ -35,72 +29,35 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   // )
 
   return (
-    <section data-component="StateUpdateStats">
+    <section>
       <PageTitle>State Update #{props.id}</PageTitle>
-      <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
-        <div className="flex justify-between gap-6">
-          <ValueItem label="Ethereum block number">
-            <Link href={`https://etherscan.io/block/${props.blockNumber}`}>
-              {formatInt(props.blockNumber)}
-            </Link>
-          </ValueItem>
-          <ValueItem label="Ethereum block timestamp">
-            {formatTimestamp(props.ethereumTimestamp)} UTC
-          </ValueItem>
-
-          {/* Disabled until StarkEx timestamp will be fixed
-          <ValueItem label="StarkEx timestamp">
-            {formatTimestamp(props.starkExTimestamp, 'utc')} UTC{' '}
-            <span className="text-sm font-semibold text-zinc-500">
-              ({delayHours}h delay)
-            </span>
-          </ValueItem> */}
-        </div>
-        <div className="hidden" data-component="StateUpdateStats-Advanced">
-          <div className="flex flex-col gap-4 rounded bg-slate-800 p-6">
-            <ValueItem label="Fact hash">
-              {props.hashes.factHash.toString()}
-            </ValueItem>
-            {props.hashes.positionTreeRoot && (
-              <ValueItem label="Position tree root">
-                0x{props.hashes.positionTreeRoot.toString()}
-              </ValueItem>
-            )}
-            {props.hashes.onChainVaultTreeRoot && (
-              <ValueItem label="On-chain vault tree root">
-                0x{props.hashes.onChainVaultTreeRoot.toString()}
-              </ValueItem>
-            )}
-            {props.hashes.offChainVaultTreeRoot && (
-              <ValueItem label="Off-chain vault tree root">
-                0x{props.hashes.offChainVaultTreeRoot.toString()}
-              </ValueItem>
-            )}
-            {props.hashes.orderRoot && (
-              <ValueItem label="Order root">
-                0x{props.hashes.orderRoot.toString()}
-              </ValueItem>
-            )}
-            {props.rawDataAvailable && (
-              <Link
-                href={`/state-updates/${props.id}/raw`}
-                className="text-lg font-semibold"
+      <Card>
+        <div>
+          <div className="flex flex-col justify-between gap-6 sm:flex-row">
+            <ValueItem label="Transaction hash">
+              <EtherscanLink
+                chainId={props.context.chainId}
+                type="tx"
+                txHash={props.transactionHash.toString()}
               >
-                View raw data
-              </Link>
-            )}
+                <InlineEllipsis className="max-w-[280px] sm:max-w-[250px] lg:max-w-md">
+                  {props.transactionHash.toString()}
+                </InlineEllipsis>
+              </EtherscanLink>
+            </ValueItem>
+            <ValueItem label="Ethereum block timestamp">
+              {formatTimestamp(props.ethereumTimestamp)} UTC
+            </ValueItem>
+          </div>
+          <div className="mt-8 flex flex-col">
+            <ValueItem label="Balances tree root">
+              <LongHash withCopy>
+                0x{props.balancesTreeRootHash.toString()}
+              </LongHash>
+            </ValueItem>
           </div>
         </div>
-      </div>
-      <div className="flex justify-center">
-        <Button
-          variant="outlined"
-          className="flex h-10 items-center justify-center"
-        >
-          View advanced data <ChevronDownIcon className="inline-block" />
-          <ChevronUpIcon className="hidden" />
-        </Button>
-      </div>
+      </Card>
     </section>
   )
 }

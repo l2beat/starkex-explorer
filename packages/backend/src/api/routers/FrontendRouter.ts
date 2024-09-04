@@ -1,21 +1,19 @@
-import {
-  CollateralAsset,
-  stringAs,
-  stringAsBigInt,
-  stringAsPositiveInt,
-  TradingMode,
-} from '@explorer/shared'
+import { stringAs, stringAsBigInt, stringAsPositiveInt } from '@explorer/shared'
 import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import * as z from 'zod'
 
+import { Config } from '../../config'
+import { EscapeHatchController } from '../controllers/EscapeHatchController'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
+import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
+import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
 import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
 import { addSpotTradingRoutes } from './SpotFrontendRouter'
@@ -30,9 +28,11 @@ export function createFrontendRouter(
   forcedActionController: ForcedActionController,
   forcedTradeOfferController: ForcedTradeOfferController | undefined,
   merkleProofController: MerkleProofController,
-  collateralAsset: CollateralAsset | undefined,
-  tradingMode: TradingMode,
-  searchController: SearchController
+  searchController: SearchController,
+  l2TransactionController: L2TransactionController,
+  escapeHatchController: EscapeHatchController,
+  tutorialController: TutorialController,
+  config: Config
 ) {
   const router = new Router()
 
@@ -114,6 +114,32 @@ export function createFrontendRouter(
           givenUser,
           ctx.params.stateUpdateId
         )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/state-updates/:stateUpdateId/l2-transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          stateUpdateId: stringAsPositiveInt(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result =
+          await stateUpdateController.getStateUpdateL2TransactionsPage(
+            givenUser,
+            ctx.params.stateUpdateId,
+            pagination
+          )
         applyControllerResult(ctx, result)
       }
     )
@@ -344,24 +370,148 @@ export function createFrontendRouter(
     )
   )
 
-  if (tradingMode === 'perpetual') {
+  router.get('/freeze', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeHatchController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeHatchController.getEscapeHatchActionPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get('/freeze', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeHatchController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeHatchController.getEscapeHatchActionPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  if (config.starkex.l2Transactions.enabled) {
+    router.get(
+      '/l2-transactions',
+      withTypedContext(
+        z.object({
+          query: z.object({
+            page: z.optional(stringAsPositiveInt()),
+            perPage: z.optional(stringAsPositiveInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const pagination = getPagination(ctx.query)
+          const result = await homeController.getHomeL2TransactionsPage(
+            givenUser,
+            pagination
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
+      '/users/:starkKey/l2-transactions',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            starkKey: stringAs(StarkKey),
+          }),
+          query: z.object({
+            page: z.optional(stringAsPositiveInt()),
+            perPage: z.optional(stringAsPositiveInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const pagination = getPagination(ctx.query)
+          const result = await userController.getUserL2TransactionsPage(
+            givenUser,
+            ctx.params.starkKey,
+            pagination
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+  }
+  router.get('/tutorials', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await tutorialController.getTutorialsPage(givenUser)
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/tutorials/:slug',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          slug: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await tutorialController.getTutorialPage(
+          givenUser,
+          ctx.params.slug
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  if (config.starkex.tradingMode === 'perpetual') {
     if (!forcedTradeOfferController) {
       throw new Error(
         'forcedTradeOfferController is required in perpetual trading mode'
       )
     }
 
-    if (!collateralAsset) {
-      throw new Error(
-        'Collateral asset must be defined in perpetual trading mode'
-      )
-    }
-
     addPerpetualTradingRoutes(
       router,
+      homeController,
       forcedTradeOfferController,
       forcedActionController,
-      collateralAsset
+      l2TransactionController,
+      config
     )
   } else {
     addSpotTradingRoutes(router, forcedActionController)

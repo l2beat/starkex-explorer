@@ -5,14 +5,14 @@ import {
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
-import { FINALIZE_OFFER_FORM_ID } from '../../../../view/pages/transaction/components/FinalizeOfferForm'
+import { FINALIZE_OFFER_FORM_CLASS } from '../../../../view/pages/transaction/components/FinalizeOfferForm'
 import { Api } from '../../../peripherals/api'
 import { Wallet } from '../../../peripherals/wallet'
+import { makeQuery } from '../../../utils/query'
 
 export function initFinalizeForm() {
-  const forms = document.querySelectorAll<HTMLFormElement>(
-    `.${FINALIZE_OFFER_FORM_ID}`
-  )
+  const { $$ } = makeQuery(document.body)
+  const forms = $$<HTMLFormElement>(`.${FINALIZE_OFFER_FORM_CLASS}`)
   forms.forEach((form) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {

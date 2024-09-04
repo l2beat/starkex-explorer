@@ -92,7 +92,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             {props.transactionHash ? (
               <TransactionPageTitle
                 title={`Forced ${props.type.toLowerCase()}`}
@@ -125,6 +125,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             </div>
           </div>
           <TransactionOverview
+            chainId={props.context.chainId}
             stateUpdateId={props.stateUpdateId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
@@ -164,6 +165,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
         <TransactionUserDetails
           title="Creator details"
           tradingMode="perpetual"
+          chainId={props.context.chainId}
           starkKey={props.maker.starkKey}
           ethereumAddress={props.maker.ethereumAddress}
           vaultOrPositionId={props.maker.positionId}
@@ -172,6 +174,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           <TransactionUserDetails
             title={`${props.type === 'BUY' ? 'Seller' : 'Buyer'} details`}
             tradingMode="perpetual"
+            chainId={props.context.chainId}
             starkKey={props.taker.starkKey}
             ethereumAddress={props.taker.ethereumAddress}
             vaultOrPositionId={props.taker.positionId}

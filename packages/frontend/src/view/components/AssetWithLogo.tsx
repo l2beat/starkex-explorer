@@ -31,8 +31,9 @@ export function AssetWithLogo({
       />
       <span
         className={classNames(
-          'ml-2',
-          type === 'small' ? 'text-sm font-medium' : 'text-lg font-semibold'
+          type === 'small'
+            ? 'ml-1 text-sm font-medium'
+            : 'ml-2 text-lg font-semibold'
         )}
       >
         {type === 'full' && (

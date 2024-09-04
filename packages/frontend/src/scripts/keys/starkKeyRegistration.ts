@@ -4,9 +4,12 @@ import Cookies from 'js-cookie'
 import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import { Wallet } from '../peripherals/wallet'
+import { makeQuery } from '../utils/query'
 
 export function initStarkKeyRegistration() {
-  const registerButton = document.getElementById(REGISTER_STARK_KEY_BUTTON_ID)
+  const { $ } = makeQuery(document.body)
+
+  const registerButton = $.maybe(`#${REGISTER_STARK_KEY_BUTTON_ID}`)
 
   if (!registerButton) {
     return
@@ -33,6 +36,6 @@ export function initStarkKeyRegistration() {
       EthereumAddress(exchangeAddress)
     )
 
-    window.location.reload()
+    window.location.href = `/users/${starkKey.toString()}`
   })
 }

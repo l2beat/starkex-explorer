@@ -1,4 +1,7 @@
 import {
+  renderFinalizeEscapeDetailsPage,
+  renderFreezeRequestDetailsPage,
+  renderInitializeEscapePage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -87,8 +90,8 @@ export class TransactionController {
             userTransaction.data.starkKey
           )
         const transactionHistory = new TransactionHistory({
-          sentTransaction: sentTransaction,
-          userTransaction: userTransaction,
+          sentTransaction,
+          userTransaction,
         })
 
         const content = renderPerpetualForcedWithdrawalPage({
@@ -183,6 +186,7 @@ export class TransactionController {
         })
         return { type: 'success', content }
       }
+
       case 'Withdraw':
       case 'WithdrawWithTokenId':
       case 'MintWithdraw': {
@@ -224,6 +228,95 @@ export class TransactionController {
         })
         return { type: 'success', content }
       }
+
+      case 'VerifyEscape': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKey
+          )
+        const transactionHistory = new TransactionHistory({
+          userTransaction,
+          sentTransaction,
+        })
+
+        const content = renderInitializeEscapePage({
+          context,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            starkKey: userTransaction.data.starkKey,
+            ethereumAddress: txUser?.ethAddress,
+          },
+          dataFromL1: {
+            asset: { hashOrId: context.collateralAsset.assetId },
+            amount: userTransaction.data.withdrawalAmount,
+          },
+          positionOrVaultId: userTransaction.data.positionId.toString(),
+          history: transactionHistory.getRegularTransactionHistory(),
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
+        return { type: 'success', content }
+      }
+
+      case 'FinalizeEscape': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKey
+          )
+        const transactionHistory = new TransactionHistory({
+          userTransaction,
+          sentTransaction,
+        })
+
+        const content = renderFinalizeEscapeDetailsPage({
+          context,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            starkKey: userTransaction.data.starkKey,
+            ethereumAddress: txUser?.ethAddress,
+          },
+          asset: { hashOrId: context.collateralAsset.assetId },
+          amount: userTransaction.data.quantizedAmount,
+          positionOrVaultId: sentTransaction?.vaultOrPositionId
+            ? sentTransaction.vaultOrPositionId.toString()
+            : undefined,
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
+        return { type: 'success', content }
+      }
+      case 'FreezeRequest': {
+        const transactionHistory = new TransactionHistory({
+          userTransaction,
+          sentTransaction,
+        })
+
+        const txUser = sentTransaction
+          ? await this.userRegistrationEventRepository.findByStarkKey(
+              sentTransaction.starkKey
+            )
+          : undefined
+
+        const content = renderFreezeRequestDetailsPage({
+          context,
+          transactionHash: userTransaction.transactionHash,
+          ignored: sentTransaction
+            ? {
+                starkKey: sentTransaction.starkKey,
+                ethereumAddress: txUser?.ethAddress,
+              }
+            : undefined,
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
+        return { type: 'success', content }
+      }
+
       default:
         assertUnreachable(userTransaction.data)
     }
@@ -370,6 +463,86 @@ export class TransactionController {
           history: transactionHistory.getRegularTransactionHistory(),
         })
 
+        return { type: 'success', content }
+      }
+
+      case 'VerifyEscape': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+
+        const content = renderInitializeEscapePage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: txUser?.ethAddress,
+          },
+          positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
+
+        return { type: 'success', content }
+      }
+
+      case 'ForcedWithdrawalFreezeRequest':
+      case 'ForcedTradeFreezeRequest':
+      case 'FullWithdrawalFreezeRequest': {
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+        const registeredUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.starkKey
+          )
+
+        const content = renderFreezeRequestDetailsPage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          ignored: {
+            starkKey: sentTransaction.starkKey,
+            ethereumAddress: registeredUser?.ethAddress,
+          },
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
+
+        return { type: 'success', content }
+      }
+
+      case 'FinalizePerpetualEscape':
+      case 'FinalizeSpotEscape': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+        const registeredUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+
+        const content = renderFinalizeEscapeDetailsPage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: registeredUser?.ethAddress,
+          },
+          asset: { hashOrId: context.collateralAsset.assetId },
+          amount: sentTransaction.data.quantizedAmount,
+          positionOrVaultId: sentTransaction.vaultOrPositionId?.toString(),
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
         return { type: 'success', content }
       }
 

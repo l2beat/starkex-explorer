@@ -2,6 +2,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earl'
 
 import { Config } from '../config'
+import { KeyValueStore } from '../peripherals/database/KeyValueStore'
 import { fakeCollateralAsset } from '../test/fakes'
 import { PageContextService } from './PageContextService'
 import { UserService } from './UserService'
@@ -12,12 +13,24 @@ describe(PageContextService.name, () => {
       tradingMode: 'perpetual',
       instanceName: 'dYdX',
       collateralAsset: fakeCollateralAsset,
+      l2Transactions: {
+        enabled: true,
+      },
+      blockchain: {
+        chainId: 1,
+      },
     },
   } as Config
   const spotConfig = {
     starkex: {
       tradingMode: 'spot',
       instanceName: 'Myria',
+      l2Transactions: {
+        enabled: true,
+      },
+      blockchain: {
+        chainId: 5,
+      },
     },
   } as const as Config
 
@@ -29,9 +42,13 @@ describe(PageContextService.name, () => {
       const mockedUserService = mockObject<UserService>({
         getUserDetails: mockFn(async () => undefined),
       })
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         perpetualConfig,
-        mockedUserService
+        mockedUserService,
+        mockedKvStore
       )
 
       const context = await pageContextService.getPageContext(givenUser)
@@ -39,10 +56,14 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'perpetual',
+        showL2Transactions: perpetualConfig.starkex.l2Transactions.enabled,
+        chainId: 1,
         instanceName: perpetualConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
+        freezeStatus: 'not-frozen',
       })
       expect(mockedUserService.getUserDetails).toHaveBeenCalledWith(givenUser)
+      expect(mockedKvStore.findByKeyWithDefault).toHaveBeenCalled()
     })
 
     it('should return the correct context for spot', async () => {
@@ -52,9 +73,13 @@ describe(PageContextService.name, () => {
       const mockedUserService = mockObject<UserService>({
         getUserDetails: mockFn(async () => undefined),
       })
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         spotConfig,
-        mockedUserService
+        mockedUserService,
+        mockedKvStore
       )
 
       const context = await pageContextService.getPageContext(givenUser)
@@ -62,7 +87,10 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'spot',
+        showL2Transactions: spotConfig.starkex.l2Transactions.enabled,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
+        freezeStatus: 'not-frozen',
       })
       expect(mockedUserService.getUserDetails).toHaveBeenCalledWith(givenUser)
     })
@@ -72,17 +100,24 @@ describe(PageContextService.name, () => {
       const givenUser = {
         address: EthereumAddress.fake(),
       }
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         perpetualConfig,
         mockObject<UserService>({
           getUserDetails: mockFn(async () => givenUser),
-        })
+        }),
+        mockedKvStore
       )
       const pageContext = {
         user: givenUser,
         tradingMode: 'perpetual',
+        chainId: 1,
+        showL2Transactions: false,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
+        freezeStatus: 'not-frozen',
       } as const
       pageContextService.getPageContext = mockFn(async () => pageContext)
 
@@ -92,17 +127,24 @@ describe(PageContextService.name, () => {
     })
 
     it('should return undefined if user is not connected', async () => {
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         perpetualConfig,
-        mockObject<UserService>()
+        mockObject<UserService>(),
+        mockedKvStore
       )
       pageContextService.getPageContext = mockFn(
         async () =>
           ({
             user: undefined,
             tradingMode: 'perpetual',
+            showL2Transactions: false,
+            chainId: 1,
             instanceName: spotConfig.starkex.instanceName,
             collateralAsset: fakeCollateralAsset,
+            freezeStatus: 'not-frozen',
           } as const)
       )
       const context = await pageContextService.getPageContextWithUser({})
@@ -118,17 +160,24 @@ describe(PageContextService.name, () => {
           address: EthereumAddress.fake(),
           starkKey: StarkKey.fake(),
         }
+        const mockedKvStore = mockObject<KeyValueStore>({
+          findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+        })
         const pageContextService = new PageContextService(
           perpetualConfig,
           mockObject<UserService>({
             getUserDetails: mockFn(async () => givenUser),
-          })
+          }),
+          mockedKvStore
         )
         const pageContext = {
           user: givenUser,
           tradingMode: 'perpetual',
+          chainId: 1,
+          showL2Transactions: false,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
+          freezeStatus: 'not-frozen',
         } as const
         pageContextService.getPageContextWithUser = mockFn(
           async () => pageContext
@@ -142,7 +191,8 @@ describe(PageContextService.name, () => {
       it('should return undefined if user is not connected', async () => {
         const pageContextService = new PageContextService(
           perpetualConfig,
-          mockObject<UserService>()
+          mockObject<UserService>(),
+          mockObject<KeyValueStore>()
         )
         pageContextService.getPageContextWithUser = mockFn(
           async () => undefined
@@ -157,17 +207,24 @@ describe(PageContextService.name, () => {
         const givenUser = {
           address: EthereumAddress.fake(),
         }
+        const mockedKvStore = mockObject<KeyValueStore>({
+          findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+        })
         const pageContextService = new PageContextService(
           perpetualConfig,
           mockObject<UserService>({
             getUserDetails: mockFn(async () => givenUser),
-          })
+          }),
+          mockedKvStore
         )
         const pageContext = {
           user: givenUser,
           tradingMode: 'perpetual',
+          chainId: 1,
+          showL2Transactions: false,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
+          freezeStatus: 'not-frozen',
         } as const
         pageContextService.getPageContextWithUser = mockFn(
           async () => pageContext
@@ -181,15 +238,22 @@ describe(PageContextService.name, () => {
   )
   describe(PageContextService.prototype.getCollateralAsset.name, () => {
     it('should return the collateral asset for perpetuals', () => {
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         perpetualConfig,
-        mockObject<UserService>()
+        mockObject<UserService>(),
+        mockedKvStore
       )
       const pageContext = {
         user: undefined,
         tradingMode: 'perpetual',
+        showL2Transactions: false,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
+        freezeStatus: 'not-frozen',
       } as const
 
       const collateralAsset = pageContextService.getCollateralAsset(pageContext)
@@ -198,14 +262,21 @@ describe(PageContextService.name, () => {
     })
 
     it('should return undefined for spot', () => {
+      const mockedKvStore = mockObject<KeyValueStore>({
+        findByKeyWithDefault: mockFn().resolvesTo('not-frozen'),
+      })
       const pageContextService = new PageContextService(
         spotConfig,
-        mockObject<UserService>()
+        mockObject<UserService>(),
+        mockedKvStore
       )
       const pageContext = {
         user: undefined,
         tradingMode: 'spot',
+        showL2Transactions: false,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
+        freezeStatus: 'not-frozen',
       } as const
 
       const collateralAsset = pageContextService.getCollateralAsset(pageContext)

@@ -1,9 +1,9 @@
 import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

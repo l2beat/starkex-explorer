@@ -1,59 +1,53 @@
+import classNames from 'classnames'
 import React from 'react'
 
+import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
+import { Card } from '../../../components/Card'
 import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
 
-export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
-  {
-    title: 'Learn how to use StarkEx Explorer efficiently',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/features',
-  },
-  {
-    title: 'All about forced transactions',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/forced-transactions',
-  },
-  {
-    title: 'Stark key registration',
-    imageUrl: '/images/tutorial.jpg',
-    href: '/tutorials/registration',
-  },
-]
-
-interface HomeTutorialsProps {
-  tutorials: HomeTutorialEntry[]
-}
-
 export interface HomeTutorialEntry {
   title: string
-  imageUrl: string
-  href: string
+  slug: string
+}
+interface HomeTutorialsProps {
+  className?: string
+  tutorials: HomeTutorialEntry[]
+  showViewAll?: boolean
 }
 
 export function HomeTutorials(props: HomeTutorialsProps) {
   return (
-    <section className="xl:mt-[72px]">
+    <div className={classNames('flex flex-col', props.className)}>
       <SectionHeading
         title="Tutorials"
-        description="Learn how to use the StarkEx Explorer"
-        leftAlign
+        description={
+          props.showViewAll ? (
+            <Link href="/tutorials">View all</Link>
+          ) : (
+            'Learn how to use the StarkEx Explorer'
+          )
+        }
       />
-      <ul className="flex flex-col gap-4">
+      <Card className="flex h-min flex-col gap-4">
         {props.tutorials.map((tutorial, i) => (
-          <li key={i}>
-            <a href={tutorial.href} className="flex w-full items-center gap-4">
-              <img className="h-20 w-[128px] rounded" src={tutorial.imageUrl} />
-              <div className="flex-1">
-                <p className="mb-1.5 text-lg font-semibold leading-tight">
-                  {tutorial.title}
-                </p>
-                <Link className="text-xs font-semibold">Read now</Link>
-              </div>
-            </a>
-          </li>
+          <a
+            key={i}
+            href={`/tutorials/${tutorial.slug}`}
+            className="group flex w-full items-center gap-4"
+          >
+            <img className="h-[63px] rounded" src="/images/starkex-logo.png" />
+            <div className="flex-1">
+              <p className="text-base font-semibold leading-tight">
+                {tutorial.title}
+              </p>
+              <span className="flex items-center text-xs font-semibold text-brand group-hover:underline">
+                Read now <ArrowRightIcon />
+              </span>
+            </div>
+          </a>
         ))}
-      </ul>
-    </section>
+      </Card>
+    </div>
   )
 }

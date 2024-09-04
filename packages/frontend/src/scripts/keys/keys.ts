@@ -22,8 +22,10 @@ export const Registration = z.object({
 })
 
 // Follows the same logic as https://github.com/dydxprotocol/starkex-lib
-export function getDydxStarkExKeyPairFromData(hexData: string): StarkKeyPair {
-  const hashedData = keccak256(hexData)
+export function getGenericStarkExKeyPairFromData(
+  signature: string
+): StarkKeyPair {
+  const hashedData = keccak256(signature)
   const privateKey = BigInt(hashedData) / 2n ** 5n
   const normalized = normalizeHex32(privateKey.toString(16))
 

@@ -1,7 +1,10 @@
 import { PageContext, PageContextWithUser } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
+import { Tooltip } from '../Tooltip'
+import { BreakpointIndicator } from './BreakpointIndicator'
 import { Footer } from './Footer'
+import { FreezeBanner } from './FreezeBanner'
 import { Head } from './Head'
 import { Navbar } from './Navbar'
 
@@ -20,8 +23,14 @@ interface Props {
 }
 
 export function Page(props: Props) {
+  const isDebug = process.env.DEBUG === 'true'
+  const isPreview = process.env.DEPLOYMENT_ENV === 'preview'
   return (
-    <html lang="en" className="h-full bg-neutral-900 text-white">
+    <html
+      lang="en"
+      className="h-full bg-neutral-900 text-white"
+      data-chain-id={props.context.chainId}
+    >
       <Head
         description={props.description}
         image={props.image ?? '/images/meta-image.png'}
@@ -34,17 +43,39 @@ export function Page(props: Props) {
             `https://${props.context.instanceName.toLowerCase()}.l2beat.com`,
           props.path
         )}
-        stylesheets={props.stylesheets ?? ['/styles/main.css']}
+        stylesheets={
+          props.stylesheets ?? [
+            '/styles/main.css',
+            ...(isDebug && isPreview ? ['/styles/debug.css'] : []),
+          ]
+        }
       />
       <body className="flex h-full flex-col">
-        <Navbar searchBar={!props.withoutSearch} context={props.context} />
+        {isPreview && <BreakpointIndicator />}
+        <Navbar
+          showSearchBar={!props.withoutSearch}
+          context={props.context}
+          path={props.path}
+          isPreview={isPreview}
+        />
+        <FreezeBanner freezeStatus={props.context.freezeStatus} />
+        <GradientBackground />
         {props.children}
         <Footer />
+        <Tooltip />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />
         ))}
       </body>
     </html>
+  )
+}
+
+function GradientBackground() {
+  return (
+    <div className="relative">
+      <div className="absolute top-0 -z-50 h-96 w-full bg-gradient-to-b from-[#262646] via-transparent "></div>
+    </div>
   )
 }
 

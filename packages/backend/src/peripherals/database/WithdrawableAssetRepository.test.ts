@@ -5,10 +5,10 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger } from '../../tools/Logger'
 import {
   MintWithdrawData,
   WithdrawData,
@@ -315,6 +315,81 @@ describe(WithdrawableAssetRepository.name, () => {
             assetHash: secondAsset,
             withdrawableBalance: 246n,
           },
+        ])
+      })
+    }
+  )
+
+  describe(
+    WithdrawableAssetRepository.prototype.getByStarkKeyFromBlockNumber.name,
+    () => {
+      it('returns all requested records', async () => {
+        const starkKey1 = StarkKey.fake()
+        const starkKey2 = StarkKey.fake()
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123003),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 124,
+          timestamp: Timestamp(123004),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey2,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 125,
+          timestamp: Timestamp(123005),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 126,
+          timestamp: Timestamp(123006),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey2,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 127,
+          timestamp: Timestamp(123007),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 128,
+          timestamp: Timestamp(123008),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+          }),
+        })
+
+        const records = await repository.getByStarkKeyFromBlockNumber(
+          starkKey1,
+          125
+        )
+
+        expect(records.map((r) => r.timestamp)).toEqual([
+          Timestamp(123005),
+          Timestamp(123007),
+          Timestamp(123008),
         ])
       })
     }

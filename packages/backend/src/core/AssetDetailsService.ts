@@ -20,6 +20,7 @@ export class AssetDetailsService {
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
     withdrawableAssets?: { assetHash: AssetHash; withdrawableBalance: bigint }[]
+    escapableAssetHashes?: AssetHash[]
   }): Promise<AssetDetailsMap | undefined> {
     if (this.tradingMode !== 'spot') {
       return undefined
@@ -35,6 +36,7 @@ export class AssetDetailsService {
         this.getUserTransactionAssetHash(tx)
       ) ?? []),
       ...(records.withdrawableAssets?.map((a) => a.assetHash) ?? []),
+      ...(records.escapableAssetHashes ?? []),
     ].filter((hash): hash is AssetHash => AssetHash.check(hash))
 
     const assetTypeAndTokenIds: { assetType: AssetHash; tokenId: bigint }[] =
@@ -72,6 +74,7 @@ export class AssetDetailsService {
   ): AssetHash | undefined {
     switch (userTransaction.data.type) {
       case 'Withdraw':
+      case 'FinalizeEscape':
         return userTransaction.data.assetType
       case 'WithdrawWithTokenId':
       case 'MintWithdraw':
@@ -79,6 +82,8 @@ export class AssetDetailsService {
       case 'ForcedTrade':
       case 'ForcedWithdrawal':
       case 'FullWithdrawal':
+      case 'VerifyEscape':
+      case 'FreezeRequest':
         return undefined
       default:
         assertUnreachable(userTransaction.data)

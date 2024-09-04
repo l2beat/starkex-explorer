@@ -1,68 +1,50 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { ComponentPropsWithoutRef, ElementType } from 'react'
 
-import { Link } from './Link'
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  readonly variant?: ButtonVariant
-}
+type ButtonProps<T extends ElementType> = {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  className?: string
+  as?: T
+} & ComponentPropsWithoutRef<T> &
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  (T extends 'a' ? { disabled?: boolean } : {})
 
 type ButtonVariant = 'contained' | 'outlined'
-const mainClassNames =
-  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8 rounded'
-const classNameMap: Record<ButtonVariant, string> = {
+const variantClassNames: Record<ButtonVariant, string> = {
   contained:
     'bg-brand hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
   outlined:
     'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
 }
 
-export function Button({
-  variant = 'contained',
-  className,
-  children,
-  disabled,
-  ...rest
-}: ButtonProps) {
-  return (
-    <button
-      className={cx(mainClassNames, classNameMap[variant], className)}
-      disabled={disabled}
-      {...rest}
-    >
-      {children}
-    </button>
-  )
+type ButtonSize = 'sm' | 'md' | 'lg'
+const sizeClassNames: Record<ButtonSize, string> = {
+  sm: 'h-8 text-sm rounded',
+  md: 'h-10 text-md rounded-lg',
+  lg: 'h-12 text-md rounded-lg',
 }
 
-interface LinkButtonProps extends React.HTMLProps<HTMLAnchorElement> {
-  readonly variant?: ButtonVariant
-  readonly href: string
-}
-
-export function LinkButton({
+export function Button<T extends ElementType = 'button'>({
   variant = 'contained',
+  size = 'md',
   className,
   children,
-  href,
-  disabled,
+  as,
   ...rest
-}: LinkButtonProps) {
+}: ButtonProps<T>) {
+  const Comp = as ?? 'button'
   return (
-    <Link
-      href={disabled ? undefined : href}
-      disabled={disabled}
+    <Comp
       className={cx(
-        'flex items-center justify-center !text-white !no-underline',
-        mainClassNames,
-        disabled
-          ? 'cursor-not-allowed bg-white bg-opacity-20'
-          : classNameMap[variant],
+        'flex items-center justify-center px-8 py-2.5 font-semibold transition-colors disabled:cursor-not-allowed',
+        variantClassNames[variant],
+        sizeClassNames[size],
         className
       )}
       {...rest}
     >
       {children}
-    </Link>
+    </Comp>
   )
 }

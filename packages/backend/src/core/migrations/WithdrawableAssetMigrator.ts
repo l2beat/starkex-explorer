@@ -1,8 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../../model'
-import { SoftwareMigrationRepository } from '../../peripherals/database/SoftwareMigrationRepository'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
-import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
 import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedCollector'
 
@@ -10,8 +10,7 @@ import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedColle
 // that happened until now to build the withdrawable assets repository.
 export class WithdrawableAssetMigrator {
   constructor(
-    private softwareMigrationRepository: SoftwareMigrationRepository,
-    private syncStatusRepository: SyncStatusRepository,
+    private kvStore: KeyValueStore,
     private withdrawableAssetRepository: WithdrawableAssetRepository,
     private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private userTransactionCollector: UserTransactionCollector,
@@ -22,18 +21,23 @@ export class WithdrawableAssetMigrator {
 
   async migrate(): Promise<void> {
     const migrationNumber =
-      await this.softwareMigrationRepository.getMigrationNumber()
+      (await this.kvStore.findByKey('softwareMigrationNumber')) ?? 0
     if (migrationNumber >= 4) {
       return
     }
     await this.migrateWithdrawableAssets()
     // Migration is set to 4 because there were previous migrations
     // that had since been replaced by this one.
-    await this.softwareMigrationRepository.setMigrationNumber(4)
+    await this.kvStore.addOrUpdate({
+      key: 'softwareMigrationNumber',
+      value: 4,
+    })
   }
 
   private async migrateWithdrawableAssets() {
-    const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
+    const lastSyncedBlock = await this.kvStore.findByKey(
+      'lastBlockNumberSynced'
+    )
     if (lastSyncedBlock === undefined) {
       return
     }

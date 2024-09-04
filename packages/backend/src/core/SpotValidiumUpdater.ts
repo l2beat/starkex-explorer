@@ -1,12 +1,12 @@
 import { FullWithdrawal, SpotCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatchData'
-import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
 export interface ValidiumStateTransition {

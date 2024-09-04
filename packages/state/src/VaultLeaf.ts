@@ -20,16 +20,28 @@ export class VaultLeaf extends MerkleValue {
   // Computes the hash h(key_token_hash, amount), where key_token_hash := h(stark_key, token_id)
   // For python implementation, see:
   // https://github.com/starkware-libs/starkex-resources/blob/master/stark_ex_objects/starkware/objects/state.py#L76
-  async calculateHash() {
-    const key_token_hash = await pedersen(
-      PedersenHash(this.starkKey.toString()),
-      PedersenHash(this.assetHash.toString())
-    )
-    const hash = await pedersen(
-      key_token_hash,
-      PedersenHash(packBytes([{ bytes: 32, value: this.balance }]))
-    )
-    return hash
+  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
+    const proofNodes: { left: PedersenHash; right: PedersenHash }[] = []
+
+    let hash = PedersenHash(this.starkKey.toString()) // This is only casting, not hashing
+    for (const item of [
+      this.assetHash.toString(),
+      packBytes([{ bytes: 32, value: this.balance }]),
+    ]) {
+      const itemAsPedersenHash = PedersenHash(item) // This is only casting, not hashing
+      proofNodes.push({ left: hash, right: itemAsPedersenHash })
+      hash = await pedersen(hash, itemAsPedersenHash)
+    }
+
+    return {
+      nodes: proofNodes,
+      finalHash: hash,
+    }
+  }
+
+  async calculateHash(): Promise<PedersenHash> {
+    const MerkleProofPrefix = await this.calculateMerkleProofPrefix()
+    return MerkleProofPrefix.finalHash
   }
 
   async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {

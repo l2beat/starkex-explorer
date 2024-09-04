@@ -15,13 +15,13 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import {
   EMPTY_STATE_HASH,
   PerpetualValidiumUpdater,
@@ -84,6 +84,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           stateTransitionHash: Hash256.fake('456'),
           rootHash: PedersenHash.fake('789'),
           timestamp: Timestamp(0),
+          perpetualState: undefined,
         }
         const mockProcessStateTransition =
           mockFn<typeof updater.processStateTransition>()
@@ -161,7 +162,8 @@ describe(PerpetualValidiumUpdater.name, () => {
           mockProgramOutput.newState.positionRoot,
           testForcedActions,
           mockProgramOutput.newState.oraclePrices,
-          updatedPositions
+          updatedPositions,
+          mockProgramOutput.newState
         )
         expect(result).toEqual(processedStateUpdate)
       })

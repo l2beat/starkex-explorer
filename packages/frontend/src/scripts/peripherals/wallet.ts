@@ -1,12 +1,20 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  assertUnreachable,
   CollateralAsset,
   CreateOfferData,
   encodeFinalizeExitRequest,
+  encodeFinalizePerpetualEscapeRequest,
+  encodeFinalizeSpotEscapeRequest,
+  encodeForcedTradeFreezeRequest,
+  encodeForcedWithdrawalFreezeRequest,
+  encodeFullWithdrawalFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
+  encodeVerifyPerpetualEscapeRequest,
+  encodeVerifySpotEscapeRequest,
   encodeWithdrawal,
   encodeWithdrawalWithTokenId,
   FinalizeOfferData,
@@ -15,7 +23,10 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import omit from 'lodash/omit'
 
+import { FreezeRequestActionFormProps, VerifyEscapeFormProps } from '../../view'
+import { FinalizeEscapeFormProps } from '../../view/pages/user/components/FinalizeEscapeForm'
 import { Registration } from '../keys/keys'
 
 function getProvider() {
@@ -54,6 +65,30 @@ export const Wallet = {
   async signMyriaKey(account: EthereumAddress): Promise<string> {
     const message =
       '0x5369676e2d696e20746f20796f7572204d79726961204c322057616c6c6574'
+
+    const result = await getProvider().request({
+      method: 'personal_sign',
+      params: [message, account.toString()],
+    })
+    return result as string
+  },
+
+  async signApexKey(
+    account: EthereumAddress,
+    chainId: number
+  ): Promise<string> {
+    const message = `name: ApeX\nversion: 1.0\nenvId: ${chainId}\naction: L2 Key\nonlySignOn: https://pro.apex.exchange`
+
+    const result = await getProvider().request({
+      method: 'personal_sign',
+      params: [message, account.toString()],
+    })
+    return result as string
+  },
+
+  async signApexTestnetKey(account: EthereumAddress): Promise<string> {
+    const message =
+      'name: ApeX\nversion: 1.0\nenvId: 5\naction: L2 Key\nonlySignOn: https://pro.apex.exchange'
 
     const result = await getProvider().request({
       method: 'personal_sign',
@@ -185,6 +220,126 @@ export const Wallet = {
   },
 
   // #endregion
+
+  // #region Escape
+  async sendFreezeRequestTransaction(
+    account: EthereumAddress,
+    props: FreezeRequestActionFormProps
+  ) {
+    const getEncodedData = () => {
+      switch (props.type) {
+        case 'ForcedWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeForcedWithdrawalFreezeRequest(toEncode)
+        }
+        case 'ForcedTrade': {
+          const toEncode = omit(
+            props,
+            'type',
+            'starkExAddress',
+            'collateralAsset'
+          )
+          return encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
+        }
+        case 'FullWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeFullWithdrawalFreezeRequest(toEncode)
+        }
+        default:
+          assertUnreachable(props)
+      }
+    }
+    const data = getEncodedData()
+
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: props.starkExAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendVerifyEscapeTransaction(
+    account: EthereumAddress,
+    props: VerifyEscapeFormProps
+  ) {
+    const { escapeVerifierAddress, ...rest } = props
+    const getEncodedData = () => {
+      switch (rest.tradingMode) {
+        case 'perpetual': {
+          return encodeVerifyPerpetualEscapeRequest({
+            serializedMerkleProof: rest.serializedMerkleProof,
+            assetCount: rest.assetCount,
+            serializedState: rest.serializedState,
+          })
+        }
+        case 'spot': {
+          return encodeVerifySpotEscapeRequest({
+            serializedEscapeProof: rest.serializedEscapeProof,
+          })
+        }
+      }
+    }
+    const data = getEncodedData()
+
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: escapeVerifierAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendFinalizeEscapeTransaction(
+    account: EthereumAddress,
+    props: FinalizeEscapeFormProps
+  ) {
+    const { exchangeAddress, ...rest } = props
+    const getEncodedData = () => {
+      switch (rest.tradingMode) {
+        case 'perpetual': {
+          return encodeFinalizePerpetualEscapeRequest({
+            starkKey: rest.starkKey,
+            positionId: rest.positionId,
+            quantizedAmount: rest.quantizedAmount,
+          })
+        }
+        case 'spot': {
+          return encodeFinalizeSpotEscapeRequest({
+            starkKey: rest.starkKey,
+            vaultId: rest.vaultId,
+            assetHash: rest.assetId,
+            quantizedAmount: rest.quantizedAmount,
+          })
+        }
+      }
+    }
+    const data = getEncodedData()
+
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: exchangeAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+  // #endregion
+
   // #region Withdrawals
 
   async sendOldWithdrawalTransaction(

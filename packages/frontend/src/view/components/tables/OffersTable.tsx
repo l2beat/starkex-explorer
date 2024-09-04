@@ -4,6 +4,7 @@ import {
   PageContext,
 } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
+import classNames from 'classnames'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -14,13 +15,15 @@ import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
-import { TimeCell } from '../TimeCell'
+import { TimeAgeCell } from '../TimeAgeCell'
 
 interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
-  showStatus?: boolean
+  isHomePage?: boolean
   showRole?: boolean
+  showOfferMatchColumn?: boolean
+  showTypeColumn?: boolean
 }
 
 export interface OfferEntry {
@@ -39,18 +42,35 @@ export interface OfferEntry {
     | 'INCLUDED'
     | 'EXPIRED'
     | 'REVERTED'
-  type: 'BUY' | 'SELL'
+  type?: 'BUY' | 'SELL'
   role?: 'MAKER' | 'TAKER'
 }
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Time (UTC)' },
-    { header: 'Id' },
-    { header: 'Trade', align: 'center' },
-    ...(props.showStatus ? [{ header: 'Status' }] : []),
+    { header: 'Id', className: classNames(props.isHomePage && 'w-[130px]') },
+    ...(props.showTypeColumn ? [{ header: 'Type' }] : []),
+    ...(props.showOfferMatchColumn
+      ? [
+          {
+            header: (
+              <span className="flex items-center justify-center">
+                OFFER
+                <ArrowRightIcon className="flex-inline mx-1" />
+                MATCH
+              </span>
+            ),
+            align: 'center' as const,
+            className: classNames(props.isHomePage && 'w-max'),
+          },
+        ]
+      : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
-    { header: 'Type' },
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    { header: 'Age', className: classNames(props.isHomePage && 'w-[90px]') },
   ]
 
   return (
@@ -58,23 +78,25 @@ export function OffersTable(props: OffersTableProps) {
       columns={columns}
       rows={props.offers.map((offer) => {
         const cells: ReactNode[] = [
-          <TimeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
-          <TradeColumn
-            offer={offer}
-            collateralAsset={props.context.collateralAsset}
-          />,
-          ...(props.showStatus
+          ...(props.showTypeColumn
+            ? [<span className="capitalize">{offer.type?.toLowerCase()}</span>]
+            : []),
+          ...(props.showOfferMatchColumn
             ? [
-                <StatusBadge type={toStatusType(offer.status)}>
-                  {toStatusText(offer.status)}
-                </StatusBadge>,
+                <OfferMatchColumn
+                  offer={offer}
+                  collateralAsset={props.context.collateralAsset}
+                />,
               ]
             : []),
           ...(props.showRole
             ? [<span className="capitalize">{offer.role?.toLowerCase()}</span>]
             : []),
-          <span className="capitalize">{offer.type.toLowerCase()}</span>,
+          <StatusBadge type={toStatusType(offer.status)}>
+            {toStatusText(offer.status)}
+          </StatusBadge>,
+          <TimeAgeCell timestamp={offer.timestamp} />,
         ]
 
         return {
@@ -91,7 +113,7 @@ interface Props {
   collateralAsset: CollateralAsset
 }
 
-function TradeColumn({ offer, collateralAsset }: Props) {
+function OfferMatchColumn({ offer, collateralAsset }: Props) {
   const trade =
     offer.type === 'SELL'
       ? {
@@ -118,16 +140,14 @@ function TradeColumn({ offer, collateralAsset }: Props) {
         <AssetWithLogo
           type="small"
           assetInfo={assetToInfo(trade.offeredAsset)}
-          symbolClassName="max-w-[60px]"
         />
       </div>
-      <ArrowRightIcon className="mx-1 flex-1" />
+      <ArrowRightIcon className="mx-1 flex-shrink-0" />
       <div className="flex items-center gap-2">
         {formatAmount(trade.receivedAsset, trade.receivedAmount)}
         <AssetWithLogo
           type="small"
           assetInfo={assetToInfo(trade.receivedAsset)}
-          symbolClassName="max-w-[60px]"
         />
       </div>
     </div>

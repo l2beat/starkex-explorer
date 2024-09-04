@@ -2,9 +2,9 @@ import { PageContextWithUserAndStarkKey } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { EtherscanLink } from '../../components/EtherscanLink'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -21,51 +21,57 @@ function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
       context={props.context}
-      description="Register your stark key to your ethereum address"
+      description="Register your Stark key to your ethereum address"
       path="/users/register"
     >
-      <ContentWrapper className="flex gap-12">
-        <div className="flex-1">
-          <div className="text-xxl font-semibold">Register Stark key</div>
-          <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
+      <ContentWrapper className="grid auto-rows-min grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-12">
+        <div className="text-xxl font-semibold lg:hidden">
+          Register your Ethereum address
+        </div>
+        <div>
+          <div className="hidden text-xxl font-semibold lg:block">
+            Register your Ethereum address
+          </div>
+          <div className="flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500 lg:mt-6">
             <span>
-              You have connected your wallet and recovered the stark key but our
-              system doesn't see any registered account for this address. There
-              is no need for doing anything, registering your stark key is only
-              needed when you want to perform forced actions.
+              Our system doesn't recognize any Ethereum address registered to
+              your Stark key.
             </span>
             <span>
-              Registering means that your stark key will be linked to your
-              ethereum address on L1. However the cost is very high so do not do
-              this if you don't need to.
+              This registration is needed to perform forced operations. However,
+              <strong>
+                the cost of registration is very high, and so is not recommended
+                if not absolutely necessary.
+              </strong>
             </span>
           </div>
         </div>
-        <Card className="h-min max-w-lg flex-1">
-          <p className="text-sm font-semibold text-zinc-500">
-            Ethereum address
-          </p>
-          <div className="mt-3 flex items-center justify-between">
-            <InlineEllipsis className="max-w-[200px] font-semibold">
-              {props.context.user.address.toString()}
-            </InlineEllipsis>
-            <Button
-              id={REGISTER_STARK_KEY_BUTTON_ID}
-              data-exchange-address={props.exchangeAddress.toString()}
-            >
-              Register
-            </Button>
-          </div>
-          <div className="mt-3 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
-            <InfoIcon />
-            <p className="ml-2 text-sm font-medium text-white">
-              Register your Stark key
-            </p>
-          </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
-          <InlineEllipsis className="mt-1 max-w-[70%] font-semibold text-white">
+        <Card className="row-start-2 h-min lg:col-start-2 lg:row-start-1">
+          <p className="mt-3 text-sm font-semibold text-zinc-500">Stark key</p>
+          <InlineEllipsis className="mt-1 w-full max-w-[250px] font-semibold text-white sm:max-w-[80%] md:max-w-[100%] lg:max-w-[50%] ">
             {props.context.user.starkKey.toString()}
           </InlineEllipsis>
+          <p className="mt-3 text-sm font-semibold text-zinc-500">
+            Ethereum address
+          </p>
+          <EtherscanLink
+            chainId={props.context.chainId}
+            type="address"
+            address={props.context.user.address.toString()}
+            className="mt-1"
+          >
+            <InlineEllipsis className="max-w-[250px] font-semibold sm:max-w-full lg:max-w-[250px]">
+              {props.context.user.address.toString()}
+            </InlineEllipsis>
+          </EtherscanLink>
+          <Button
+            className="mt-6 w-full"
+            id={REGISTER_STARK_KEY_BUTTON_ID}
+            data-exchange-address={props.exchangeAddress.toString()}
+            size="lg"
+          >
+            Register your Ethereum address
+          </Button>
         </Card>
       </ContentWrapper>
     </Page>

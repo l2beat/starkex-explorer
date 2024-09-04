@@ -1,4 +1,4 @@
-import { ForcedAction, OraclePrice } from '@explorer/encoding'
+import { ForcedAction, OraclePrice, State } from '@explorer/encoding'
 import {
   IMerkleStorage,
   MerkleProof,
@@ -7,6 +7,7 @@ import {
   VaultLeaf,
 } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
@@ -17,9 +18,10 @@ import {
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
-import { Logger } from '../tools/Logger'
 
-export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
+export class StateUpdater<
+  T extends PositionLeaf | VaultLeaf = PositionLeaf | VaultLeaf
+> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<T>,
@@ -39,7 +41,8 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
-    newLeaves: { index: bigint; value: T }[]
+    newLeaves: { index: bigint; value: T }[],
+    perpetualState?: State
   ) {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
@@ -62,6 +65,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
       stateTransitionHash,
       rootHash,
       timestamp,
+      perpetualState,
     }
     await Promise.all([
       this.stateUpdateRepository.add({
@@ -238,7 +242,9 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return result
   }
 
-  async generateMerkleProof(positionOrVaultId: bigint) {
+  async generateMerkleProof(
+    positionOrVaultId: bigint
+  ): Promise<MerkleProof<T>> {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
     }

@@ -1,37 +1,39 @@
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
+import { Env } from '@l2beat/backend-tools'
 
-import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
-export function getGammaxGoerliConfig(): StarkexConfig {
+export function getGammaxGoerliConfig(env: Env): StarkexConfig {
   return {
     instanceName: 'GammaX',
     dataAvailabilityMode: 'validium',
     tradingMode: 'perpetual',
     blockchain: {
       chainId: 5,
-      jsonRpcUrl: getEnv('JSON_RPC_URL'),
+      jsonRpcUrl: env.string('JSON_RPC_URL'),
       safeBlockDistance: 40,
-      syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      syncBatchSize: env.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 6934760,
-      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
+      maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     contracts: {
       perpetual: EthereumAddress('0x6E5de338D71af33B57831C5552775f54394d181B'),
+      escapeVerifier: EthereumAddress.ZERO, // it actually is ZERO
+    },
+    l2Transactions: {
+      enabled: false,
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {
-        return `${getEnv('GAMMAX_AG_URL')}?batch_id=${batchId}`
+        return `${env.string('GAMMAX_AG_URL')}?batch_id=${batchId}`
       },
       auth: {
         type: 'certificates',
-        serverCertificate: getEnv('GAMMAX_AG_SERVER_CERTIFICATE'),
-        userCertificate: getEnv('GAMMAX_AG_USER_CERTIFICATE'),
-        userKey: getEnv('GAMMAX_AG_USER_KEY'),
+        serverCertificate: env.string('GAMMAX_AG_SERVER_CERTIFICATE'),
+        userCertificate: env.string('GAMMAX_AG_USER_CERTIFICATE'),
+        userKey: env.string('GAMMAX_AG_USER_KEY'),
       },
     },
-    feederGateway: undefined,
-    l2TransactionApi: undefined,
     collateralAsset: {
       assetId: AssetId('COLLATERAL-1'),
       assetHash: AssetHash(

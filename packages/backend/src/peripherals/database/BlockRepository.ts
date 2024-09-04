@@ -1,7 +1,7 @@
 import { Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { BlockRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

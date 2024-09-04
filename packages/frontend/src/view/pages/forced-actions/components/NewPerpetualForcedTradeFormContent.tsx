@@ -3,7 +3,7 @@ import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { ArrowDownIcon } from '../../../assets/icons/ArrowIcon'
-import { Button, LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
@@ -52,16 +52,18 @@ export function NewPerpetualForcedTradeFormContent(
         </ForcedActionCard>
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" id={FormId.SubmitButton}>
+        <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Create {label} offer
         </Button>
-        <LinkButton
+        <Button
+          as="a"
           className="w-full"
+          size="lg"
           variant="outlined"
           href={`/users/${props.starkKey.toString()}`}
         >
           Back to assets
-        </LinkButton>
+        </Button>
       </div>
     </>
   )

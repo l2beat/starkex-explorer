@@ -1,25 +1,32 @@
-import cx from 'classnames'
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 interface SectionHeadingProps {
   title: ReactNode
   description?: ReactNode
-  leftAlign?: boolean
   children?: ReactNode
+  className?: string
 }
 
 export function SectionHeading(props: SectionHeadingProps) {
   return (
     <div
-      className={cx(
-        'mb-5 flex flex-col items-baseline gap-4 lg:flex-row',
-        !props.leftAlign && 'justify-between'
+      className={classNames(
+        'mb-5 flex flex-wrap items-baseline justify-between gap-4',
+        props.className
       )}
     >
-      <h2 className={cx('text-xl font-semibold', props.children && 'flex-1')}>
+      <h2
+        className={classNames(
+          'text-xl font-semibold leading-tight',
+          props.children && 'flex-1'
+        )}
+      >
         {props.title}
       </h2>
-      <p className="text-sm font-medium text-zinc-500">{props.description}</p>
+      {props.description && (
+        <p className="text-sm font-medium text-zinc-500">{props.description}</p>
+      )}
       {props.children}
     </div>
   )

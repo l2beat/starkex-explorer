@@ -1,7 +1,7 @@
 import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { WithdrawableAssetRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 import { WithdrawalPerformedData } from './transactions/UserTransaction'
@@ -35,6 +35,9 @@ export class WithdrawableAssetRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.getAssetBalancesByStarkKey = this.wrapGet(
       this.getAssetBalancesByStarkKey
+    )
+    this.getByStarkKeyFromBlockNumber = this.wrapGet(
+      this.getByStarkKeyFromBlockNumber
     )
     this.findById = this.wrapFind(this.findById)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -87,6 +90,17 @@ export class WithdrawableAssetRepository extends BaseRepository {
     const knex = await this.knex()
     const result = await knex('withdrawable_assets').where('id', id).first()
     return result ? toWithdrawalBalanceChangeRecord(result) : undefined
+  }
+
+  async getByStarkKeyFromBlockNumber(
+    starkKey: StarkKey,
+    blockNumber: number
+  ): Promise<WithdrawableAssetRecord[]> {
+    const knex = await this.knex()
+    const results = await knex('withdrawable_assets')
+      .where('stark_key', starkKey.toString())
+      .andWhere('block_number', '>=', blockNumber)
+    return results.map(toWithdrawalBalanceChangeRecord)
   }
 
   async deleteAfter(blockNumber: number): Promise<number> {

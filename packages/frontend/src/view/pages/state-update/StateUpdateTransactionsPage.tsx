@@ -40,7 +40,7 @@ function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
           {...common}
           title={
             <StateUpdatePageTitle
-              prefix="Included transactions of"
+              prefix="Forced transactions of state update"
               id={props.id}
             />
           }
@@ -49,7 +49,7 @@ function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <TransactionsTable hideTime transactions={props.transactions} />
+          <TransactionsTable hideAge transactions={props.transactions} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

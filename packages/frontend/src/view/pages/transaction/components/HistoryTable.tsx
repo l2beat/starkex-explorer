@@ -4,7 +4,7 @@ import React from 'react'
 import { SectionHeading } from '../../../components/SectionHeading'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
-import { TimeCell } from '../../../components/TimeCell'
+import { TimeAgeCell } from '../../../components/TimeAgeCell'
 
 interface TransactionHistoryTableProps {
   entries: TransactionHistoryEntry[]
@@ -23,7 +23,7 @@ export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
       <SectionHeading title="History" />
       <Table
         columns={[
-          { header: 'Time (UTC)' },
+          { header: 'Age' },
           { header: 'Status' },
           { header: 'Description' },
         ]}
@@ -31,7 +31,7 @@ export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
           return {
             cells: [
               entry.timestamp ? (
-                <TimeCell timestamp={entry.timestamp} />
+                <TimeAgeCell timestamp={entry.timestamp} />
               ) : (
                 // This may be unknown if i.e. forced trade offer was not initiated using our explorer.
                 // We know that the offer was created, but we don't know when.

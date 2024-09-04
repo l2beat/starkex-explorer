@@ -6,11 +6,13 @@ import {
   encodeSentTransactionData,
   ForcedTradeData,
   ForcedWithdrawalData,
+  ForcedWithdrawalFreezeRequestData,
+  VerifyEscapeData,
   WithdrawData,
 } from './SentTransaction'
 
 describe(encodeSentTransactionData.name, () => {
-  it('can encode a ForcedWithdrawal', () => {
+  it('can encode and decode a ForcedWithdrawal', () => {
     const data: ForcedWithdrawalData = {
       type: 'ForcedWithdrawal',
       positionId: 1234n,
@@ -31,7 +33,7 @@ describe(encodeSentTransactionData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a ForcedTrade', () => {
+  it('can encode and decode a ForcedTrade', () => {
     const data: ForcedTradeData = {
       type: 'ForcedTrade',
       starkKeyA: StarkKey.fake(),
@@ -62,7 +64,7 @@ describe(encodeSentTransactionData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a Withdraw', () => {
+  it('can encode and decode a Withdraw', () => {
     const data: WithdrawData = {
       type: 'Withdraw',
       starkKey: StarkKey.fake(),
@@ -73,6 +75,47 @@ describe(encodeSentTransactionData.name, () => {
     expect(encoded).toEqual({
       starkKey: data.starkKey,
       vaultOrPositionId: undefined,
+      data: expect.anything(),
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeSentTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+
+  it('can encode and decode a VerifyEscape', () => {
+    const data: VerifyEscapeData = {
+      type: 'VerifyEscape',
+      starkKey: StarkKey.fake(),
+      positionOrVaultId: 1234n,
+    }
+
+    const encoded = encodeSentTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKey: data.starkKey,
+      vaultOrPositionId: data.positionOrVaultId,
+      data: expect.anything(),
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeSentTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+
+  it('can encode and decode a ForcedWithdrawalFreezeRequest', () => {
+    const data: ForcedWithdrawalFreezeRequestData = {
+      type: 'ForcedWithdrawalFreezeRequest',
+      starkKey: StarkKey.fake(),
+      positionId: 1234n,
+      quantizedAmount: 5000n,
+    }
+
+    const encoded = encodeSentTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKey: data.starkKey,
+      vaultOrPositionId: data.positionId,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)

@@ -1,5 +1,5 @@
 import { PageContext } from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -13,6 +13,7 @@ import { UserPageTitle } from './components/UserPageTitle'
 interface UserAssetsPageProps {
   context: PageContext
   starkKey: StarkKey
+  ethereumAddress: EthereumAddress | undefined
   assets: UserAssetEntry[]
   limit: number
   offset: number
@@ -25,6 +26,7 @@ export function renderUserAssetsPage(props: UserAssetsPageProps) {
 
 function UserAssetsPage(props: UserAssetsPageProps) {
   const common = getAssetsTableProps(props.starkKey)
+  const isMine = props.context.user?.starkKey === props.starkKey
   return (
     <Page
       path={common.path}
@@ -43,9 +45,12 @@ function UserAssetsPage(props: UserAssetsPageProps) {
           total={props.total}
         >
           <UserAssetsTable
-            starkKey={props.starkKey}
             tradingMode={props.context.tradingMode}
+            starkKey={props.starkKey}
+            ethereumAddress={props.ethereumAddress}
             assets={props.assets}
+            isMine={isMine}
+            isFrozen={props.context.freezeStatus === 'frozen'}
           />
         </TableWithPagination>
       </ContentWrapper>

@@ -5,13 +5,18 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import range from 'lodash/range'
 import { it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
-import { Logger, LogLevel } from '../../tools/Logger'
+import {
+  decodedFakePerpetualState,
+  fakeInt,
+  fakeTimestamp,
+  fakeWithdrawal,
+} from '../../test/fakes'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
@@ -23,7 +28,7 @@ describe(StateUpdateRepository.name, () => {
 
   const repository = new StateUpdateRepository(
     database,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
 
   afterEach(() => repository.deleteAll())
@@ -64,6 +69,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
       await repository.add({
         stateUpdate,
@@ -86,6 +92,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
 
       const result = await repository.update(stateUpdateUpdateData)
@@ -147,6 +154,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
 
       await repository.add({ stateUpdate, positions: [], prices: [] })
@@ -246,6 +254,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
       await repository.add({ stateUpdate, positions: [], prices: [] })
 
@@ -304,6 +313,7 @@ describe(StateUpdateRepository.name, () => {
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
+          perpetualState: decodedFakePerpetualState,
         }
         const stateUpdate2 = {
           id: 30_002_000,
@@ -312,6 +322,7 @@ describe(StateUpdateRepository.name, () => {
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
+          perpetualState: undefined,
         }
         await repository.add({
           stateUpdate: stateUpdate1,
@@ -351,6 +362,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
       const stateUpdate2 = {
         id: 30_002_000,
@@ -359,6 +371,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
       await repository.add({
         stateUpdate: stateUpdate1,
@@ -504,7 +517,7 @@ describe(StateUpdateRepository.name, () => {
       beforeEach(async () => {
         const forcedTransactionRepository = new ForcedTransactionRepository(
           database,
-          new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+          new Logger({ format: 'pretty', logLevel: 'ERROR' })
         )
 
         await forcedTransactionRepository.add(tx1, sentAt1)

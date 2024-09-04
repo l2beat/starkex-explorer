@@ -7,8 +7,9 @@ import { Column, Row } from './types'
 interface TableProps {
   columns: Column[]
   rows: Row[]
-  fullBackground?: boolean
   alignLastColumnRight?: boolean
+  shortenOnMobile?: boolean
+  rowClassName?: string
 }
 
 export function Table(props: TableProps) {
@@ -16,8 +17,8 @@ export function Table(props: TableProps) {
   return (
     <div
       className={cx(
-        '-mx-4 w-[calc(100%+32px)] overflow-x-auto sm:mx-0 sm:w-full',
-        { 'rounded-lg bg-gray-800 pb-4': props.fullBackground }
+        'overflow-x-auto bg-gray-800 group-[.Card]/card:-mx-6 sm:w-full sm:group-[.Card]/card:mx-0',
+        props.rows.length > 0 && 'pb-2 group-[.Card]/card:pb-0'
       )}
     >
       <table
@@ -33,10 +34,12 @@ export function Table(props: TableProps) {
                 scope="col"
                 key={i}
                 className={cx(
-                  'bg-gray-800 px-2 first:rounded-l first:pl-4 last:rounded-r last:pr-4 sm:px-2.5 sm:first:pl-5 sm:last:pr-5',
+                  'bg-slate-800 px-2 first:rounded-l first:pl-4 last:rounded-r last:pr-4 sm:px-2.5 sm:first:pl-5 sm:last:pr-5',
                   column.numeric && 'text-right',
                   column.align === 'center' && 'text-center',
-                  alignLastColumnRight && 'last:w-0'
+                  column.minimalWidth && 'w-0',
+                  alignLastColumnRight && 'last:w-0',
+                  !column.excludeClassNameFromHeader && column.className
                 )}
               >
                 {column.header}
@@ -50,7 +53,8 @@ export function Table(props: TableProps) {
               cells={cells}
               link={link}
               columns={props.columns}
-              fullBackground={props.fullBackground}
+              className={props.rowClassName}
+              shortenOnMobile={props.shortenOnMobile}
               i={i}
               key={i}
             />

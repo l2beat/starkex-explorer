@@ -41,10 +41,10 @@ function UserOffersPage(props: UserOffersPageProps) {
           total={props.total}
         >
           <OffersTable
-            showStatus
-            showRole
             offers={props.offers}
             context={props.context}
+            showRole
+            showOfferMatchColumn
           />
         </TableWithPagination>
       </ContentWrapper>

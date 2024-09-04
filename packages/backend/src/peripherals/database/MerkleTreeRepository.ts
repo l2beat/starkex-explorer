@@ -5,9 +5,9 @@ import {
   NodeOrLeaf,
 } from '@explorer/state'
 import { json, PedersenHash } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import partition from 'lodash/partition'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -68,9 +68,22 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
     const knex = await this.knex()
     const queries = []
     if (filteredNodeRows.length > 0) {
-      queries.push(
-        knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
-      )
+      // We can't just insert all filteredNodeRows like this:
+      //  queries.push(
+      //    knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
+      //  )
+      // ... because there is a limit to the amount of placeholders in the query.
+      // To get around that, we insert in chunks:
+
+      const chunkSize = 10000
+      for (let i = 0; i < filteredNodeRows.length; i += chunkSize) {
+        queries.push(
+          knex('merkle_nodes')
+            .insert(filteredNodeRows.slice(i, i + chunkSize))
+            .onConflict('hash')
+            .merge()
+        )
+      }
     }
     if (filteredLeafRows.length > 0) {
       queries.push(

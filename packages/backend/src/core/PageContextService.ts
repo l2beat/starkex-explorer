@@ -7,30 +7,41 @@ import {
 } from '@explorer/shared'
 
 import { Config } from '../config'
+import { KeyValueStore } from '../peripherals/database/KeyValueStore'
 import { UserService } from './UserService'
 
 export class PageContextService {
   constructor(
     private readonly config: Config,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly keyValueStore: KeyValueStore
   ) {}
 
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const [user, freezeStatus] = await Promise.all([
+      this.userService.getUserDetails(givenUser),
+      this.keyValueStore.findByKeyWithDefault('freezeStatus', 'not-frozen'),
+    ])
 
     if (this.config.starkex.tradingMode === 'perpetual') {
       return {
         user,
         tradingMode: this.config.starkex.tradingMode,
         instanceName: this.config.starkex.instanceName,
+        chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
+        showL2Transactions: this.config.starkex.l2Transactions.enabled,
+        freezeStatus,
       }
     }
 
     return {
       user,
       tradingMode: this.config.starkex.tradingMode,
+      chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
+      showL2Transactions: this.config.starkex.l2Transactions.enabled,
+      freezeStatus,
     }
   }
 
@@ -51,7 +62,7 @@ export class PageContextService {
   ): Promise<PageContextWithUserAndStarkKey | undefined> {
     const context = await this.getPageContextWithUser(givenUser)
 
-    if (!context || !context.user.starkKey) {
+    if (!context?.user.starkKey) {
       return undefined
     }
 

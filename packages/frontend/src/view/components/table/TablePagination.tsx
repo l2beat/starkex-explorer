@@ -12,6 +12,8 @@ interface TablePaginationProps {
   perPage: number
 }
 
+const MAX_PAGE_TO_SHOW_AS_LAST = 500
+
 export function TablePagination(props: TablePaginationProps) {
   const { previous, next, display } = getPages(
     props.current,
@@ -38,8 +40,9 @@ export function TablePagination(props: TablePaginationProps) {
           <li
             key={i}
             className={cx(
-              'flex h-6 min-w-[24px] items-center justify-center px-0.5',
-              page === props.current && 'rounded bg-brand'
+              'flex h-6 min-w-[24px] items-center justify-center rounded px-0.5',
+              page === props.current && 'bg-brand',
+              page === null && 'select-none'
             )}
           >
             {page ? (
@@ -106,6 +109,10 @@ function getDisplay(pages: Set<number>) {
     const next = sorted[i + 1]
     if (next !== undefined && next - page > 1) {
       display.push(null)
+      // Hide the last page if it's over MAX_PAGE_TO_SHOW_AS_LAST
+      if (i === pages.size - 2 && next > MAX_PAGE_TO_SHOW_AS_LAST) {
+        break
+      }
     }
   }
   return display

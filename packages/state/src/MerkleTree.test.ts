@@ -1,4 +1,4 @@
-import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
 import { InMemoryMerkleStorage } from './InMemoryMerkleStorage'
@@ -322,6 +322,160 @@ describe(MerkleTree.name, () => {
 
       const recovered = new MerkleTree(storage, 3n, await tree.hash())
       expect(await recovered.getLeaf(2n)).toEqual(positionLeafA)
+    })
+  })
+
+  describe(MerkleTree.prototype.getMerkleProofForLeaf.name, () => {
+    it('generates correct merkle proof for a tree with PositionLeaf', async () => {
+      const storage = new InMemoryMerkleStorage()
+      let tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
+
+      const positionLeafA = new PositionLeaf(StarkKey.fake('dead'), 420n, [])
+      const positionLeafB = new PositionLeaf(StarkKey.fake('beef'), 69n, [
+        { assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n },
+      ])
+
+      tree = await tree.update([
+        { index: 2n, value: positionLeafA },
+        { index: 7n, value: positionLeafB },
+      ])
+
+      const proof = await tree.getMerkleProofForLeaf(7n)
+      expect(proof).toEqual({
+        leaf: positionLeafB,
+        leafIndex: 7n,
+        leafPrefixLength: 3,
+        path: [
+          {
+            left: PedersenHash(
+              '0000000000000000000000000000000000000000000000000000000000000000'
+            ),
+            right: PedersenHash(
+              '004254432d313000000000000000000080000000000000048000000000000003'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '0726c9603ac7bccf9523718f2f1b45fac7673780ae5089ecf2ab0e67f96f7dd0'
+            ),
+            right: PedersenHash(
+              '0beef00000000000000000000000000000000000000000000000000000000000'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '0271eb38f2bf004c2407a88958620a5d2c25fcee84590e50f0d2e37858bfba62'
+            ),
+            right: PedersenHash(
+              '0000000000000000000000000000000000000000000080000000000000450001'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '028109b4e56fad0455aa4b316045c93937b1e7e4e0fc663db375b9e67c80c620'
+            ),
+            right: PedersenHash(
+              '040e52d372a32b20035f44f456e7beea936b35298c64f5b8d6a56604ff4b3a6d'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '037ff447129584d02735f8b24db6d39dfc7d1ccbd7459fca871b795bffbeddf2'
+            ),
+            right: PedersenHash(
+              '00968c9e36fd542708ca7d03ce09b81835ee1da53d50faa4bba820b28da6f93e'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '07d54313f8a6085c0f072dab5a3bbb28132f74b4adc3a00238c465163d052ed4'
+            ),
+            right: PedersenHash(
+              '0490d6399cb336c5b4f017c608cdf662dba1942fbbc9c744d7e1cdda5feedaf9'
+            ),
+          },
+        ],
+        perpetualAssetCount: 1,
+        root: PedersenHash(
+          '00c9c74a31d9247f04cc9dbef31686d072fec342810c56d53855fa81e7af4bfd'
+        ),
+        starkKey: StarkKey.fake('beef'),
+      })
+    })
+
+    it('generates correct merkle proof for a tree with VaultLeaf', async () => {
+      const storage = new InMemoryMerkleStorage()
+      let tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
+
+      const vaultLeafA = new VaultLeaf(
+        StarkKey.fake('dead'),
+        123000n,
+        AssetHash.fake('abc')
+      )
+      const vaultLeafB = new VaultLeaf(
+        StarkKey.fake('beef'),
+        456000n,
+        AssetHash.fake('def')
+      )
+
+      tree = await tree.update([
+        { index: 2n, value: vaultLeafA },
+        { index: 7n, value: vaultLeafB },
+      ])
+
+      const proof = await tree.getMerkleProofForLeaf(7n)
+      expect(proof).toEqual({
+        leaf: vaultLeafB,
+        leafIndex: 7n,
+        leafPrefixLength: 2,
+        path: [
+          {
+            left: PedersenHash(
+              '0beef00000000000000000000000000000000000000000000000000000000000'
+            ),
+            right: PedersenHash(
+              '0def000000000000000000000000000000000000000000000000000000000000'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '06c1352a97b9c878ee2897c8180a82cc034bcbca4fe169e36c5f8b180f32535a'
+            ),
+            right: PedersenHash(
+              '000000000000000000000000000000000000000000000000000000000006f540'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '028109b4e56fad0455aa4b316045c93937b1e7e4e0fc663db375b9e67c80c620'
+            ),
+            right: PedersenHash(
+              '07d05226e7e24660010d9a366e585b2deb5e2fcdf4431c7f2e1e8808b8ad1bd5'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '037ff447129584d02735f8b24db6d39dfc7d1ccbd7459fca871b795bffbeddf2'
+            ),
+            right: PedersenHash(
+              '05d09d0e91067aa668880c668e105a0a510a056b04cd7ea37bd0c01357c7754a'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '0614aa7ecda7618ddd79577a038b2691ceaebea5424a745e87e077a58b5f3e09'
+            ),
+            right: PedersenHash(
+              '01361b33d7c1a5697b4de3daed7c7790116020dd5c7c9b37e6ff1ec929f175af'
+            ),
+          },
+        ],
+        perpetualAssetCount: 0,
+        root: PedersenHash(
+          '014f10fe0dfad76a60a8279bb67645b25db72b2af9125303a637468ddc48b953'
+        ),
+        starkKey: StarkKey.fake('beef'),
+      })
     })
   })
 })

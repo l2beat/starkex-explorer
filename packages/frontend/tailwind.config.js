@@ -2,6 +2,11 @@
 module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
+    extend: {
+      transitionProperty: {
+        'max-height': 'max-height',
+      },
+    },
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
     },
@@ -20,13 +25,24 @@ module.exports = {
       amber: {
         500: '#F7931A',
       },
+      orange: {
+        500: '#FF7425',
+      },
+      fuchsia: {
+        400: '#F770F1',
+      },
+      indigo: {
+        900: '#333180',
+      },
       zinc: {
         500: '#70737D',
         800: '#272A31',
       },
       gray: {
         600: '#575B64',
+        750: '#2D3037',
         800: '#222531',
+        900: '#131622',
       },
       slate: {
         800: '#2F3341',
@@ -35,6 +51,7 @@ module.exports = {
         900: '#0C0C0E',
       },
       blue: {
+        300: '#5AC4FF',
         400: '#3e8fef',
         500: '#3B82F6',
         600: '#2166FF',
@@ -52,6 +69,7 @@ module.exports = {
       },
       cyan: {
         600: '#1595B1',
+        400: '#25FFD8',
       },
       yellow: {
         300: '#FFEF5A',
@@ -64,5 +82,8 @@ module.exports = {
       'brand-darker': '#4F4CD7',
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/container-queries'),
+    require('@tailwindcss/typography'),
+  ],
 }

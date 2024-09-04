@@ -1,6 +1,8 @@
 import {
+  EscapableAssetEntry,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserL2TransactionsPage,
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
@@ -8,26 +10,32 @@ import {
   renderUserTransactionsPage,
   TransactionEntry,
   UserAssetEntry,
+  WithdrawableAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
 import {
   CollateralAsset,
-  ERC20Details,
+  FreezeStatus,
+  PageContext,
   TradingMode,
   UserDetails,
 } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { sumUpTransactionCount } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   SentTransactionRecord,
@@ -38,9 +46,13 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
+import { getCollateralAssetDetails } from './getCollateralAssetDetails'
+import { EscapableMap, getEscapableAssets } from './getEscapableAssets'
+import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
@@ -52,12 +64,17 @@ export class UserController {
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private readonly exchangeAddress: EthereumAddress,
-    private readonly collateralAsset?: CollateralAsset
+    private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
+    private readonly vaultRepository: VaultRepository,
+    private readonly excludeL2TransactionTypes:
+      | L2TransactionTypesToExclude
+      | undefined,
+    private readonly exchangeAddress: EthereumAddress
   ) {}
 
   async getUserRegisterPage(
@@ -68,6 +85,18 @@ export class UserController {
 
     if (!context) {
       return { type: 'redirect', url: '/users/recover' }
+    }
+
+    const registeredUser =
+      await this.userRegistrationEventRepository.findByStarkKey(
+        context.user.starkKey
+      )
+
+    if (registeredUser) {
+      return {
+        type: 'redirect',
+        url: `/users/${context.user.starkKey.toString()}`,
+      }
     }
 
     const content = renderUserRegisterPage({
@@ -121,13 +150,16 @@ export class UserController {
       registeredUser,
       userAssets,
       history,
+      l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
       forcedTradeOffers,
       forcedTradeOffersCount,
       finalizableOffers,
-      withdrawableAssets,
+      starkKeyWithdrawableAssets,
       userStatistics,
     ] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -140,6 +172,15 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        paginationOpts,
+        this.excludeL2TransactionTypes
+      ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -157,12 +198,30 @@ export class UserController {
       this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
-    if (!userStatistics) {
-      return {
-        type: 'not found',
-        message: `User with starkKey ${starkKey.toString()} not found`,
-      }
-    }
+    const ethAddressWithdrawableAssets =
+      starkKey === givenUser.starkKey && givenUser.address
+        ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
+            EthereumAddress.asStarkKey(givenUser.address)
+          )
+        : []
+
+    const withdrawableAssets = [
+      ...starkKeyWithdrawableAssets,
+      ...ethAddressWithdrawableAssets,
+    ]
+
+    const escapableMap = await getEscapableAssets(
+      this.userTransactionRepository,
+      this.sentTransactionRepository,
+      this.vaultRepository,
+      context,
+      starkKey,
+      collateralAsset
+    )
+
+    const escapableAssetHashes: AssetHash[] = [
+      ...Object.values(escapableMap).map((a) => a.assetHash),
+    ]
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
@@ -170,12 +229,15 @@ export class UserController {
       sentTransactions,
       userTransactions,
       withdrawableAssets,
+      escapableAssetHashes,
     })
 
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
         a,
         context.tradingMode,
+        escapableMap,
+        context.freezeStatus,
         collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -184,7 +246,6 @@ export class UserController {
     const balanceChangesEntries = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
-
     const transactions = buildUserTransactions(
       sentTransactions,
       userTransactions,
@@ -194,50 +255,54 @@ export class UserController {
 
     const totalTransactions = userTransactionsCount
     const offers =
-      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.toEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
+
+    // If escape process has started on perpetuals, hide all assets
+    const hideAllAssets =
+      context.freezeStatus === 'frozen' &&
+      context.tradingMode === 'perpetual' &&
+      escapableAssetHashes.length > 0
 
     const content = renderUserPage({
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
-      withdrawableAssets: withdrawableAssets.map((asset) => ({
-        asset: {
-          hashOrId:
-            collateralAsset?.assetHash === asset.assetHash
-              ? collateralAsset.assetId
-              : asset.assetHash,
-          details:
-            context.tradingMode === 'perpetual'
-              ? // TODO: this is a hack to get the regular withdrawals working for perpetuals
-                // This should be revised mandatory in phase 2!
-                ERC20Details.parse({
-                  assetHash: context.collateralAsset.assetHash,
-                  assetTypeHash: context.collateralAsset.assetHash,
-                  type: 'ERC20',
-                  quantum: AssetId.decimals(
-                    context.collateralAsset.assetId
-                  ).toString(),
-                  contractError: [],
-                  address: EthereumAddress.ZERO,
-                  name: AssetId.symbol(context.collateralAsset.assetId),
-                  symbol: AssetId.symbol(context.collateralAsset.assetId),
-                  decimals: 2,
-                })
-              : assetDetailsMap?.getByAssetHash(asset.assetHash),
-        },
-        amount: asset.withdrawableBalance,
-      })),
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      totalL2Transactions,
+      escapableAssets: toEscapableBalanceEntries(
+        escapableMap,
+        context,
+        assetDetailsMap
+      ),
+      withdrawableAssets: withdrawableAssets.map((asset) =>
+        toWithdrawableAssetEntry(
+          asset,
+          context,
+          assetDetailsMap,
+          collateralAsset
+        )
+      ),
       exchangeAddress: this.exchangeAddress,
       finalizableOffers: finalizableOffers.map((offer) =>
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
-      assets: assetEntries,
-      totalAssets: userStatistics.assetCount,
+      assets: hideAllAssets ? [] : assetEntries, // When frozen and escaped, don't show assets
+      totalAssets: hideAllAssets ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: Number(userStatistics.balanceChangeCount), // TODO: don't cast
+      totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
       totalTransactions,
       offers,
@@ -254,7 +319,8 @@ export class UserController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const [userAssets, userStatistics] = await Promise.all([
+    const [registeredUser, userAssets, userStatistics] = await Promise.all([
+      this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
@@ -270,25 +336,89 @@ export class UserController {
       }
     }
 
+    const escapableMap = await getEscapableAssets(
+      this.userTransactionRepository,
+      this.sentTransactionRepository,
+      this.vaultRepository,
+      context,
+      starkKey,
+      collateralAsset
+    )
+
+    const escapableAssetHashes: AssetHash[] = [
+      ...Object.values(escapableMap).map((a) => a.assetHash),
+    ]
+
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
+      escapableAssetHashes,
     })
 
     const assets = userAssets.map((a) =>
       toUserAssetEntry(
         a,
         context.tradingMode,
+        escapableMap,
+        context.freezeStatus,
         collateralAsset?.assetId,
         assetDetailsMap
       )
     )
 
+    const hideAllAssets =
+      context.freezeStatus === 'frozen' &&
+      context.tradingMode === 'perpetual' &&
+      escapableAssetHashes.length > 0
+
     const content = renderUserAssetsPage({
       context,
       starkKey,
-      assets,
+      ethereumAddress: registeredUser?.ethAddress,
+      assets: hideAllAssets ? [] : assets, // When frozen and escaped, don't show assets
       ...pagination,
-      total: userStatistics.assetCount,
+      total: hideAllAssets ? 0 : userStatistics.assetCount,
+    })
+    return { type: 'success', content }
+  }
+
+  async getUserL2TransactionsPage(
+    givenUser: Partial<UserDetails>,
+    starkKey: StarkKey,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const [
+      l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
+    ] = await Promise.all([
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        pagination,
+        this.excludeL2TransactionTypes
+      ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
+    ])
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
+
+    const content = renderUserL2TransactionsPage({
+      context,
+      starkKey,
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      total: totalL2Transactions,
+      ...pagination,
     })
     return { type: 'success', content }
   }
@@ -397,7 +527,7 @@ export class UserController {
     }
 
     const offers =
-      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.toEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )
@@ -416,9 +546,28 @@ export class UserController {
 function toUserAssetEntry(
   asset: PreprocessedAssetHistoryRecord,
   tradingMode: TradingMode,
+  escapableMap: EscapableMap,
+  freezeStatus: FreezeStatus,
   collateralAssetId?: AssetId,
   assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
+  const escapableEntry = escapableMap[asset.positionOrVaultId.toString()]
+  let action: UserAssetEntry['action'] = 'NO_ACTION'
+
+  if (tradingMode === 'spot' || asset.assetHashOrId === collateralAssetId) {
+    if (freezeStatus !== 'frozen') {
+      action = 'WITHDRAW'
+    } else {
+      action = escapableEntry === undefined ? 'ESCAPE' : 'NO_ACTION'
+    }
+  } else {
+    if (freezeStatus !== 'frozen') {
+      action = 'CLOSE'
+    } else {
+      action = 'USE_COLLATERAL_ESCAPE'
+    }
+  }
+
   return {
     asset: {
       hashOrId: asset.assetHashOrId,
@@ -434,10 +583,7 @@ function toUserAssetEntry(
         ? asset.balance / 10000n // TODO: use the correct decimals
         : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
-    action:
-      tradingMode === 'spot' || asset.assetHashOrId === collateralAssetId
-        ? 'WITHDRAW'
-        : 'CLOSE',
+    action,
   }
 }
 
@@ -466,9 +612,9 @@ function buildUserTransactions(
   collateralAsset?: CollateralAsset,
   assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry[] {
+  const userTransactionHashes = userTransactions.map((t) => t.transactionHash)
   const sentEntries = sentTransactions
-    // Mined non-reverted transactions will be inside userTransactions
-    .filter((t) => t.mined === undefined || t.mined.reverted)
+    .filter((t) => !userTransactionHashes.includes(t.transactionHash))
     .map((t) => sentTransactionToEntry(t, collateralAsset, assetDetailsMap))
 
   const userEntries = userTransactions.map((t) =>
@@ -476,4 +622,48 @@ function buildUserTransactions(
   )
 
   return [...sentEntries, ...userEntries]
+}
+
+function toWithdrawableAssetEntry(
+  asset: {
+    assetHash: AssetHash
+    withdrawableBalance: bigint
+  },
+  context: PageContext,
+  assetDetailsMap?: AssetDetailsMap,
+  collateralAsset?: CollateralAsset
+): WithdrawableAssetEntry {
+  return {
+    asset: {
+      hashOrId:
+        collateralAsset?.assetHash === asset.assetHash
+          ? collateralAsset.assetId
+          : asset.assetHash,
+      details:
+        context.tradingMode === 'perpetual'
+          ? getCollateralAssetDetails(context.collateralAsset)
+          : assetDetailsMap?.getByAssetHash(asset.assetHash),
+    },
+    amount: asset.withdrawableBalance,
+  }
+}
+
+function toEscapableBalanceEntries(
+  escapableMap: EscapableMap,
+  context: PageContext,
+  assetDetailsMap?: AssetDetailsMap
+): EscapableAssetEntry[] {
+  return Object.entries(escapableMap)
+    .filter(([_, value]) => value.amount > 0)
+    .map(([positionOrVaultIdStr, value]) => ({
+      asset: {
+        hashOrId: value.assetHash,
+        details:
+          context.tradingMode === 'perpetual'
+            ? getCollateralAssetDetails(context.collateralAsset)
+            : assetDetailsMap?.getByAssetHash(value.assetHash),
+      },
+      amount: value.amount,
+      positionOrVaultId: BigInt(positionOrVaultIdStr),
+    }))
 }

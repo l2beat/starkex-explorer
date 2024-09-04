@@ -15,3 +15,11 @@ export function TransactionField(props: TransactionFieldProps) {
     </div>
   )
 }
+
+export function TransactionYesOrNoField(
+  props: Omit<TransactionFieldProps, 'children'> & { value: boolean }
+) {
+  return (
+    <TransactionField {...props}>{props.value ? 'Yes' : 'No'}</TransactionField>
+  )
+}

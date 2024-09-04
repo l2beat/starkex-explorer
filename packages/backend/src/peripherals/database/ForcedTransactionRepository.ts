@@ -11,11 +11,11 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
 
-import { Logger } from '../../tools/Logger'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'

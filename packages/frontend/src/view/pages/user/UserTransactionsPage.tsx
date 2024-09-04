@@ -39,7 +39,7 @@ function UserTransactionsPage(props: UserTransactionsPageProps) {
           {...common}
           title={
             <UserPageTitle
-              prefix="Ethereum transactions of"
+              prefix="Forced transactions of"
               starkKey={props.starkKey}
             />
           }

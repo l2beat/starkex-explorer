@@ -11,6 +11,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
@@ -21,7 +22,6 @@ import {
 } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 import { EMPTY_STATE_HASH } from './PerpetualValidiumUpdater'
 
@@ -222,7 +222,8 @@ describe(PerpetualRollupUpdater.name, () => {
           PedersenHash.fake('987'),
           testForcedActions,
           mockOnChainData.newState.oraclePrices,
-          updatedPositions
+          updatedPositions,
+          mockOnChainData.newState
         )
       })
     }

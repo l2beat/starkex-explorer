@@ -29,11 +29,11 @@ export function StateUpdateBalanceChangesTable(
   return (
     <Table
       columns={[
-        { header: 'StarkKey' },
+        { header: 'Stark Key' },
+        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         { header: 'Asset' },
         { header: 'Change', numeric: true },
         { header: 'Balance', numeric: true },
-        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         return {
@@ -44,12 +44,12 @@ export function StateUpdateBalanceChangesTable(
                 {entry.starkKey.toString()}
               </InlineEllipsis>
             </Link>,
+            <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             <ChangeText className="text-sm font-medium">
               {formatAmount(entry.asset, entry.change, { signed: true })}
             </ChangeText>,
             formatAmount(entry.asset, entry.balance),
-            <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
           ],
         }
       })}

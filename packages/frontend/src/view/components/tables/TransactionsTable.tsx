@@ -1,4 +1,5 @@
 import { Hash256, Timestamp } from '@explorer/types'
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -9,11 +10,13 @@ import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
-import { TimeCell } from '../TimeCell'
+import { TimeAgeCell } from '../TimeAgeCell'
 
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
-  hideTime?: boolean
+  isHomePage?: boolean
+  hideAge?: boolean
+  hideInfo?: boolean
 }
 
 export interface TransactionEntry {
@@ -22,21 +25,39 @@ export interface TransactionEntry {
   asset?: Asset
   amount?: bigint
   status: 'SENT' | 'MINED' | 'INCLUDED' | 'REVERTED'
-  type: 'FORCED_WITHDRAW' | 'FORCED_BUY' | 'FORCED_SELL' | 'WITHDRAW'
+  type:
+    | 'FORCED_WITHDRAW'
+    | 'FORCED_BUY'
+    | 'FORCED_SELL'
+    | 'WITHDRAW'
+    | 'INITIATE_ESCAPE'
+    | 'FREEZE_REQUEST'
+    | 'FINALIZE_ESCAPE'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
-  const columns: Column[] = []
-  if (!props.hideTime) {
-    columns.push({ header: 'Time (UTC)' })
-  }
-  columns.push(
-    { header: 'Tx Hash' },
-    { header: 'Asset' },
-    { header: 'Amount', numeric: true },
-    { header: 'Status' },
-    { header: 'Type' }
-  )
+  const columns: Column[] = [
+    {
+      header: 'Tx Hash',
+      className: classNames(props.isHomePage && 'w-[130px]'),
+    },
+    { header: 'Type' },
+    ...(!props.hideInfo
+      ? [{ header: 'Info', className: classNames(props.isHomePage && 'w-max') }]
+      : []),
+    {
+      header: 'Status',
+      className: classNames(props.isHomePage && 'w-[140px]'),
+    },
+    ...(!props.hideAge
+      ? [
+          {
+            header: 'Age',
+            className: classNames(props.isHomePage && 'w-[90px]'),
+          },
+        ]
+      : []),
+  ]
 
   return (
     <Table
@@ -44,30 +65,35 @@ export function TransactionsTable(props: TransactionsTableProps) {
       rows={props.transactions.map((transaction) => {
         const status = getStatus(transaction)
 
-        const cells: ReactNode[] = []
-        if (!props.hideTime) {
-          cells.push(<TimeCell timestamp={transaction.timestamp} />)
-        }
-        cells.push(
+        const cells: ReactNode[] = [
           <Link>
             <InlineEllipsis className="max-w-[80px]">
               {transaction.hash.toString()}
             </InlineEllipsis>
           </Link>,
-          transaction.asset ? (
-            <AssetWithLogo
-              type="small"
-              assetInfo={assetToInfo(transaction.asset)}
-            />
-          ) : (
-            '-'
-          ),
-          transaction.asset && transaction.amount !== undefined
-            ? formatAmount(transaction.asset, transaction.amount)
-            : '-',
+          toTypeText(transaction.type),
+          ...(!props.hideInfo
+            ? [
+                <div className="flex items-center gap-0.5">
+                  {transaction.asset && transaction.amount !== undefined
+                    ? formatAmount(transaction.asset, transaction.amount)
+                    : '-'}
+                  {transaction.asset ? (
+                    <AssetWithLogo
+                      type="small"
+                      assetInfo={assetToInfo(transaction.asset)}
+                    />
+                  ) : (
+                    '-'
+                  )}
+                </div>,
+              ]
+            : []),
           <StatusBadge type={status.type}>{status.text}</StatusBadge>,
-          toTypeText(transaction.type)
-        )
+          ...(!props.hideAge
+            ? [<TimeAgeCell timestamp={transaction.timestamp} />]
+            : []),
+        ]
 
         return {
           link: `/transactions/${transaction.hash.toString()}`,
@@ -94,7 +120,12 @@ function getStatus(transaction: TransactionEntry): {
         return { type: 'ERROR', text: 'REVERTED' }
     }
   }
-  if (transaction.type === 'WITHDRAW') {
+  if (
+    transaction.type === 'WITHDRAW' ||
+    transaction.type === 'FINALIZE_ESCAPE' ||
+    transaction.type === 'FREEZE_REQUEST' ||
+    transaction.type === 'INITIATE_ESCAPE'
+  ) {
     switch (transaction.status) {
       case 'SENT':
         return { type: 'BEGIN', text: 'SENT (1/2)' }
@@ -103,9 +134,12 @@ function getStatus(transaction: TransactionEntry): {
       case 'REVERTED':
         return { type: 'ERROR', text: 'REVERTED' }
       case 'INCLUDED':
-        throw new Error('WITHDRAW transaction cannot be INCLUDED')
+        throw new Error(
+          `${transaction.type} transaction cannot be ${transaction.status}`
+        )
     }
   }
+
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':
@@ -127,7 +161,13 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'F. buy'
     case 'FORCED_SELL':
       return 'F. sell'
+    case 'INITIATE_ESCAPE':
+      return 'Init. escape'
     case 'WITHDRAW':
       return 'Withdraw'
+    case 'FREEZE_REQUEST':
+      return 'Freeze req.'
+    case 'FINALIZE_ESCAPE':
+      return 'Finalize escape'
   }
 }

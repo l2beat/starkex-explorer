@@ -17,7 +17,8 @@ export class ForcedTradeOfferViewService {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
-  async ToEntriesWithFullHistory(
+
+  async toEntriesWithFullHistory(
     forcedTradeOffers: ForcedTradeOfferRecord[],
     userStarkKey?: StarkKey
   ) {

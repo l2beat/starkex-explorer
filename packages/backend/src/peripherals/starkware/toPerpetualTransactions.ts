@@ -1,5 +1,9 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  PerpetualL2MultiTransactionData,
+  PerpetualL2TransactionData,
+} from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -9,39 +13,58 @@ import {
 } from '@explorer/types'
 
 import {
-  L2TransactionData,
-  MultiL2TransactionData,
-} from '../database/L2Transaction'
-import {
   AssetOraclePrice,
-  L2Transaction as TransactionSchema,
   OrderTypeResponse,
-  PerpetualL2TransactionResponse,
+  PerpetualL2Transaction as TransactionSchema,
   SignatureResponse,
   SignedOraclePrice,
-} from './schema'
+} from './schema/PerpetualBatchInfoResponse'
+import {
+  L2TransactionParseError,
+  PerpetualLiveL2TransactionResponse,
+} from './schema/PerpetualLiveL2TransactionResponse'
 
-export interface PerpetualL2Transaction {
+export type PerpetualL2Transaction =
+  | SuccessfullyParsedL2Transaction
+  | UnsuccessfullyParsedL2Transaction
+
+export interface SuccessfullyParsedL2Transaction {
+  parsedSuccessfully: true // discriminating field
   thirdPartyId: number
   transactionId: number
-  transaction: L2TransactionData
+  transaction: PerpetualL2TransactionData
+  timestamp: Timestamp
+}
+
+export interface UnsuccessfullyParsedL2Transaction {
+  parsedSuccessfully: false // discriminating field
+  thirdPartyId: number
+  parseError: L2TransactionParseError
 }
 
 export function toPerpetualL2Transactions(
-  response: PerpetualL2TransactionResponse
+  response: PerpetualLiveL2TransactionResponse
 ): PerpetualL2Transaction[] {
-  return response.txs.map((tx) => {
-    return {
-      thirdPartyId: tx.apex_id,
-      transactionId: tx.tx_info.tx_id,
-      transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
-    }
-  })
+  return response.txs.map((tx) =>
+    tx.tx_info.parseError === undefined
+      ? ({
+          parsedSuccessfully: true,
+          thirdPartyId: tx.apex_id,
+          transactionId: tx.tx_info.tx_id,
+          transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
+          timestamp: Timestamp.fromSeconds(tx.time_created),
+        } as SuccessfullyParsedL2Transaction)
+      : ({
+          parsedSuccessfully: false,
+          thirdPartyId: tx.apex_id,
+          parseError: tx.tx_info.parseError,
+        } as UnsuccessfullyParsedL2Transaction)
+  )
 }
 
 export function toPerpetualL2TransactionData(
   tx: TransactionSchema
-): L2TransactionData {
+): PerpetualL2TransactionData {
   return tx.type === 'MULTI_TRANSACTION'
     ? toPerpetualMultiTransaction(tx)
     : toPerpetualTransaction(tx)
@@ -49,7 +72,7 @@ export function toPerpetualL2TransactionData(
 
 export function toPerpetualTransaction(
   tx: Exclude<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): Exclude<L2TransactionData, MultiL2TransactionData> {
+): Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData> {
   switch (tx.type) {
     case 'DEPOSIT': {
       return {
@@ -228,7 +251,7 @@ export function toPerpetualTransaction(
 
 export function toPerpetualMultiTransaction(
   tx: Extract<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): MultiL2TransactionData {
+): PerpetualL2MultiTransactionData {
   return {
     type: 'MultiTransaction',
     transactions: tx.txs.map(toPerpetualTransaction),

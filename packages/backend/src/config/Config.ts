@@ -1,19 +1,18 @@
+import { TradingMode } from '@explorer/shared'
+import { LoggerOptions } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
-import { LogLevel } from '../tools/Logger'
 import { StarkexConfig } from './starkex/StarkexConfig'
 
-export interface Config {
+export interface Config<T extends TradingMode = TradingMode> {
   name: string
-  logger: {
-    logLevel: LogLevel
-    format: 'pretty' | 'json'
-  }
+  logger: Pick<LoggerOptions, 'logLevel' | 'format'> & Partial<LoggerOptions>
   port: number
   databaseConnection: string | Knex.StaticConnectionConfig
   enableSync: boolean
   enablePreprocessing: boolean
   freshStart: boolean
   forceHttps: boolean
-  starkex: StarkexConfig
+  basicAuth?: string
+  starkex: StarkexConfig<T>
 }

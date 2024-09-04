@@ -1,9 +1,10 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../../model'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { JobQueue } from '../../tools/JobQueue'
-import { Logger } from '../../tools/Logger'
+import { FreezeCheckService } from '../FreezeCheckService'
 import { IDataSyncService } from '../IDataSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
@@ -26,12 +27,13 @@ export class SyncScheduler {
   private maxBlockNumber: number
 
   constructor(
-    private readonly syncStatusRepository: SyncStatusRepository,
+    private readonly kvStore: KeyValueStore,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: IDataSyncService,
     private readonly preprocessor:
       | Preprocessor<AssetHash>
       | Preprocessor<AssetId>,
+    private readonly freezeCheckService: FreezeCheckService,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {
@@ -43,11 +45,13 @@ export class SyncScheduler {
 
   async start() {
     const lastSynced =
-      (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
+      (await this.kvStore.findByKey('lastBlockNumberSynced')) ??
+      this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
 
     await this.preprocessor.sync()
+    await this.freezeCheckService.updateFreezeStatus()
 
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
@@ -74,7 +78,6 @@ export class SyncScheduler {
         name: 'action',
         execute: async () => {
           this.logger.debug({ method: 'effect', effect: effect.type })
-
           if (effect.type === 'sync') {
             await this.handleSync(effect.blocks)
           } else {
@@ -83,6 +86,10 @@ export class SyncScheduler {
         },
       })
     }
+  }
+
+  isTip(syncedBlockNumber: number) {
+    return this.state.remaining.end === syncedBlockNumber
   }
 
   async handleSync(blocks: BlockRange) {
@@ -101,10 +108,15 @@ export class SyncScheduler {
       return
     }
     try {
+      const isTip = this.isTip(blocks.end)
       await this.dataSyncService.discardAfter(blocks.start - 1)
-      await this.dataSyncService.sync(blocks)
-      await this.syncStatusRepository.setLastSynced(blocks.end - 1)
+      await this.dataSyncService.sync(blocks, isTip)
+      await this.kvStore.addOrUpdate({
+        key: 'lastBlockNumberSynced',
+        value: blocks.end - 1,
+      })
       await this.preprocessor.sync()
+      await this.freezeCheckService.updateFreezeStatus()
       this.dispatch({ type: 'syncSucceeded' })
     } catch (err) {
       this.dispatch({ type: 'syncFailed', blocks })
@@ -114,9 +126,13 @@ export class SyncScheduler {
 
   private async handleDiscardAfter(blockNumber: number) {
     try {
-      await this.syncStatusRepository.setLastSynced(blockNumber)
+      await this.kvStore.addOrUpdate({
+        key: 'lastBlockNumberSynced',
+        value: blockNumber,
+      })
       await this.preprocessor.sync()
       await this.dataSyncService.discardAfter(blockNumber)
+      await this.freezeCheckService.updateFreezeStatus()
       this.dispatch({ type: 'discardAfterSucceeded', blockNumber })
     } catch (err) {
       this.dispatch({ type: 'discardAfterFailed' })

@@ -1,5 +1,11 @@
 import { assertUnreachable } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+} from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -16,6 +22,9 @@ export type UserTransactionData =
   | ForcedWithdrawalData
   | FullWithdrawalData
   | WithdrawalPerformedData
+  | VerifyEscapeData
+  | FinalizeEscapeData
+  | FreezeRequestData
 
 export type WithdrawalPerformedData =
   | WithdrawData
@@ -53,6 +62,14 @@ export interface ForcedTradeData {
   nonce: bigint
 }
 
+export interface VerifyEscapeData {
+  type: 'VerifyEscape'
+  starkKey: StarkKey
+  withdrawalAmount: bigint
+  sharedStateHash: Hash256
+  positionId: bigint
+}
+
 export interface WithdrawData {
   type: 'Withdraw'
   starkKey: StarkKey
@@ -82,6 +99,18 @@ export interface MintWithdrawData {
   assetId: AssetHash
 }
 
+export interface FinalizeEscapeData {
+  type: 'FinalizeEscape'
+  starkKey: StarkKey
+  assetType: AssetHash
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+}
+
+export interface FreezeRequestData {
+  type: 'FreezeRequest'
+}
+
 export function encodeUserTransactionData(
   values: UserTransactionData
 ): Encoded<UserTransactionData> {
@@ -92,12 +121,18 @@ export function encodeUserTransactionData(
       return encodeFullWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
+    case 'VerifyEscape':
+      return encodeVerifyEscape(values)
     case 'Withdraw':
       return encodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return encodeWithdrawWithTokenId(values)
     case 'MintWithdraw':
       return encodeMintWithdraw(values)
+    case 'FinalizeEscape':
+      return encodeFinalizeEscape(values)
+    case 'FreezeRequest':
+      return encodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -113,12 +148,18 @@ export function decodeUserTransactionData(
       return decodeFullWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
+    case 'VerifyEscape':
+      return decodeVerifyEscape(values)
     case 'Withdraw':
       return decodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return decodeWithdrawWithTokenId(values)
     case 'MintWithdraw':
       return decodeMintWithdraw(values)
+    case 'FinalizeEscape':
+      return decodeFinalizeEscape(values)
+    case 'FreezeRequest':
+      return decodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -171,6 +212,34 @@ function decodeFullWithdrawal(
     ...values,
     starkKey: StarkKey(values.starkKey),
     vaultId: BigInt(values.vaultId),
+  }
+}
+
+function encodeVerifyEscape(
+  values: VerifyEscapeData
+): Encoded<VerifyEscapeData> {
+  return {
+    starkKeyA: values.starkKey,
+    vaultOrPositionIdA: values.positionId,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      positionId: values.positionId.toString(),
+      withdrawalAmount: values.withdrawalAmount.toString(),
+      sharedStateHash: values.sharedStateHash.toString(),
+    },
+  }
+}
+
+function decodeVerifyEscape(
+  values: ToJSON<VerifyEscapeData>
+): VerifyEscapeData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    positionId: BigInt(values.positionId),
+    withdrawalAmount: BigInt(values.withdrawalAmount),
+    sharedStateHash: Hash256(values.sharedStateHash),
   }
 }
 
@@ -295,4 +364,47 @@ function decodeMintWithdraw(
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
+}
+
+function encodeFinalizeEscape(
+  values: FinalizeEscapeData
+): Encoded<FinalizeEscapeData> {
+  return {
+    starkKeyA: values.starkKey,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      assetType: values.assetType.toString(),
+      nonQuantizedAmount: values.nonQuantizedAmount.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+    },
+  }
+}
+
+function decodeFinalizeEscape(
+  values: ToJSON<FinalizeEscapeData>
+): FinalizeEscapeData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    assetType: AssetHash(values.assetType),
+    nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
+    quantizedAmount: BigInt(values.quantizedAmount),
+  }
+}
+
+function encodeFreezeRequest(
+  values: FreezeRequestData
+): Encoded<FreezeRequestData> {
+  return {
+    // This is a hack to make the database happy.
+    starkKeyA: StarkKey.ZERO,
+    data: values,
+  }
+}
+
+function decodeFreezeRequest(
+  values: ToJSON<FreezeRequestData>
+): FreezeRequestData {
+  return values
 }

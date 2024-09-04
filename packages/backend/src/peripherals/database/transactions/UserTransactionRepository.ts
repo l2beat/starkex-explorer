@@ -1,9 +1,9 @@
 import { Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { UserTransactionRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../../model/PaginationOptions'
-import { Logger } from '../../../tools/Logger'
 import { BaseRepository } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
 import {
@@ -70,10 +70,11 @@ export class UserTransactionRepository extends BaseRepository {
       this.getCountOfIncludedByStateUpdateId
     )
     this.findById = this.wrapFind(this.findById)
+    this.findOldestNotIncluded = this.wrapFind(this.findOldestNotIncluded)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-
+    this.freezeRequestExists = this.wrapAny(this.freezeRequestExists)
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
@@ -113,6 +114,14 @@ export class UserTransactionRepository extends BaseRepository {
       }))
     )
     return records.map((x) => x.transactionHash)
+  }
+
+  async freezeRequestExists(): Promise<boolean> {
+    const knex = await this.knex()
+    const result = await knex('user_transactions')
+      .where({ type: 'FreezeRequest' })
+      .first()
+    return !!result
   }
 
   async getByStarkKey<T extends UserTransactionData['type']>(
@@ -244,6 +253,21 @@ export class UserTransactionRepository extends BaseRepository {
       query = query.whereIn('type', types)
     }
     return toRecords<T>(await query)
+  }
+
+  async findOldestNotIncluded<T extends UserTransactionData['type']>(
+    types?: T[]
+  ): Promise<UserTransactionRecord<T> | undefined> {
+    const knex = await this.knex()
+    let query = queryWithIncluded(knex)
+      .where('included_forced_requests.transaction_hash', null)
+      .orderBy('timestamp', 'asc')
+      .first()
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    const result = await query
+    return result ? toRecord(result) : undefined
   }
 
   async countAll(types?: UserTransactionData['type'][]): Promise<number> {
