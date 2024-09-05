@@ -5,19 +5,27 @@ import { REGULAR_WITHDRAWAL_FORM_ID } from '../view/pages/user/components/Regula
 import { Api } from './peripherals/api'
 import { Wallet } from './peripherals/wallet'
 import { makeQuery } from './utils/query'
+import { showSpinner } from './utils/showSpinner'
 
 export function initRegularWithdrawalForm() {
   const { $ } = makeQuery(document.body)
   const form = $.maybe<HTMLFormElement>(`#${REGULAR_WITHDRAWAL_FORM_ID}`)
 
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const { assetDetails, account, starkKey, exchangeAddress } =
-      getDataFromForm(form)
+  if (!form) {
+    return
+  }
 
-    submit(account, starkKey, exchangeAddress, assetDetails).catch(
-      console.error
-    )
+  const { $: form$ } = makeQuery(form)
+  const submitButton = form$('button')
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    await showSpinner(submitButton, async () => {
+      const { assetDetails, account, starkKey, exchangeAddress } =
+        getDataFromForm(form)
+
+      await submit(account, starkKey, exchangeAddress, assetDetails)
+    })
   })
 }
 

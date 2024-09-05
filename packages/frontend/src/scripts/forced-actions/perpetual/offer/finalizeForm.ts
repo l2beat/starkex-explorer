@@ -9,25 +9,30 @@ import { FINALIZE_OFFER_FORM_CLASS } from '../../../../view/pages/transaction/co
 import { Api } from '../../../peripherals/api'
 import { Wallet } from '../../../peripherals/wallet'
 import { makeQuery } from '../../../utils/query'
+import { showSpinner } from '../../../utils/showSpinner'
 
 export function initFinalizeForm() {
   const { $$ } = makeQuery(document.body)
   const forms = $$<HTMLFormElement>(`.${FINALIZE_OFFER_FORM_CLASS}`)
   forms.forEach((form) => {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    const { $: form$ } = makeQuery(form)
+    const button = form$('button')
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const { address, offer, offerId, perpetualAddress, collateralAsset } =
-        getFormData(form)
+      await showSpinner(button, async () => {
+        const { address, offer, offerId, perpetualAddress, collateralAsset } =
+          getFormData(form)
 
-      const hash = await Wallet.sendPerpetualForcedTradeTransaction(
-        address,
-        offer,
-        perpetualAddress,
-        collateralAsset
-      )
-      await Api.submitPerpetualForcedTrade(offerId, hash)
-      window.location.href = `/transactions/${hash.toString()}`
+        const hash = await Wallet.sendPerpetualForcedTradeTransaction(
+          address,
+          offer,
+          perpetualAddress,
+          collateralAsset
+        )
+        await Api.submitPerpetualForcedTrade(offerId, hash)
+        window.location.href = `/transactions/${hash.toString()}`
+      })
     })
   })
 }

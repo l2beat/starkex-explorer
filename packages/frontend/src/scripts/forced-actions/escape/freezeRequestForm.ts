@@ -8,6 +8,7 @@ import {
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
+import { showSpinner } from '../../utils/showSpinner'
 
 export function initFreezeRequestForm() {
   const { $ } = makeQuery(document.body)
@@ -16,15 +17,19 @@ export function initFreezeRequestForm() {
   if (!form) {
     return
   }
+  const { $: form$ } = makeQuery(form)
+  const button = form$('button')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = FreezeRequestActionFormProps.parse(propsJson)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    submitFreezeRequest(props, user).catch(console.error)
+    await showSpinner(button, async () => {
+      await submitFreezeRequest(props, user)
+    })
   })
 }
 

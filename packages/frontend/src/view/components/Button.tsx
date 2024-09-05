@@ -1,6 +1,8 @@
 import cx from 'classnames'
 import React, { ComponentPropsWithoutRef, ElementType } from 'react'
 
+import { Spinner } from './Spinner'
+
 type ButtonProps<T extends ElementType> = {
   variant?: ButtonVariant
   size?: ButtonSize
@@ -37,7 +39,7 @@ export function Button<T extends ElementType = 'button'>({
   return (
     <Comp
       className={cx(
-        'flex items-center justify-center px-8 py-2.5 font-semibold transition-colors disabled:cursor-not-allowed',
+        'group flex items-center justify-center px-8 py-2.5 font-semibold transition-colors disabled:cursor-not-allowed',
         variantClassNames[variant],
         sizeClassNames[size],
         className
@@ -45,6 +47,7 @@ export function Button<T extends ElementType = 'button'>({
       {...rest}
     >
       {children}
+      <Spinner className="ml-2 hidden group-data-[state=loading]:block" />
     </Comp>
   )
 }

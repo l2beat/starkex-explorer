@@ -6,6 +6,7 @@ import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/New
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
+import { showSpinner } from '../../utils/showSpinner'
 
 export function initSpotForcedWithdrawalForm() {
   const { $ } = makeQuery(document.body)
@@ -14,6 +15,10 @@ export function initSpotForcedWithdrawalForm() {
   if (!form) {
     return
   }
+
+  const { $: form$ } = makeQuery(form)
+  const submitButton = form$('button')
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = NewForcedActionFormProps.parse(propsJson)
@@ -23,9 +28,11 @@ export function initSpotForcedWithdrawalForm() {
   if (!AssetHash.check(props.asset.hashOrId.toString())) {
     throw new Error('Invalid asset hash')
   }
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    submitExit(props, user).catch(console.error)
+    await showSpinner(submitButton, async () => {
+      await submitExit(props, user)
+    })
   })
 }
 
