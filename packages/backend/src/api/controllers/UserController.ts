@@ -285,7 +285,8 @@ export class UserController {
       escapableAssets: toEscapableBalanceEntries(
         escapableMap,
         context,
-        assetDetailsMap
+        assetDetailsMap,
+        collateralAsset
       ),
       withdrawableAssets: withdrawableAssets.map((asset) =>
         toWithdrawableAssetEntry(
@@ -651,13 +652,17 @@ function toWithdrawableAssetEntry(
 function toEscapableBalanceEntries(
   escapableMap: EscapableMap,
   context: PageContext,
-  assetDetailsMap?: AssetDetailsMap
+  assetDetailsMap?: AssetDetailsMap,
+  collateralAsset?: CollateralAsset
 ): EscapableAssetEntry[] {
   return Object.entries(escapableMap)
     .filter(([_, value]) => value.amount > 0)
     .map(([positionOrVaultIdStr, value]) => ({
       asset: {
-        hashOrId: value.assetHash,
+        hashOrId:
+          collateralAsset?.assetHash === value.assetHash
+            ? collateralAsset.assetId
+            : value.assetHash,
         details:
           context.tradingMode === 'perpetual'
             ? getCollateralAssetDetails(context.collateralAsset)
