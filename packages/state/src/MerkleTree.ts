@@ -23,16 +23,6 @@ export interface MerkleProof<T extends MerkleValue> {
   starkKey: StarkKey
 }
 
-export interface MerkleProof<T extends MerkleValue> {
-  root: PedersenHash
-  path: {
-    left: PedersenHash
-    right: PedersenHash
-  }[],
-  leafPrefixLength: number,
-  leaf: T
-}
-
 export class MerkleTree<T extends MerkleValue> {
   private maxIndex = 0n
 

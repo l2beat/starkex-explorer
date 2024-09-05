@@ -2,7 +2,7 @@ import { pedersen } from '@explorer/crypto'
 import { PedersenHash } from '@explorer/types'
 import partition from 'lodash/partition'
 
-import { MerkleProofPrefix, MerkleValue } from './MerkleValue'
+import { MerkleValue } from './MerkleValue'
 
 export interface IMerkleStorage<T extends MerkleValue> {
   recover(hash: PedersenHash): Promise<NodeOrLeaf<T>>
@@ -159,12 +159,5 @@ export class MerkleNode<T extends MerkleValue> extends MerkleValue {
       this.rightHash(),
     ])
     return pedersen(leftHash, rightHash)
-  }
-
-  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
-    return {
-      nodes: [], // TODO: implement
-      finalHash: await this.hash(),
-    }
   }
 }

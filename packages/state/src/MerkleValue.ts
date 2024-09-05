@@ -10,7 +10,6 @@ export interface MerkleProofPrefix {
 
 export abstract class MerkleValue {
   protected abstract calculateHash(): Promise<PedersenHash>
-  abstract calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> 
 
   protected knownHash?: PedersenHash
   protected calculatedHash?: Promise<PedersenHash>
