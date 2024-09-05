@@ -1,10 +1,10 @@
-import '@nomicfoundation/hardhat-toolbox';
+import '@nomicfoundation/hardhat-toolbox'
 
-import { getEnv } from '@l2beat/backend-tools';
-import { config as dotenv } from 'dotenv';
-import { extendEnvironment, HardhatUserConfig } from 'hardhat/config';
+import { getEnv } from '@l2beat/backend-tools'
+import { config as dotenv } from 'dotenv'
+import { extendEnvironment, HardhatUserConfig } from 'hardhat/config'
 
-import { HardhatUtils } from './src/utils';
+import { HardhatUtils } from './src/utils'
 
 dotenv()
 
@@ -13,20 +13,16 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       chainId: 1,
-      accounts: []
+      accounts: [],
     },
-  }
-};
+  },
+}
 
 extendEnvironment((hre) => {
   const provider = new hre.ethers.providers.JsonRpcProvider()
   const env = getEnv()
   // @ts-expect-error
-  hre.utils = new HardhatUtils(provider, {
-    perpetualAddress: env.string('PERPETUAL_ADDRESS'),
-    starkKey: env.string('STARK_KEY'),
-    ethereumAddress: env.string('ETHEREUM_ADDRESS')
-  })
-});
+  hre.utils = new HardhatUtils(provider, env.string('PERPETUAL_ADDRESS'))
+})
 
-export default config;
+export default config

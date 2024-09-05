@@ -12,31 +12,18 @@ export class HardhatUtils {
     'function FREEZE_GRACE_PERIOD() view returns (uint256)',
     'event LogWithdrawalAllowed(uint256 ownerKey, uint256 assetType, uint256 nonQuantizedAmount, uint256 quantizedAmount)',
   ]
-  FORCED_WITHDRAWAL
-  perpetualAddress: string
+  FORCED_WITHDRAWAL = {
+    positionId: 1,
+    starkKey:
+      '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
+    ethereumAddress: '0x271bdA3c58B9C1e6016d1256Dad1C8C3Ca0590eF',
+    quantizedAmount: 10n * 10n ** 6n,
+  }
 
   constructor(
     private readonly provider: ethers.providers.JsonRpcProvider,
-    params: {
-      perpetualAddress: string
-      starkKey: string
-      ethereumAddress: string
-    }
-  ) {
-    this.perpetualAddress = params.perpetualAddress
-    this.FORCED_WITHDRAWAL = {
-      positionId: 1,
-      starkKey: params.starkKey,
-      ethereumAddress: params.ethereumAddress,
-      quantizedAmount: 10n * 10n ** 6n,
-    }
-
-    this.impersonateAccount(params.ethereumAddress).finally(() => {
-      this.setBalanceOf(params.ethereumAddress, 5n).finally(() => {
-        console.log('Finished impersonating and setting balance')
-      })
-    })
-  }
+    private readonly perpetualAddress: string
+  ) {}
 
   async getBlockNumber() {
     return this.provider.getBlockNumber()
@@ -72,6 +59,10 @@ export class HardhatUtils {
   }
 
   async triggerFreezable() {
+    // Impersonate the user of position #1
+    await helpers.impersonateAccount(this.FORCED_WITHDRAWAL.ethereumAddress)
+    // Give them some eth for gas
+    await this.setBalanceOf(this.FORCED_WITHDRAWAL.ethereumAddress, 5n)
     // Forced withdrawal data (for user at Position #1)
     const premiumCost = false
     const signer = this.provider.getSigner(
