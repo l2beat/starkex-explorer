@@ -58,6 +58,10 @@ export class HardhatUtils {
     await helpers.setBalance(address, ethAmount * 10n ** 18n)
   }
 
+  async getBalanceOf(address: string) {
+    return this.provider.getBalance(address)
+  }
+
   async triggerFreezable() {
     // Impersonate the user of position #1
     await helpers.impersonateAccount(this.FORCED_WITHDRAWAL.ethereumAddress)
