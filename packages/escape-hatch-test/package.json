@@ -1,5 +1,5 @@
 {
-  "name": "@explorer/escapetest",
+  "name": "@explorer/escape-hatch-test",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -7,7 +7,7 @@
     "yarn": ">=1.22.0"
   },
   "scripts": {
-    "escapetest": "npx hardhat test",
+    "test-escape": "npx hardhat test",
     "startfork": "env-cmd -f ./.env scripts/startfork.sh",
     "console": "npx hardhat console --network localhost"
   },
