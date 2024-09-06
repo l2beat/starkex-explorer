@@ -4,6 +4,10 @@ import { Config } from '../Config'
 import { getStarkexConfig } from '../starkex'
 
 export function getLocalConfig(env: Env): Config {
+
+  const starkexConfig = getStarkexConfig(env)
+  const isHardhatFork = env.optionalBoolean('HARDHAT_FORK')
+
   return {
     name: 'StarkexExplorer/Local',
     logger: {
@@ -18,6 +22,13 @@ export function getLocalConfig(env: Env): Config {
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: env.boolean('FRESH_START', false),
     forceHttps: false,
-    starkex: getStarkexConfig(env),
+    starkex: {
+      ...starkexConfig,
+      blockchain: {
+        ...starkexConfig.blockchain,
+        chainId: isHardhatFork ? 31337 : starkexConfig.blockchain.chainId,
+        jsonRpcUrl: isHardhatFork ? 'http://localhost:8545' : starkexConfig.blockchain.jsonRpcUrl,
+      }
+    }
   }
 }

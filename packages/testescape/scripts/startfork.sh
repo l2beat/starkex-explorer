@@ -21,4 +21,4 @@ if [ $# -eq 0 ]
     exit 1
 fi
 
-npx hardhat node --fork $JSON_RPC_URL --fork-block-number $1
+npx hardhat node --fork-block-number $1
