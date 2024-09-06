@@ -5,6 +5,7 @@ import Cookie from 'js-cookie'
 import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import { makeQuery } from '../utils/query'
+import { showSpinner } from '../utils/showSpinner'
 import {
   RecoveredKeys,
   recoverKeysApex,
@@ -24,12 +25,14 @@ export function initStarkKeyRecovery() {
   }
   const { instanceName, chainId } = getDataFromButton(registerButton)
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  registerButton.addEventListener('click', async () => {
-    const keys = await recoverKeys(account, instanceName, chainId)
-    Cookie.set('starkKey', keys.starkKey.toString())
-    setToLocalStorage(account, keys)
-    window.location.href = `/users/${keys.starkKey.toString()}`
-  })
+  registerButton.addEventListener('click', () =>
+    showSpinner(registerButton, async () => {
+      const keys = await recoverKeys(account, instanceName, chainId)
+      Cookie.set('starkKey', keys.starkKey.toString())
+      setToLocalStorage(account, keys)
+      window.location.href = `/users/${keys.starkKey.toString()}`
+    })
+  )
 }
 
 const getDataFromButton = (button: HTMLElement) => {

@@ -8,6 +8,7 @@ import {
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
+import { showSpinner } from '../../utils/showSpinner'
 
 export function initFinalizeEscapeForm() {
   const { $ } = makeQuery(document.body)
@@ -16,15 +17,20 @@ export function initFinalizeEscapeForm() {
   if (!form) {
     return
   }
+  const { $: form$ } = makeQuery(form)
+  const button = form$('button')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = FinalizeEscapeFormProps.parse(propsJson)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
-  form.addEventListener('submit', (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    submitFinalizeEscape(props, user).catch(console.error)
+    await showSpinner(button, async () => {
+      await submitFinalizeEscape(props, user)
+    })
   })
 }
 
