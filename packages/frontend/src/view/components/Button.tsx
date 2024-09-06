@@ -27,6 +27,12 @@ const sizeClassNames: Record<ButtonSize, string> = {
   lg: 'h-12 text-md rounded-lg',
 }
 
+const spinnerSizeClassNames: Record<ButtonSize, string> = {
+  sm: 'h-4 w-4',
+  md: 'h-5 w-5',
+  lg: 'h-6 w-6',
+}
+
 export function Button<T extends ElementType = 'button'>({
   variant = 'contained',
   size = 'md',
@@ -46,8 +52,14 @@ export function Button<T extends ElementType = 'button'>({
       )}
       {...rest}
     >
-      {children}
-      <Spinner className="ml-2 hidden group-data-[state=loading]:block" />
+      <span className={cx(size === 'sm' && 'group-data-[state=loading]:hidden')}>{children}</span>
+      <Spinner
+        className={cx(
+          'hidden group-data-[state=loading]:block',
+          size !== 'sm' && 'ml-2',
+          spinnerSizeClassNames[size]
+        )}
+      />
     </Comp>
   )
 }

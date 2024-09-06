@@ -23,6 +23,7 @@ export function Navbar({
 }: NavbarProps) {
   const { user, instanceName, tradingMode, chainId } = context
   const isMainnet = chainId === 1
+  const isFork = chainId === 31337
   return (
     <div className="border-b border-zinc-800">
       <nav className="relative mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-y-2 px-6 py-2.5">
@@ -35,7 +36,7 @@ export function Navbar({
             <ProjectLogo instanceName={instanceName} />
           </div>
           <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
-            {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
+            {instanceName.toUpperCase()} {isFork ? 'FORK' : isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
         <NavLinks

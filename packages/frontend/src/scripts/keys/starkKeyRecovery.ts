@@ -62,7 +62,7 @@ const recoverKeys = (
 ): Promise<RecoveredKeys> => {
   switch (instanceName) {
     case 'dYdX':
-      return recoverKeysDydx(account)
+      return recoverKeysDydx(account, chainId)
     case 'Myria':
       return recoverKeysMyria(account)
     case 'ApeX':
