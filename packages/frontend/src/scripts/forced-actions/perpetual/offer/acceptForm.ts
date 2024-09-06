@@ -19,6 +19,7 @@ export function initAcceptOfferForm() {
     const { $: form$ } = makeQuery(form)
     const button = form$('button')
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       await showSpinner(button, async () => {

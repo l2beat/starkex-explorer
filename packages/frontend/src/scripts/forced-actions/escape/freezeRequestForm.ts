@@ -25,6 +25,7 @@ export function initFreezeRequestForm() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     await showSpinner(button, async () => {

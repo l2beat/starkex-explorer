@@ -28,6 +28,7 @@ export function initSpotForcedWithdrawalForm() {
   if (!AssetHash.check(props.asset.hashOrId.toString())) {
     throw new Error('Invalid asset hash')
   }
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     await showSpinner(submitButton, async () => {

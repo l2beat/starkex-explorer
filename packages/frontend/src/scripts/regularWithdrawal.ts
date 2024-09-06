@@ -18,6 +18,7 @@ export function initRegularWithdrawalForm() {
   const { $: form$ } = makeQuery(form)
   const submitButton = form$('button')
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     await showSpinner(submitButton, async () => {

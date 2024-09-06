@@ -24,6 +24,7 @@ export function initStarkKeyRecovery() {
     return
   }
   const { instanceName, chainId } = getDataFromButton(registerButton)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   registerButton.addEventListener('click', () =>
     showSpinner(registerButton, async () => {
       const keys = await recoverKeys(account, instanceName, chainId)

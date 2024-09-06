@@ -51,6 +51,7 @@ export function initPerpetualForcedActionForm() {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   submitButton.addEventListener('click', async (e) => {
     e.preventDefault()
     await showSpinner(submitButton, async () => {
