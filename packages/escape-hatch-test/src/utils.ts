@@ -108,17 +108,4 @@ export class HardhatUtils {
       this.FORCED_WITHDRAWAL.quantizedAmount
     )
   }
-
-  async escape() {
-    const signer = this.provider.getSigner(
-      this.FORCED_WITHDRAWAL.ethereumAddress
-    ) // Use the correct signer here
-    const perpetualContract = this.getPerpetualContract()
-    const perpetualContractWithSigner = perpetualContract.connect(signer)
-    await perpetualContractWithSigner.escape(
-      this.FORCED_WITHDRAWAL.starkKey,
-      this.FORCED_WITHDRAWAL.positionId,
-      this.FORCED_WITHDRAWAL.quantizedAmount
-    )
-  }
 }
