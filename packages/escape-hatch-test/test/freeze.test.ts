@@ -33,6 +33,7 @@ describe('freeze functionality', function () {
 
     // Fork the mainnet at the block to which explorer is synced
     await forkNetworkAtBlock(blockNumber)
+    console.log('Forked to block', blockNumber)
 
     // Prepare the perpetual contract
     const provider = new ethers.providers.Web3Provider(network.provider as any)
@@ -49,6 +50,7 @@ describe('freeze functionality', function () {
 
     // The exchange should not be frozen
     expect(await perpetualContract.isFrozen()).toEqual(false)
+    console.log('Exchange is not frozen')
 
     // Forced withdrawal data (for user at Position #1)
     const starkKey = '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358'
@@ -59,14 +61,15 @@ describe('freeze functionality', function () {
 
     // Impersonate the user
     await helpers.impersonateAccount(ethereumAddress)
-
     // Give them some eth for gas
     await helpers.setBalance(ethereumAddress, 5n * (10n ** 18n))
+    console.log('Gave user some ETH', ethereumAddress)
 
     // Send forcedWithdrawalRequiest
     const signer = provider.getSigner(ethereumAddress); // Use the correct signer here
     const perpetualContractWithSigner = perpetualContract.connect(signer);
     await perpetualContractWithSigner.forcedWithdrawalRequest(starkKey, positionId, quantizedAmount, premiumCost);
+    console.log('Sent forcedWithdrawalRequest')
 
     // Send freeze request (it should fail, it's too soon)
     await expect(perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)).toBeRejected()
@@ -74,16 +77,19 @@ describe('freeze functionality', function () {
     // Make sure the freeze grace period is 14 days
     const freezeGracePeriod = (await perpetualContract.FREEZE_GRACE_PERIOD()).toNumber()
     expect(freezeGracePeriod).toEqual(14 * 24 * 60 * 60)
-
+    
     // Mine 15 blocks with 1 day interval (14 days is the limit to freeze)
     // (the first block is mined with standard interval, so we mine +1)
     await helpers.mine(15, { interval: 24 * 60 * 60 })
+    console.log('Mined 15 blocks (grace period)')
 
     // Send freeze request (it should work now)
     await perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)
-    
+    console.log('Sent freezeRequest')
+
     // The exchange should be frozen now!
     expect(await perpetualContract.isFrozen()).toEqual(true)
+    console.log('Exchange is frozen')
 
     // Send a verifyEscape request for position #1
     const escapeVerifierAbi = [
@@ -94,7 +100,7 @@ describe('freeze functionality', function () {
     const escapeVerifierWithSigner = new ethers.Contract(escapeVerifierAddress, escapeVerifierAbi, signer)
     await escapeVerifierWithSigner.verifyEscape(merkleProofForPos1, 0, newStateFromCairoOutput)
     const verifyEscapeBlockNumber = await provider.getBlockNumber()
-
+    console.log('Sent verifyEscape')
     // Verify the LogEscapeVerified event was emited:
     const verifyEscapeLogs = await provider.getLogs({
       fromBlock: verifyEscapeBlockNumber,
@@ -126,6 +132,7 @@ describe('freeze functionality', function () {
     // Perform the correct escape
     await perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount)
     const escapeBlockNumber = await provider.getBlockNumber()
+    console.log('Sent escape')
 
     // Calling escape above should have emitted this event
     const escapeLogs = await provider.getLogs({
@@ -152,13 +159,16 @@ describe('freeze functionality', function () {
     ], provider)
     const usdcBalanceBefore = (await usdcContract.balanceOf(ethereumAddress)).toBigInt()
     expect(usdcBalanceBefore).toEqual(0n)
+    console.log('USDC balance before', usdcBalanceBefore)
 
     // Withdraw the funds to the user's account
     await perpetualContractWithSigner.withdraw(starkKey, USDC_ASSET_TYPE)
+    console.log('Sent withdraw')
 
     // Make sure the funds were transfered
     const usdcBalanceAfter = (await usdcContract.balanceOf(ethereumAddress)).toBigInt()
     expect(usdcBalanceAfter).toEqual(escapeWithdrawalAmount)
+    console.log('USDC balance after', usdcBalanceAfter)
 
     // Try to withdraw again, it should not transfer any funds
     await perpetualContractWithSigner.withdraw(starkKey, USDC_ASSET_TYPE)
