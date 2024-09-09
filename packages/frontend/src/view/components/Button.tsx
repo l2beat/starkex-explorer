@@ -52,7 +52,11 @@ export function Button<T extends ElementType = 'button'>({
       )}
       {...rest}
     >
-      <span className={cx(size === 'sm' && 'group-data-[state=loading]:hidden')}>{children}</span>
+      <span
+        className={cx(size === 'sm' && 'group-data-[state=loading]:hidden')}
+      >
+        {children}
+      </span>
       <Spinner
         className={cx(
           'hidden group-data-[state=loading]:block',

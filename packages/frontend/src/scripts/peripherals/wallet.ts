@@ -40,9 +40,11 @@ function getProvider() {
 export const Wallet = {
   // #region Key recovery and registration
 
-  async signDydxKey(account: EthereumAddress, chainId: number): Promise<string> {
-    const message =
-      `{"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"}],"dYdX":[{"type":"string","name":"action"},{"type":"string","name":"onlySignOn"}]},"domain":{"name":"dYdX","version":"1.0","chainId":${chainId}},"primaryType":"dYdX","message":{"action":"dYdX STARK Key","onlySignOn":"https://trade.dydx.exchange"}}`
+  async signDydxKey(
+    account: EthereumAddress,
+    chainId: number
+  ): Promise<string> {
+    const message = `{"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"}],"dYdX":[{"type":"string","name":"action"},{"type":"string","name":"onlySignOn"}]},"domain":{"name":"dYdX","version":"1.0","chainId":${chainId}},"primaryType":"dYdX","message":{"action":"dYdX STARK Key","onlySignOn":"https://trade.dydx.exchange"}}`
 
     const result = await getProvider().request({
       method: 'eth_signTypedData_v4',
@@ -51,9 +53,11 @@ export const Wallet = {
     return result as string
   },
 
-  async signDydxKeyLegacy(account: EthereumAddress, chainId: number): Promise<string> {
-    const message =
-      `{\n  "name": "dYdX",\n  "version": "1.0",\n  "chainId": ${chainId},\n  "action": "dYdX STARK Key",\n  "onlySignOn": "https://trade.dydx.exchange"\n}`
+  async signDydxKeyLegacy(
+    account: EthereumAddress,
+    chainId: number
+  ): Promise<string> {
+    const message = `{\n  "name": "dYdX",\n  "version": "1.0",\n  "chainId": ${chainId},\n  "action": "dYdX STARK Key",\n  "onlySignOn": "https://trade.dydx.exchange"\n}`
 
     const result = await getProvider().request({
       method: 'personal_sign',

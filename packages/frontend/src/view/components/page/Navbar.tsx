@@ -36,7 +36,8 @@ export function Navbar({
             <ProjectLogo instanceName={instanceName} />
           </div>
           <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
-            {instanceName.toUpperCase()} {isFork ? 'FORK' : isMainnet ? '' : 'TESTNET'} EXPLORER
+            {instanceName.toUpperCase()}{' '}
+            {isFork ? 'FORK' : isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
         <NavLinks

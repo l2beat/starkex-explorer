@@ -4,7 +4,6 @@ import { Config } from '../Config'
 import { getStarkexConfig } from '../starkex'
 
 export function getLocalConfig(env: Env): Config {
-
   const starkexConfig = getStarkexConfig(env)
   const isHardhatFork = env.optionalBoolean('HARDHAT_FORK')
 
@@ -27,8 +26,10 @@ export function getLocalConfig(env: Env): Config {
       blockchain: {
         ...starkexConfig.blockchain,
         chainId: isHardhatFork ? 31337 : starkexConfig.blockchain.chainId,
-        jsonRpcUrl: isHardhatFork ? 'http://localhost:8545' : starkexConfig.blockchain.jsonRpcUrl,
-      }
-    }
+        jsonRpcUrl: isHardhatFork
+          ? 'http://localhost:8545'
+          : starkexConfig.blockchain.jsonRpcUrl,
+      },
+    },
   }
 }
