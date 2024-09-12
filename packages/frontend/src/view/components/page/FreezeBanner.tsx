@@ -54,7 +54,7 @@ function DydxSunsetFreezeBanner({
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-yellow-300 px-6 py-0.5 text-center text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-yellow-700 px-6 py-0.5 text-center text-white">
         <span>
           dYdX v3 has been sunset, and the exchange contracts are frozen. Please
           use the{' '}
