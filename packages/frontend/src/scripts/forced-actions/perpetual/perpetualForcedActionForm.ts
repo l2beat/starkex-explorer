@@ -3,6 +3,7 @@ import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { makeQuery } from '../../utils/query'
+import { showSpinner } from '../../utils/showSpinner'
 import { getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
@@ -50,12 +51,15 @@ export function initPerpetualForcedActionForm() {
     )
   }
 
-  submitButton.addEventListener('click', (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  submitButton.addEventListener('click', async (e) => {
     e.preventDefault()
-    if (!state || !state.canSubmit) {
-      throw new Error('Programmer error: Submit button should be disabled')
-    }
-    submit(state).catch(console.error)
+    await showSpinner(submitButton, async () => {
+      if (!state || !state.canSubmit) {
+        throw new Error('Programmer error: Submit button should be disabled')
+      }
+      await submit(state)
+    })
   })
 
   let state: FormState | undefined

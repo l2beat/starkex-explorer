@@ -8,7 +8,14 @@
   },
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/backend",
+      "packages/crypto",
+      "packages/encoding",
+      "packages/frontend",
+      "packages/shared",
+      "packages/state",
+      "packages/testnet",
+      "packages/types"
     ]
   },
   "scripts": {

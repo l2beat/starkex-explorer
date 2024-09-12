@@ -20,6 +20,7 @@
     "test": "mocha",
     "test:watch": "mocha --watch --watch-files src/**/*.ts,test/**/*.ts",
     "start": "node -r source-map-support/register build",
+    "start:fork": "HARDHAT_FORK=true yarn start",
     "dev": "node -r esbuild-register src"
   },
   "dependencies": {

@@ -4,19 +4,28 @@ import { CANCEL_OFFER_FORM_CLASS } from '../../../../view/pages/transaction/comp
 import { Api } from '../../../peripherals/api'
 import { Wallet } from '../../../peripherals/wallet'
 import { makeQuery } from '../../../utils/query'
+import { showSpinner } from '../../../utils/showSpinner'
 
 export function initCancelOfferForm() {
   const { $ } = makeQuery(document.body)
 
   const form = $.maybe<HTMLFormElement>(`.${CANCEL_OFFER_FORM_CLASS}`)
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const { address, offerId } = getFormData(form)
+  if (!form) {
+    return
+  }
+  const { $: form$ } = makeQuery(form)
+  const button = form$('button')
 
-    const signature = await Wallet.signOfferCancel(address, offerId)
-    await Api.cancelOffer(offerId, signature)
-    window.location.reload()
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    await showSpinner(button, async () => {
+      const { address, offerId } = getFormData(form)
+
+      const signature = await Wallet.signOfferCancel(address, offerId)
+      await Api.cancelOffer(offerId, signature)
+      window.location.reload()
+    })
   })
 }
 

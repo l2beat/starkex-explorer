@@ -22,6 +22,7 @@ This repository is a monorepo consisting of five projects:
 - `packages/crypto`
 - `packages/encoding`
 - `packages/testnet` - [README.md](./packages/testnet/README.md)
+- `packages/escape-hatch-test` - [README.md](./packages/test-hatch-testnet/README.md)
 
 ## Setup
 

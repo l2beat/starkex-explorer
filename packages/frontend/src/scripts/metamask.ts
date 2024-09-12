@@ -30,6 +30,7 @@ export function initMetamask() {
   const connectButton = $.maybe<HTMLButtonElement>('#connect-with-metamask')
   const instanceChainId = getInstanceChainId()
   if (!provider) {
+    updateAccounts([])
     connectButton?.addEventListener('click', () => {
       window.open('https://metamask.io/download/')
     })

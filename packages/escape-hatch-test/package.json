@@ -1,0 +1,33 @@
+{
+  "name": "@explorer/escape-hatch-test",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "^16.0.0",
+    "yarn": ">=1.22.0"
+  },
+  "scripts": {
+    "test-escape": "npx hardhat test",
+    "startfork": "env-cmd -f ./.env scripts/startfork.sh",
+    "console": "npx hardhat console --network localhost"
+  },
+  "dependencies": {
+    "@l2beat/backend-tools": "^0.3.0",
+    "env-cmd": "10.1.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "2.0.0",
+    "@nomicfoundation/hardhat-ethers": "3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.11",
+    "@nomicfoundation/hardhat-toolbox": "3.0.0",
+    "@nomicfoundation/hardhat-verify": "1.0.0",
+    "@typechain/ethers-v6": "0.4.0",
+    "@typechain/hardhat": "8.0.0",
+    "@types/chai": "4.2.0",
+    "chai": "4.2.0",
+    "hardhat": "2.16.1",
+    "hardhat-gas-reporter": "1.0.8",
+    "solidity-coverage": "0.8.1",
+    "ts-node": "10.9.2"
+  }
+}
