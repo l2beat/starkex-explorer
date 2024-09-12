@@ -56,6 +56,7 @@ interface UserPageProps {
   totalL2Transactions: number
   offers?: OfferEntry[]
   totalOffers: number
+  showAsMine?: boolean
 }
 
 export function renderUserPage(props: UserPageProps) {
@@ -64,7 +65,8 @@ export function renderUserPage(props: UserPageProps) {
 
 function UserPage(props: UserPageProps) {
   const common = getUserPageProps(props.starkKey)
-  const isMine = props.context.user?.starkKey === props.starkKey
+  const isMine =
+    props.showAsMine ?? props.context.user?.starkKey === props.starkKey
 
   const { title: assetsTableTitle, ...assetsTablePropsWithoutTitle } =
     getAssetsTableProps(props.starkKey)

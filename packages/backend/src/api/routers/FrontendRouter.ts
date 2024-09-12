@@ -218,12 +218,16 @@ export function createFrontendRouter(
         params: z.object({
           starkKey: stringAs(StarkKey),
         }),
+        query: z.object({
+          showAsMine: z.string().transform((value) => value === 'true').optional(),
+        })
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          ctx.params.starkKey
+          ctx.params.starkKey,
+          ctx.query.showAsMine
         )
         applyControllerResult(ctx, result)
       }
