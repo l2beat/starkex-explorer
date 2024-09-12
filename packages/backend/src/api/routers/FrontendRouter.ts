@@ -219,8 +219,11 @@ export function createFrontendRouter(
           starkKey: stringAs(StarkKey),
         }),
         query: z.object({
-          showAsMine: z.string().transform((value) => value === 'true').optional(),
-        })
+          showAsMine: z
+            .string()
+            .transform((value) => value === 'true')
+            .optional(),
+        }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
