@@ -8,16 +8,16 @@ export class TutorialService {
         slug: 'introduction',
       },
       {
+        title: 'Escape Hatch explained',
+        slug: 'escapehatch',
+      },
+      {
         title: 'Accessing User Page',
         slug: 'userpage',
       },
       {
         title: 'All about Forced Actions',
         slug: 'forcedactions',
-      },
-      {
-        title: 'Escape Hatch explained',
-        slug: 'escapehatch',
       },
     ]
     return tutorials

@@ -43,8 +43,8 @@ function DydxSunsetFreezeBanner({
     return (
       <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-brand px-6 py-0.5 text-center text-white">
         <span>
-          dYdX v3 is undergoing a planned sunsetting, and the operator is
-          inactive. Currently, anyone can freeze the exchange.
+          dYdX v3 is undergoing a planned shutdown and the operator is inactive.
+          Currently, anyone can freeze the exchange.
         </span>
         <a href="/freeze" className="underline">
           Read more
@@ -54,14 +54,14 @@ function DydxSunsetFreezeBanner({
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-yellow-700 px-6 py-0.5 text-center text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-red-500 py-1.5 text-center text-white">
         <span>
-          dYdX v3 has been sunset, and the exchange contracts are frozen. Please
-          use the{' '}
+          ⚠️ dYdX v3 has been discontinued and the exchange contracts are
+          frozen. Use the{' '}
           <a href="/tutorials/escapehatch" className="underline">
-            escape hatch
+            Escape Hatch
           </a>{' '}
-          functionality if you'd like to withdraw your funds.
+          functionality to withdraw your funds.
         </span>
       </div>
     )
