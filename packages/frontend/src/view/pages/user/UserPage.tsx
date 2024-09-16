@@ -2,6 +2,8 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
 import { CountBadge } from '../../components/CountBadge'
 import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -110,6 +112,20 @@ function UserPage(props: UserPageProps) {
               />
             )}
           </div>
+        </section>
+        <section>
+          <Card>
+            <div className="flex flex-1 flex-col">
+              <p className="mb-1.5 text-sm font-semibold text-zinc-500">
+                You can perform Escape Hatch operations for this user. You will
+                pay the gas cost but all withdrawals will go to this user's
+                address, not you.
+              </p>
+              <Button as="a" href="?showAsMine=true" className="w-32" size="sm">
+                Enable Actions for this User
+              </Button>
+            </div>
+          </Card>
         </section>
         <Tabs
           items={[

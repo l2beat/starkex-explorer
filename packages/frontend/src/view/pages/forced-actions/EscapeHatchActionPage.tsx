@@ -54,8 +54,7 @@ function EscapeHatchActionPage(props: Props) {
     <>Initiating (verifying) the escape (on this page)</>,
     <>Finalizing the escape (on user page)</>,
     <>
-      Withdrawing the funds (on user page - must be carried out by the owner of
-      this position){' '}
+      Withdrawing the funds (on user page){' '}
     </>,
   ]
   return (
@@ -75,9 +74,10 @@ function EscapeHatchActionPage(props: Props) {
           </span>
           <span className="text-md font-medium text-zinc-500">
             You have the option to request a withdrawal of the entire value of
-            any position by activating an 'escape hatch.' This process involves
-            interacting with an Ethereum contract, which calculates the total
-            value of the position, including any open trades and funding rates.
+            any position to position's owner address by activating an 'escape
+            hatch.' This process involves interacting with an Ethereum contract,
+            which calculates the total value of the position, including any open
+            trades and funding rates.
           </span>
           <span>The escape process consists of three steps:</span>
           <OrderedList items={steps} />
