@@ -58,7 +58,10 @@ export function Page(props: Props) {
           path={props.path}
           isPreview={isPreview}
         />
-        <FreezeBanner freezeStatus={props.context.freezeStatus} />
+        <FreezeBanner
+          instanceName={props.context.instanceName}
+          freezeStatus={props.context.freezeStatus}
+        />
         <GradientBackground />
         {props.children}
         <Footer context={props.context} />

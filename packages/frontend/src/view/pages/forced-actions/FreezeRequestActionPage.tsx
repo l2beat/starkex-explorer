@@ -79,9 +79,8 @@ function FreezeRequestActionPage(props: Props) {
         <div className="mt-6 flex  flex-col">
           <span className="text-xl font-semibold">Freeze exchange</span>
           <span className="mt-3">
-            The exchange operators have not fulfilled their obligation to
-            include a forced operation request from one of the users (you can
-            see the ignored forced operation{' '}
+            The exchange operators have not included a forced operation request
+            (you can see it{' '}
             <Link href={`/transactions/${props.transactionHash.toString()}`}>
               here
             </Link>
