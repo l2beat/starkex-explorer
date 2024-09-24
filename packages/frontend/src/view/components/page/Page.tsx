@@ -61,7 +61,7 @@ export function Page(props: Props) {
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         <GradientBackground />
         {props.children}
-        <Footer />
+        <Footer context={props.context} />
         <Tooltip />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />
