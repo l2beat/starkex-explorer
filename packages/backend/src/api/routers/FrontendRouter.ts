@@ -221,7 +221,7 @@ export function createFrontendRouter(
           starkKey: stringAs(StarkKey),
         }),
         query: z.object({
-          showAsMine: z
+          performUserActions: z
             .string()
             .transform((value) => value === 'true')
             .optional(),
@@ -232,7 +232,7 @@ export function createFrontendRouter(
         const result = await userController.getUserPage(
           givenUser,
           ctx.params.starkKey,
-          ctx.query.showAsMine
+          ctx.query.performUserActions
         )
         applyControllerResult(ctx, result)
       }

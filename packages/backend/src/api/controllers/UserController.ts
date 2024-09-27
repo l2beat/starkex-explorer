@@ -138,7 +138,7 @@ export class UserController {
   async getUserPage(
     givenUser: Partial<UserDetails>,
     starkKey: StarkKey,
-    showAsMine: boolean | undefined
+    performUserActions: boolean | undefined
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
@@ -309,7 +309,7 @@ export class UserController {
       totalTransactions,
       offers,
       totalOffers: forcedTradeOffersCount,
-      showAsMine,
+      performUserActions,
     })
 
     return { type: 'success', content }
