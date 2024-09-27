@@ -53,9 +53,7 @@ function EscapeHatchActionPage(props: Props) {
   const steps = [
     <>Initiating (verifying) the escape (on this page)</>,
     <>Finalizing the escape (on user page)</>,
-    <>
-      Withdrawing the funds (on user page){' '}
-    </>,
+    <>Withdrawing the funds (on user page) </>,
   ]
   return (
     <Page

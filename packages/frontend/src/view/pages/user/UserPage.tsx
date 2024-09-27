@@ -115,14 +115,19 @@ function UserPage(props: UserPageProps) {
         </section>
         <section>
           <Card>
-            <div className="flex flex-1 flex-col">
-              <p className="mb-1.5 text-sm font-semibold text-zinc-500">
+            <div className="flex flex-1 flex-row">
+              <p className="mb-1.5 font-semibold">
                 You can perform Escape Hatch operations for this user. You will
                 pay the gas cost but all withdrawals will go to this user's
                 address, not you.
               </p>
-              <Button as="a" href="?showAsMine=true" className="w-32" size="sm">
-                Enable Actions for this User
+              <Button
+                as="a"
+                href="?showAsMine=true"
+                className="w-64 leading-tight"
+                size="lg"
+              >
+                Perform Actions for this User
               </Button>
             </div>
           </Card>
