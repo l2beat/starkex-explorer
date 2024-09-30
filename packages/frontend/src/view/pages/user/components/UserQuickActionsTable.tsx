@@ -19,6 +19,7 @@ interface UserQuickActionsTableProps {
   readonly finalizableOffers: readonly FinalizableOfferEntry[]
   readonly starkKey: StarkKey
   readonly exchangeAddress: EthereumAddress
+  readonly isMine?: boolean
 }
 
 export interface EscapableAssetEntry {
@@ -46,6 +47,11 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
     return null
   }
 
+  // If exchange is frozen, show the panel even if I'm a different user.
+  if (!props.isMine && props.context.freezeStatus !== 'frozen') {
+    return null
+  }
+
   return (
     <Card className="flex flex-col gap-6 border border-brand">
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
@@ -64,7 +70,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
 function EscapableAssets(
   props: Pick<
     UserQuickActionsTableProps,
-    'escapableAssets' | 'context' | 'starkKey' | 'exchangeAddress'
+    'escapableAssets' | 'context' | 'starkKey' | 'exchangeAddress' | 'isMine'
   >
 ) {
   return (
@@ -100,6 +106,7 @@ function EscapableAssets(
                   exchangeAddress={props.exchangeAddress}
                   positionId={asset.positionOrVaultId}
                   quantizedAmount={asset.amount}
+                  isMine={props.isMine}
                 />
               )}
             {props.context.user &&
@@ -113,6 +120,7 @@ function EscapableAssets(
                   vaultId={asset.positionOrVaultId}
                   quantizedAmount={asset.amount}
                   assetId={asset.asset.details.assetHash}
+                  isMine={props.isMine}
                 />
               )}
           </div>
@@ -125,7 +133,7 @@ function EscapableAssets(
 function WithdrawableAssets(
   props: Pick<
     UserQuickActionsTableProps,
-    'withdrawableAssets' | 'context' | 'starkKey' | 'exchangeAddress'
+    'withdrawableAssets' | 'context' | 'starkKey' | 'exchangeAddress' | 'isMine'
   >
 ) {
   return (
@@ -159,7 +167,12 @@ function WithdrawableAssets(
                 starkKey={props.starkKey}
                 exchangeAddress={props.exchangeAddress}
               >
-                <Button className="ml-auto w-32 !px-0" size="sm">
+                <Button
+                  className={
+                    'ml-auto w-32 !px-0 ' + (!props.isMine ? 'invisible' : '')
+                  }
+                  size="sm"
+                >
                   Withdraw now
                 </Button>
               </RegularWithdrawalForm>

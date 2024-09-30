@@ -66,9 +66,18 @@ export function renderUserPage(props: UserPageProps) {
 
 function UserPage(props: UserPageProps) {
   const common = getUserPageProps(props.starkKey)
-  const isMine =
-    (props.context.user !== undefined && props.performUserActions) ??
-    props.context.user?.starkKey === props.starkKey
+  let isMine = props.context.user?.starkKey === props.starkKey
+
+  if (!isMine) {
+    // If exchange is frozen and flag is passed, let others perform these actions
+    if (
+      props.context.user !== undefined &&
+      props.context.freezeStatus === 'frozen' &&
+      props.performUserActions
+    ) {
+      isMine = true
+    }
+  }
 
   const { title: assetsTableTitle, ...assetsTablePropsWithoutTitle } =
     getAssetsTableProps(props.starkKey)
@@ -101,23 +110,22 @@ function UserPage(props: UserPageProps) {
               chainId={props.context.chainId}
               ethereumAddress={props.ethereumAddress}
             />
-            {isMine && (
-              <UserQuickActionsTable
-                escapableAssets={props.escapableAssets}
-                withdrawableAssets={props.withdrawableAssets}
-                finalizableOffers={props.finalizableOffers}
-                context={props.context}
-                exchangeAddress={props.exchangeAddress}
-                starkKey={props.starkKey}
-              />
-            )}
+            <PerformUserActionsPanel
+              performUserActions={props.performUserActions}
+              starkKey={props.starkKey}
+              context={props.context}
+            />
+            <UserQuickActionsTable
+              escapableAssets={props.escapableAssets}
+              withdrawableAssets={props.withdrawableAssets}
+              finalizableOffers={props.finalizableOffers}
+              context={props.context}
+              exchangeAddress={props.exchangeAddress}
+              starkKey={props.starkKey}
+              isMine={isMine}
+            />
           </div>
         </section>
-        <PerformUserActionsPanel
-          performUserActions={props.performUserActions}
-          starkKey={props.starkKey}
-          context={props.context}
-        />
         <Tabs
           items={[
             {
