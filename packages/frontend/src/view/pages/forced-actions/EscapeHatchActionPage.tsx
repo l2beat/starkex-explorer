@@ -52,11 +52,8 @@ function EscapeHatchActionPage(props: Props) {
   const userJson = JSON.stringify(context.user)
   const steps = [
     <>Initiating (verifying) the escape (on this page)</>,
-    <>Finalizing the escape (on user page)</>,
-    <>
-      Withdrawing the funds (on user page - must be carried out by the owner of
-      this position){' '}
-    </>,
+    <>Finalizing the escape (on User Page)</>,
+    <>Withdrawing the funds (on User Page)</>,
   ]
   return (
     <Page
@@ -75,7 +72,7 @@ function EscapeHatchActionPage(props: Props) {
           </span>
           <span className="text-md font-medium text-zinc-500">
             You have the option to request a withdrawal of the entire value of
-            any position by activating an 'escape hatch.' This process involves
+            any position by activating an 'Escape Hatch.' This process involves
             interacting with an Ethereum contract, which calculates the total
             value of the position, including any open trades and funding rates.
           </span>
@@ -84,6 +81,11 @@ function EscapeHatchActionPage(props: Props) {
           <span className="text-md font-medium text-zinc-500">
             Please note, the execution of an Escape can be expensive due to
             Ethereum gas cost.
+          </span>
+          <span className="text-md font-medium text-zinc-500">
+            Ultimately the funds will be withdraw to the Ethereum address of
+            this position's owner, regardless of the wallet used to perform the
+            Escape Hatch transactions.
           </span>
         </div>
         <Card className="row-start-1 h-min lg:col-start-2">

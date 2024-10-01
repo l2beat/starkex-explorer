@@ -16,6 +16,44 @@ The StarkEx Explorer's interface will change accordingly, with the webpage heade
 
 ## Performing an Escape
 
-After visiting their User Page, users will find an "Escape" button next to their non-perpetual tokens in the Assets panel (the values of perpetual positions are automatically included in the collateral escape). Upon clicking this button, if a user's Ethereum address has not been registered on Ethereum (which implies that Ethereum contracts do not recognize which StarkKey belongs to that Ethereum address), they will need to register it via an Ethereum transaction. Next, the user will be presented with a description of the escape process and prompted to click on the "Initiate Escape" button. This action will prompt a Metamask transaction, which may incur significant cost due to the amount of data, specifically a Merkle Proof, which proves to the Ethereum smart contract that the user indeed owns the claimed assets as of the last state update.
+The Escape Hatch is a crucial functionality that allows users to withdraw their funds from the StarkEx system directly to Ethereum when the exchange itself is frozen and operators no longer function. This is achieved by interacting with Ethereum contracts, providing so called "Merkle Proof" of the ownership of funds and performing a few transactions. Due to the amount of data and logic required to process those transactions, they can be very costly (in terms of Ethereum gas cost).
 
-Once the transaction has been confirmed on Ethereum, the User Page will display a "Pending Escapes" section. By clicking on the "Finalize Escape" button next to an asset, the user will be prompted to send a transaction via Metamask, which will complete the transfer of funds to the user's Ethereum wallet.
+Here's a detailed guide on how to perform an Escape:
+
+### Initiating an Escape
+
+1. Navigate to your User Page on the StarkEx Explorer.
+2. Look for the "Escape" button next to your non-perpetual token in the Assets panel.
+3. Click on the "Escape" button to begin the process.
+
+It's important to note that the Escape Hatch functionality is permissionless. This means that not only can you initiate an Escape for your own funds, but you can also do so for other users. However, it's crucial to understand that even if someone else triggers the Escape Hatch for a user, the funds will always be made available for withdrawal (and ultimately withdrawn) to that user's Ethereum address. The person performing these actions only pays for the gas costs on Ethereum.
+
+If you're initiating an Escape for another user, you'll need to go to their User Page and look for an option to "Perform user actions" for that user instead and then follow the regular Escape process.
+
+### The Three-Step Escape Process
+
+Escaping funds is a three-step process:
+
+1. **Initiate Escape**:
+
+   - Escape process is initiated by clicking on the "Escape" button on the User Page.
+   - You will be redirected to the Escape initialization page which will describe the whole process.
+   - Click on the "Initiate Escape" button and confirm the transaction in your MetaMask wallet.
+   - Be aware that this transaction may be costly due to the inclusion of a Merkle Proof, which verifies your ownership of the assets.
+
+2. **Finalize Escape**:
+
+   - After the initiation is confirmed on Ethereum, return to the User Page.
+   - You'll now see a new "Pending Escapes" section on the page.
+   - In this section, find the "Finalize Escape" button next to the perpetual asset.
+   - Click on "Finalize Escape" and confirm another MetaMask transaction.
+
+3. **Withdraw Funds**:
+   - Once the finalization is complete, the funds become withdrawable.
+   - Return to the User Page.
+   - Look for a new "Withdrawable Assets" section.
+   - Click on the "Withdraw now" button to complete the transfer of funds to the original user's Ethereum wallet.
+
+Remember, each step requires a separate Ethereum transaction, which means you'll need to pay gas fees for each action.
+
+Whether you're escaping your own funds or assisting another user, always double-check the details before confirming any transactions. The Explorer interface will guide you through each step, providing necessary information and confirmation prompts along the way.
