@@ -48,10 +48,6 @@ When the exchange is frozen and the user triggers Escape Hatch process, the coll
 
 Escape process allows to withdraw only the collateral token (USDC). When the exchange is frozen and the user triggers Escape Hatch process, the collateral (USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted.
 
-## Is there a time limit for using the Escape Hatch?
-
-While there isn't a strict time limit for initiating the Escape Hatch process, it's generally recommended to do so as soon as possible. The smart contracts governing the Escape Hatch functionality are designed to be long-lasting, but it's always best to secure your funds promptly. Additionally, be aware that gas prices on Ethereum can fluctuate, so choosing a time with lower network congestion could result in lower transaction fees.
-
 ## What should I do if I encounter an error during the Escape Hatch process?
 
 If you encounter an error during any step of the Escape Hatch process, the first step is to check that you have sufficient ETH in your wallet to cover gas fees. If the error persists, try the following:
