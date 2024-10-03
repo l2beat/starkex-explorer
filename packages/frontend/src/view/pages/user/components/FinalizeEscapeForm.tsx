@@ -16,6 +16,7 @@ export type FinalizeEscapeFormProps = z.infer<typeof FinalizeEscapeFormProps>
 export const FinalizeEscapeFormProps = z.intersection(
   z.object({
     exchangeAddress: stringAs(EthereumAddress),
+    isMine: z.boolean().optional(),
   }),
   z.discriminatedUnion('tradingMode', [
     z.object({
@@ -54,7 +55,10 @@ export function FinalizeEscapeForm(props: Props) {
       data-props={formPropsJson}
       data-user={userJson}
     >
-      <Button className="ml-auto w-32 !px-0" size="sm">
+      <Button
+        className={'ml-auto w-32 !px-0 ' + (!props.isMine ? 'invisible' : '')}
+        size="sm"
+      >
         Finalize escape
       </Button>
     </form>
