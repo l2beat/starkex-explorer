@@ -46,7 +46,7 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
     </section>
   ) : (
     <section>
-      <div className="-mx-4 flex flex-col gap-3 rounded-lg bg-yellow-300 bg-opacity-20 px-6 py-5 text-lg font-semibold sm:mx-0">
+      <Card className="flex flex-col gap-3 bg-yellow-300 bg-opacity-20">
         <p className="font-bold text-yellow-300">
           You have enabled performing actions for this user
         </p>
@@ -55,7 +55,7 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
           Escape Hatch operations for this user (and pay their gas costs) but
           all withdrawals will go to this user's address, not yours.
         </p>
-      </div>
+      </Card>
     </section>
   )
 }
