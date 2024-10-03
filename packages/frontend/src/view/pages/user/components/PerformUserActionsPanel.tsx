@@ -2,9 +2,7 @@ import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { WarningIcon } from '../../../assets/icons/WarningIcon'
 import { Button } from '../../../components/Button'
-import { Card } from '../../../components/Card'
 
 interface PerformUserActionsPanelProps {
   starkKey: StarkKey
@@ -22,38 +20,41 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
   ) {
     return null
   }
-  return !props.performUserActions ? (
+  return (
     <section>
-      <Card>
-        <div className="flex flex-row gap-4">
-          <p className="mb-1.5 flex-1 font-semibold">
-            You are not connected to this user's wallet. You can enable Escape
-            Hatch operations and pay their gas cost, but all withdrawals will go
-            to this user's address, not yours.
-          </p>
-          <Button
-            as="a"
-            href="?performUserActions=true"
-            className="w-48 leading-tight"
-            size="lg"
-          >
-            Perform Actions for this User
-          </Button>
-        </div>
-      </Card>
-    </section>
-  ) : (
-    <section>
-      <Card className="bg-warning">
-        <div className="flex flex-row gap-4">
-          <WarningIcon width="64" height="48" />
-          <p className="mb-1.5 font-semibold">
-            You are not connected to this user's wallet. You can still perform
-            Escape Hatch operations for this user (and pay their gas costs) but
-            all withdrawals will go to this user's address, not yours.
-          </p>
-        </div>
-      </Card>
+      <div className="-mx-4 flex flex-col gap-3 rounded-lg bg-yellow-300 bg-opacity-20 px-6 py-5 text-lg font-semibold sm:mx-0">
+        {!props.performUserActions ? (
+          <>
+            <p className="font-bold text-yellow-300">
+              Do you want to perform actions for this user?
+            </p>
+            <p className="mb-1.5 flex-1 text-sm font-semibold">
+              You are not connected to this user's wallet. You can enable Escape
+              Hatch operations and pay their gas cost, but all withdrawals will
+              go to this user's address, not yours.
+            </p>
+            <Button
+              as="a"
+              href="?performUserActions=true"
+              className="w-full bg-yellow-300 leading-tight text-black hover:!bg-[#fdf17c]"
+              size="lg"
+            >
+              Perform
+            </Button>
+          </>
+        ) : (
+          <>
+            <p className="font-bold text-yellow-300">
+              You can perform actions for this user
+            </p>
+            <p className="mb-1.5 text-sm font-semibold">
+              You are not connected to this user's wallet. You can still perform
+              Escape Hatch operations for this user (and pay their gas costs)
+              but all withdrawals will go to this user's address, not yours.
+            </p>
+          </>
+        )}
+      </div>
     </section>
   )
 }
