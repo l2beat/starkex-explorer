@@ -2,6 +2,7 @@ import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
 
@@ -24,10 +25,10 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
   return !props.performUserActions ? (
     <section>
       <Card>
-        <p className="mb-2 font-bold">
+        <p className="mb-2 font-bold leading-tight">
           Do you want to enable actions for this user?
         </p>
-        <div className="flex gap-4 max-md:flex-col">
+        <div className="flex gap-4 max-lg:flex-col">
           <p className="flex-1 text-sm font-semibold leading-tight">
             You are not connected to this user's wallet. You can enable Escape
             Hatch operations and pay their gas cost, but all withdrawals will go
@@ -37,7 +38,7 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
             as="a"
             href="?performUserActions=true"
             variant="outlined"
-            className="w-full md:w-48"
+            className="w-full sm:w-1/2 mx-auto lg:w-48"
           >
             Enable
           </Button>
@@ -47,9 +48,12 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
   ) : (
     <section>
       <Card className="flex flex-col gap-3 bg-yellow-300 bg-opacity-20">
-        <p className="font-bold text-yellow-300">
+        <div className='flex'>
+        <InfoIcon className='mt-px mr-1.5 fill-yellow-300 shrink-0'/>
+        <p className="font-bold text-yellow-300 leading-tight">
           You have enabled performing actions for this user
         </p>
+        </div>
         <p className="mb-1.5 text-sm font-semibold leading-tight">
           You are not connected to this user's wallet. You can still perform
           Escape Hatch operations for this user (and pay their gas costs) but
