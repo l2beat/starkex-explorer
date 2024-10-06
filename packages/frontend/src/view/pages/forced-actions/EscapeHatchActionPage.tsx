@@ -10,6 +10,7 @@ import { z } from 'zod'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -111,6 +112,10 @@ function EscapeHatchActionPage(props: Props) {
             <Button className="w-full" size="lg">
               Initiate Escape
             </Button>
+            <div>
+              By initiating the escape process, you agree to our{' '}
+              <Link href="/tos">Terms of Service</Link>
+            </div>
           </form>
         </Card>
       </ContentWrapper>
