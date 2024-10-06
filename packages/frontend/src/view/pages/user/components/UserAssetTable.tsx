@@ -9,6 +9,7 @@ import {
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 
 interface UserAssetsTableProps {
@@ -94,6 +95,11 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               ? [
                   <span className="text-zinc-500">
                     {getActionButtonLabel(entry.action)}
+                    <div>
+                      <Link href="/tutorials/faqescapehatch#can-i-use-the-escape-hatch-for-all-types-of-assets">
+                        (more info)
+                      </Link>
+                    </div>
                   </span>,
                 ]
               : []),

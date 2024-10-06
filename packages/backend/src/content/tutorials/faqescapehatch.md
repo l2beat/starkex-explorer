@@ -48,7 +48,7 @@ When the exchange is frozen and the user triggers Escape Hatch process, the coll
 
 ## Can I use the Escape Hatch for all types of assets?
 
-Escape process allows to withdraw only the collateral token (e.g. USDC). When the exchange is frozen and the user triggers Escape Hatch process, the collateral (e.g. USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted.
+Escape process allows to withdraw only the collateral token (e.g. USDC), but the collateral amount _will include the value of user's every open position_, valued at the oracle prices at the time when the trading halted.
 
 ## What should I do if I encounter an error during the Escape Hatch process?
 
