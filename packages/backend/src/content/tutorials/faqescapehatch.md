@@ -1,5 +1,9 @@
 # Escape Hatch FAQ
 
+For introduction to Escape Hatch functionality, please see this guide:
+
+- [Escape Hatch Explained](/tutorials/escapehatch)
+
 ## Do I need the StarkEx Explorer to use the Escape Hatch functionality?
 
 No, the Escape Hatch functionality is based on smart contracts deployed on the Ethereum blockchain, which users can interact with directly. The StarkEx Explorer is simply a user-friendly interface built on top of these smart contracts. While it provides a convenient way to interact with the Escape Hatch functionality, it is not necessary to use the Explorer to perform the escape process. Users are free to interact with the smart contracts directly if they prefer.
@@ -14,7 +18,9 @@ Currently, the StarkEx Explorer only supports MetaMask or MetaMask-compatible wa
 
 1. You can create a new MetaMask wallet specifically for this purpose. With this new wallet, you can trigger the Escape Hatch process for your position, as long as the wallet has enough funds to cover the gas costs.
 
-2. Alternatively, you can ask someone else who has a MetaMask-compatible wallet to trigger the Escape Hatch process for your position.
+2. If you're using a hardware wallet, chances are you can connect it to a Metamask extension and use it for the Escape Hatch process.
+
+3. Alternatively, you can ask someone else who has a MetaMask-compatible wallet to trigger the Escape Hatch process for your position.
 
 In both cases, it's important to note that while anyone can trigger the Escape Hatch process, the funds will always be withdrawn to the Ethereum address of the original position owner.
 

@@ -57,3 +57,9 @@ Escaping funds is a three-step process:
 Remember, each step requires a separate Ethereum transaction, which means you'll need to pay gas fees for each action.
 
 Whether you're escaping your own funds or assisting another user, always double-check the details before confirming any transactions. The Explorer interface will guide you through each step, providing necessary information and confirmation prompts along the way.
+
+## Read more
+
+To learn more about Escape Hatch process, see:
+
+- [Escape Hatch FAQ](/tutorials/faqescapehatch)
