@@ -1,8 +1,4 @@
-# dYdX Escape Hatch FAQ
-
-## Why is the dYdX exchange frozen?
-
-The dYdX exchange has been frozen because it has been sunset by the operators and will no longer function. For detailed information about why this has occurred, please refer to the official dYdX blog post: https://dYdX.exchange/blog/v3-product-sunset
+# Escape Hatch FAQ
 
 ## Do I need the StarkEx Explorer to use the Escape Hatch functionality?
 
@@ -38,15 +34,15 @@ If you start the Escape Hatch process but don't complete all steps, your funds w
 
 No, once the Escape Hatch process has been initiated, it cannot be cancelled. However, you're not obligated to complete the process immediately. You can wait and complete the remaining steps at a later time if needed.
 
-For any additional questions or concerns, please refer to the official dYdX documentation or contact their support team.
+For any additional questions or concerns, please refer to the official exchange documentation or contact their support team.
 
 ## What happens to my open positions when I use the Escape Hatch?
 
-When the exchange is frozen and the user triggers Escape Hatch process, the collateral (USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted. You cannot selectively close or maintain specific positions – all positions are "closed" as part of the Escape Hatch procedure.
+When the exchange is frozen and the user triggers Escape Hatch process, the collateral (e.g. USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted. You cannot selectively close or maintain specific positions – all positions are "closed" as part of the Escape Hatch procedure.
 
-## Can I use the Escape Hatch for all types of assets on dYdX?
+## Can I use the Escape Hatch for all types of assets?
 
-Escape process allows to withdraw only the collateral token (USDC). When the exchange is frozen and the user triggers Escape Hatch process, the collateral (USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted.
+Escape process allows to withdraw only the collateral token (e.g. USDC). When the exchange is frozen and the user triggers Escape Hatch process, the collateral (e.g. USDC) amount that will be withdrawn will include the value of user's every open position, valued at the oracle prices at the time when the trading halted.
 
 ## What should I do if I encounter an error during the Escape Hatch process?
 
@@ -56,7 +52,7 @@ If you encounter an error during any step of the Escape Hatch process, the first
 2. Clear your browser cache and reconnect your wallet.
 3. Try using a different browser or device.
 
-If you continue to experience issues, you can seek help from the dYdX community forums or contact the dYdX support team. Remember, the Explorer is just a graphical interface, so if all else fails, you can interact with the smart contracts directly, though this requires technical knowledge.
+If you continue to experience issues, you can seek help from the community forums or contact the exchange's support team. Remember, the Explorer is just a graphical interface, so if all else fails, you can interact with the smart contracts directly, though this requires technical knowledge.
 
 ## Can I use a hardware wallet for the Escape Hatch process?
 
