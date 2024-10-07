@@ -109,13 +109,13 @@ function EscapeHatchActionPage(props: Props) {
                 </span>
               </span>
             </div>
-            <Button className="w-full" size="lg">
-              Initiate Escape
-            </Button>
-            <div>
+            <div className="text-center">
               By initiating the escape process, you agree to our{' '}
               <Link href="/tos">Terms of Service</Link>
             </div>
+            <Button className="w-full" size="lg">
+              Initiate Escape
+            </Button>
           </form>
         </Card>
       </ContentWrapper>
