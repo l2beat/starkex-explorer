@@ -33,11 +33,11 @@ export function NewPerpetualForcedWithdrawalFormContent(
           <AmountInput asset={props.asset} />
         </ForcedActionCard>
       </div>
+      <div className="text-center">
+        By initiating this action you agree to our{' '}
+        <Link href="/tos">Terms of Service</Link>
+      </div>
       <div className="flex flex-col gap-2">
-        <div className="text-center">
-          By initiating this action you agree to our{' '}
-          <Link href="/tos">Terms of Service</Link>
-        </div>
         <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Prepare for withdrawal
         </Button>

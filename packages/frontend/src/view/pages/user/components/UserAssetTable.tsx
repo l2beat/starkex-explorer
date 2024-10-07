@@ -95,11 +95,6 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               ? [
                   <span className="text-zinc-500">
                     {getActionButtonLabel(entry.action)}
-                    <div>
-                      <Link href="/tutorials/faqescapehatch#can-i-use-the-escape-hatch-for-all-types-of-assets">
-                        (more info)
-                      </Link>
-                    </div>
                   </span>,
                 ]
               : []),
@@ -119,7 +114,14 @@ function getActionButtonLabel(action: UserAssetEntry['action']) {
     case 'ESCAPE':
       return 'Escape'
     case 'USE_COLLATERAL_ESCAPE':
-      return 'Use collateral escape'
+      return (
+        <span>
+          Use{' '}
+          <Link href="/tutorials/faqescapehatch#can-i-use-the-escape-hatch-for-all-types-of-assets">
+            collateral escape
+          </Link>
+        </span>
+      )
     case 'NO_ACTION':
       throw new Error('No action')
     default:
