@@ -10,10 +10,10 @@ import { z } from 'zod'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
-import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { TermsOfServiceAck } from '../../components/TermsOfServiceAck'
 import { reactToHtml } from '../../reactToHtml'
 
 export const VERIFY_ESCAPE_REQUEST_FORM_ID = 'verify-escape-request-form'
@@ -109,10 +109,7 @@ function EscapeHatchActionPage(props: Props) {
                 </span>
               </span>
             </div>
-            <div className="text-center">
-              By initiating the escape process, you agree to our{' '}
-              <Link href="/tos">Terms of Service</Link>
-            </div>
+            <TermsOfServiceAck prefix="By initiating the escape process, you agree to our" />
             <Button className="w-full" size="lg">
               Initiate Escape
             </Button>

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { L2BeatLogo } from '../../assets/logos/L2BeatLogo'
 import { StarkWareLogo } from '../../assets/logos/StarkWareLogo'
-import { Link } from '../Link'
+import { TermsOfServiceAck } from '../TermsOfServiceAck'
 
 interface FooterProps {
   readonly context: PageContext
@@ -24,10 +24,7 @@ export function Footer({ context }: FooterProps) {
         <StarkWareLogo height={18} width={98} className="ml-1 inline-block" />
       </span>
       {instanceName === 'dYdX' && (
-        <span>
-          By accessing this website, you agree to our{' '}
-          <Link href="/tos">Terms of Service</Link>
-        </span>
+        <TermsOfServiceAck prefix="By accessing this website you agree to our" />
       )}
       <span className="text-zinc-500">
         Copyright {new Date().getFullYear()} L2BEAT

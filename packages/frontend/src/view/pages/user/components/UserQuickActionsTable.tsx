@@ -8,8 +8,8 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
-import { Link } from '../../../components/Link'
 import { OfferEntry } from '../../../components/tables/OffersTable'
+import { TermsOfServiceAck } from '../../../components/TermsOfServiceAck'
 import { FinalizeEscapeForm } from './FinalizeEscapeForm'
 import { RegularWithdrawalForm } from './RegularWithdrawalForm'
 
@@ -49,10 +49,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
 
   return (
     <Card className="flex flex-col gap-6 border border-brand">
-      <span>
-        By performing following actions you agree to our{' '}
-        <Link href="/tos">Terms of Service</Link>
-      </span>
+      <TermsOfServiceAck prefix="By performing following actions you agree to our" />
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
       {props.escapableAssets.length > 0 && <EscapableAssets {...props} />}
       {props.context.tradingMode === 'perpetual' &&

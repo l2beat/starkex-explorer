@@ -4,7 +4,7 @@ import React from 'react'
 
 import { ArrowDownIcon } from '../../../assets/icons/ArrowIcon'
 import { Button } from '../../../components/Button'
-import { Link } from '../../../components/Link'
+import { TermsOfServiceAck } from '../../../components/TermsOfServiceAck'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
@@ -52,10 +52,7 @@ export function NewPerpetualForcedTradeFormContent(
           <TotalInput assetId={props.collateralAsset.assetId} />
         </ForcedActionCard>
       </div>
-      <div className="text-center">
-        By initiating this action you agree to our{' '}
-        <Link href="/tos">Terms of Service</Link>
-      </div>
+      <TermsOfServiceAck prefix="By initiating this action you agree to our" />
       <div className="flex flex-col gap-2">
         <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Create {label} offer
