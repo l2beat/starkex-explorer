@@ -10,6 +10,7 @@ import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { TermsOfServiceAck } from '../../components/TermsOfServiceAck'
 import { reactToHtml } from '../../reactToHtml'
 import { ForcedActionCard } from './components/ForcedActionCard'
 import {
@@ -105,6 +106,7 @@ function NewSpotForcedWithdrawalPage(props: Props) {
               </ForcedActionCard>
             </div>
             <div className="flex flex-col gap-2">
+              <TermsOfServiceAck prefix="By initiating this action you agree to our" />
               <Button className="w-full" size="lg">
                 Prepare for withdrawal
               </Button>

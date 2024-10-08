@@ -12,6 +12,10 @@ export class TutorialService {
         slug: 'escapehatch',
       },
       {
+        title: 'Escape Hatch FAQ',
+        slug: 'faqescapehatch',
+      },
+      {
         title: 'Accessing User Page',
         slug: 'userpage',
       },

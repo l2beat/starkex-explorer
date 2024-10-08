@@ -9,6 +9,7 @@ import {
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 
 interface UserAssetsTableProps {
@@ -113,7 +114,14 @@ function getActionButtonLabel(action: UserAssetEntry['action']) {
     case 'ESCAPE':
       return 'Escape'
     case 'USE_COLLATERAL_ESCAPE':
-      return 'Use collateral escape'
+      return (
+        <span>
+          Use{' '}
+          <Link href="/tutorials/faqescapehatch#can-i-use-the-escape-hatch-for-all-types-of-assets">
+            collateral escape
+          </Link>
+        </span>
+      )
     case 'NO_ACTION':
       throw new Error('No action')
     default:
