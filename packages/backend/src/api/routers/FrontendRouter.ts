@@ -408,6 +408,14 @@ export function createFrontendRouter(
     applyControllerResult(ctx, result)
   })
 
+  router.get('/installMetamask', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeHatchController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
     '/escape/:positionOrVaultId',
     withTypedContext(
@@ -503,6 +511,14 @@ export function createFrontendRouter(
   router.get('/tos', async (ctx) => {
     const givenUser = getGivenUser(ctx)
     const result = await termsOfServiceController.getTermsOfServicePage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get('/installMetaMask', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await termsOfServiceController.getInstallMetaMaskPage(
       givenUser
     )
     applyControllerResult(ctx, result)

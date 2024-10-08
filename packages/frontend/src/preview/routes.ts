@@ -22,6 +22,7 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderInstallMetaMaskPage,
   renderMerkleProofPage,
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
@@ -282,6 +283,19 @@ const routes: Route[] = [
             token: AssetHash.fake(),
           }),
         },
+      })
+    },
+  },
+  {
+    path: '/installMetaMask',
+    description: 'Request to install MetaMask.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      ctx.body = renderInstallMetaMaskPage({
+        context,
       })
     },
     breakAfter: true,

@@ -1,4 +1,7 @@
-import { renderTermsOfServicePage } from '@explorer/frontend'
+import {
+  renderInstallMetaMaskPage,
+  renderTermsOfServicePage,
+} from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -28,6 +31,19 @@ export class TermsOfServiceController {
       content: renderTermsOfServicePage({
         context,
         contents,
+      }),
+    }
+  }
+
+  async getInstallMetaMaskPage(
+    givenUser: Partial<UserDetails>
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+
+    return {
+      type: 'success',
+      content: renderInstallMetaMaskPage({
+        context,
       }),
     }
   }
