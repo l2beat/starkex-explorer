@@ -38,7 +38,7 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
             as="a"
             href="?performUserActions=true"
             variant="outlined"
-            className="w-full sm:w-1/2 mx-auto lg:w-48"
+            className="mx-auto w-full sm:w-1/2 lg:w-48"
           >
             Enable
           </Button>
@@ -48,11 +48,11 @@ export function PerformUserActionsPanel(props: PerformUserActionsPanelProps) {
   ) : (
     <section>
       <Card className="flex flex-col gap-3 bg-yellow-300 bg-opacity-20">
-        <div className='flex'>
-        <InfoIcon className='mt-px mr-1.5 fill-yellow-300 shrink-0'/>
-        <p className="font-bold text-yellow-300 leading-tight">
-          You have enabled performing actions for this user
-        </p>
+        <div className="flex">
+          <InfoIcon className="mr-1.5 mt-px shrink-0 fill-yellow-300" />
+          <p className="font-bold leading-tight text-yellow-300">
+            You have enabled performing actions for this user
+          </p>
         </div>
         <p className="mb-1.5 text-sm font-semibold leading-tight">
           You are not connected to this user's wallet. You can still perform
