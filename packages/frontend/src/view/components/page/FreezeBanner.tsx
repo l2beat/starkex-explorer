@@ -26,7 +26,7 @@ export function FreezeBanner({
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-red-500 px-6 py-0.5 text-center text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-yellow-300 px-6 py-0.5 text-center text-black">
         <span>This exchange is frozen and no longer operates normally. </span>
       </div>
     )
@@ -54,7 +54,7 @@ function DydxSunsetFreezeBanner({
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-red-500 py-1.5 text-center text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-yellow-300 py-1.5 text-center text-black">
         <span>
           ⚠️ dYdX v3 has been discontinued and the exchange contracts are
           frozen. Use the{' '}
