@@ -2,7 +2,6 @@ import React from 'react'
 
 import { Favicons } from './Favicons'
 import { MetaTags } from './MetaTags'
-import { PageContext, PageContextWithUser } from '@explorer/shared'
 
 interface HeadProps {
   isDydx: boolean
