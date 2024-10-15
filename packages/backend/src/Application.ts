@@ -82,6 +82,7 @@ import { PreprocessedStateDetailsRepository } from './peripherals/database/Prepr
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserL2TransactionsStatisticsRepository } from './peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
+import { PricesRepository } from './peripherals/database/PricesRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
@@ -129,6 +130,7 @@ export class Application {
 
     const kvStore = new KeyValueStore(database, logger)
 
+    const pricesRepository = new PricesRepository(database, logger)
     const verifierEventRepository = new VerifierEventRepository(
       database,
       logger
@@ -607,6 +609,7 @@ export class Application {
       pageContextService,
       assetDetailsService,
       preprocessedAssetHistoryRepository,
+      pricesRepository,
       sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
