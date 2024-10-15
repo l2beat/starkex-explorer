@@ -596,10 +596,10 @@ function toUserAssetEntry(
     },
     balance: asset.balance,
     value:
-      assetPrice !== undefined
-        ? asset.assetHashOrId === collateralAssetId
-          ? asset.balance / 10000n // TODO: use the correct decimals
-          : getAssetValueUSDCents(asset.balance, assetPrice.price)
+      asset.assetHashOrId === collateralAssetId
+        ? asset.balance / 10000n // TODO: use the correct decimals
+        : assetPrice !== undefined
+        ? getAssetValueUSDCents(asset.balance, assetPrice.price)
         : undefined,
 
     vaultOrPositionId: asset.positionOrVaultId.toString(),
