@@ -220,12 +220,19 @@ export function createFrontendRouter(
         params: z.object({
           starkKey: stringAs(StarkKey),
         }),
+        query: z.object({
+          performUserActions: z
+            .string()
+            .transform((value) => value === 'true')
+            .optional(),
+        }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          ctx.params.starkKey
+          ctx.params.starkKey,
+          ctx.query.performUserActions
         )
         applyControllerResult(ctx, result)
       }
