@@ -58,10 +58,13 @@ export function Page(props: Props) {
           path={props.path}
           isPreview={isPreview}
         />
-        <FreezeBanner freezeStatus={props.context.freezeStatus} />
+        <FreezeBanner
+          instanceName={props.context.instanceName}
+          freezeStatus={props.context.freezeStatus}
+        />
         <GradientBackground />
         {props.children}
-        <Footer />
+        <Footer context={props.context} />
         <Tooltip />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />

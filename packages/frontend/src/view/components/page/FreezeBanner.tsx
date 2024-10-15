@@ -1,25 +1,101 @@
-import { FreezeStatus } from '@explorer/shared'
+import { FreezeStatus, InstanceName } from '@explorer/shared'
 import React from 'react'
 
-export function FreezeBanner({ freezeStatus }: { freezeStatus: FreezeStatus }) {
+export function FreezeBanner({
+  instanceName,
+  freezeStatus,
+}: {
+  instanceName: InstanceName
+  freezeStatus: FreezeStatus
+}) {
+  if (instanceName === 'dYdX') {
+    return <DydxSunsetFreezeBanner freezeStatus={freezeStatus} />
+  }
+
   if (freezeStatus === 'freezable') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-brand px-6 py-0.5 text-center text-white">
+      <InfoBanner>
         <span>
           This exchange can be frozen due to inactivity of the operator.
         </span>
         <a href="/freeze" className="underline">
           Read more
         </a>
-      </div>
+      </InfoBanner>
     )
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-4 bg-red-500 px-6 py-0.5 text-center text-white">
+      <WarningBanner>
         <span>This exchange is frozen and no longer operates normally. </span>
-      </div>
+      </WarningBanner>
     )
   }
   return null
+}
+
+function DydxSunsetFreezeBanner({
+  freezeStatus,
+}: {
+  freezeStatus: FreezeStatus
+}) {
+  if (freezeStatus === 'frozen') {
+    return (
+      <WarningBanner>
+        <span>
+          ⚠️ dYdX v3 has been discontinued and the exchange contracts are
+          frozen. Use the{' '}
+          <a href="/tutorials/escapehatch" className="underline">
+            Escape Hatch
+          </a>{' '}
+          functionality to withdraw your funds.
+        </span>
+      </WarningBanner>
+    )
+  }
+
+  return (
+    <InfoBanner>
+      {freezeStatus === 'freezable' ? (
+        <>
+          <span>
+            dYdX v3 is undergoing a planned shutdown and the operator is
+            inactive. Currently, anyone can freeze the exchange.
+          </span>{' '}
+          <a href="/freeze" className="underline">
+            Read more
+          </a>
+        </>
+      ) : (
+        <>
+          <span>
+            dYdX v3 is scheduled to shut down on October 28th at 12:05 P.M. UTC.
+          </span>{' '}
+          <a
+            href="https://dydx.exchange/blog/v3-product-sunset"
+            target="_blank"
+            className="underline"
+          >
+            Read more
+          </a>
+        </>
+      )}
+    </InfoBanner>
+  )
+}
+
+function InfoBanner({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-balance sticky top-0 z-50 bg-brand px-6 py-0.5 text-center text-sm leading-tight text-white md:text-lg md:leading-normal">
+      {children}
+    </div>
+  )
+}
+
+function WarningBanner({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-balance sticky top-0 z-50 bg-yellow-300 px-6 py-0.5 text-center text-sm leading-tight text-black md:text-lg md:leading-normal">
+      {children}
+    </div>
+  )
 }

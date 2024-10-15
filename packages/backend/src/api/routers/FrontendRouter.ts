@@ -12,6 +12,7 @@ import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
+import { TermsOfServiceController } from '../controllers/TermsOfServiceController'
 import { TransactionController } from '../controllers/TransactionController'
 import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
@@ -32,6 +33,7 @@ export function createFrontendRouter(
   l2TransactionController: L2TransactionController,
   escapeHatchController: EscapeHatchController,
   tutorialController: TutorialController,
+  termsOfServiceController: TermsOfServiceController,
   config: Config
 ) {
   const router = new Router()
@@ -218,12 +220,19 @@ export function createFrontendRouter(
         params: z.object({
           starkKey: stringAs(StarkKey),
         }),
+        query: z.object({
+          performUserActions: z
+            .string()
+            .transform((value) => value === 'true')
+            .optional(),
+        }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          ctx.params.starkKey
+          ctx.params.starkKey,
+          ctx.query.performUserActions
         )
         applyControllerResult(ctx, result)
       }
@@ -497,6 +506,14 @@ export function createFrontendRouter(
       }
     )
   )
+
+  router.get('/tos', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await termsOfServiceController.getTermsOfServicePage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
 
   if (config.starkex.tradingMode === 'perpetual') {
     if (!forcedTradeOfferController) {
