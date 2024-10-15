@@ -2,6 +2,7 @@ import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Button } from '../../../components/Button'
+import { TermsOfServiceAck } from '../../../components/TermsOfServiceAck'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
@@ -32,6 +33,7 @@ export function NewPerpetualForcedWithdrawalFormContent(
           <AmountInput asset={props.asset} />
         </ForcedActionCard>
       </div>
+      <TermsOfServiceAck prefix="By initiating this action you agree to our" />
       <div className="flex flex-col gap-2">
         <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Prepare for withdrawal

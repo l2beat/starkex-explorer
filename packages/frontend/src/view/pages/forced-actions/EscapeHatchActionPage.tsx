@@ -13,6 +13,7 @@ import { Card } from '../../components/Card'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { TermsOfServiceAck } from '../../components/TermsOfServiceAck'
 import { reactToHtml } from '../../reactToHtml'
 import { PerformUserActionsPanel } from '../user/components/PerformUserActionsPanel'
 
@@ -53,8 +54,8 @@ function EscapeHatchActionPage(props: Props) {
   const userJson = JSON.stringify(context.user)
   const steps = [
     <>Initiating (verifying) the escape (on this page)</>,
-    <>Finalizing the escape (on user page)</>,
-    <>Withdrawing the funds (on user page) </>,
+    <>Finalizing the escape (on User Page)</>,
+    <>Withdrawing the funds (on User Page)</>,
   ]
   return (
     <Page
@@ -73,22 +74,27 @@ function EscapeHatchActionPage(props: Props) {
             <div className="hidden text-xxl font-semibold lg:block">
               Escape your funds
             </div>
-            <span className="text-md font-medium text-zinc-500 lg:mt-3">
+            <span className="font-medium text-zinc-500 lg:mt-3">
               The exchange is frozen, preventing it from executing regular
               operations or supporting standard actions.
             </span>
-            <span className="text-md font-medium text-zinc-500">
+            <span className="font-medium text-zinc-500">
               You have the option to request a withdrawal of the entire value of
               any position to position's owner address by activating an 'escape
               hatch.' This process involves interacting with an Ethereum
               contract, which calculates the total value of the position,
               including any open trades and funding rates.
             </span>
+            <span className="font-bold">
+              Ultimately the funds will be withdraw to the Ethereum address of
+              the position's owner, regardless of the wallet used to perform the
+              Escape Hatch transactions.
+            </span>
             <span>The escape process consists of three steps:</span>
             <OrderedList items={steps} />
-            <span className="text-md font-medium text-zinc-500">
+            <span className="font-medium text-zinc-500">
               Please note, the execution of an Escape can be expensive due to
-              Ethereum gas cost.
+              the Ethereum gas cost.
             </span>
           </div>
           <Card className="row-start-1 h-min lg:col-start-2">
@@ -111,6 +117,7 @@ function EscapeHatchActionPage(props: Props) {
                   </span>
                 </span>
               </div>
+              <TermsOfServiceAck prefix="By initiating the escape process, you agree to our" />
               <Button className="w-full" size="lg">
                 Initiate Escape
               </Button>
