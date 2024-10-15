@@ -2,8 +2,10 @@ import React from 'react'
 
 import { Favicons } from './Favicons'
 import { MetaTags } from './MetaTags'
+import { PageContext, PageContextWithUser } from '@explorer/shared'
 
 interface HeadProps {
+  isDydx: boolean
   title: string
   description: string
   image: string
@@ -19,7 +21,7 @@ export function Head(props: HeadProps) {
       {props.stylesheets.map((href, i) => (
         <link key={i} rel="stylesheet" href={href} />
       ))}
-      <Favicons />
+      <Favicons isDydx={props.isDydx} />
       <MetaTags
         title={props.title}
         description={props.description}
