@@ -24,7 +24,7 @@ interface UserAssetsTableProps {
 export interface UserAssetEntry {
   asset: Asset
   balance: bigint
-  value: bigint
+  value: bigint | undefined
   vaultOrPositionId: string
   action:
     | 'WITHDRAW'
@@ -62,7 +62,9 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               </span>
               {props.tradingMode === 'perpetual' && (
                 <span className="mt-2 text-xxs text-zinc-500">
-                  {formatWithDecimals(entry.value, 2, { prefix: '$' })}
+                  {entry.value
+                    ? formatWithDecimals(entry.value, 2, { prefix: '$' })
+                    : 'Unknown price'}
                 </span>
               )}
             </div>,
