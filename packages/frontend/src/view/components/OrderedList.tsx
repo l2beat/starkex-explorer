@@ -27,7 +27,7 @@ interface IndexProps {
 }
 function Index({ index }: IndexProps) {
   return (
-    <span className="absolute -left-6 h-6 w-6 shrink-0 rounded-lg bg-brand text-center">
+    <span className="absolute -left-6 h-6 w-6 shrink-0 rounded-lg bg-zinc-500 text-center group-first:bg-brand">
       {index + 1}
     </span>
   )
