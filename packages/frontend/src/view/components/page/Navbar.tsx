@@ -32,7 +32,8 @@ export function Navbar({
         >
           <ProjectLogo instanceName={instanceName} />
           <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
-            {instanceName.toUpperCase()}{' '}
+            {instanceName === 'dYdX' ? 'dYdX' : instanceName.toUpperCase()}{' '}
+            {instanceName === 'dYdX' ? 'v3' : ''}{' '}
             {isFork ? 'FORK' : isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
