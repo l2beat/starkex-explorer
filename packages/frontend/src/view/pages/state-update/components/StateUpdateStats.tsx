@@ -5,13 +5,13 @@ import React, { ReactNode } from 'react'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { Card } from '../../../components/Card'
 import { EtherscanLink } from '../../../components/EtherscanLink'
-import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { LongHash } from '../../../components/LongHash'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
-  transactionHash: Hash256
+  blockNumber: number
+  stateTransitionHash: Hash256
   balancesTreeRootHash: PedersenHash
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
@@ -34,25 +34,30 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
       <Card>
         <div>
           <div className="flex flex-col justify-between gap-6 sm:flex-row">
-            <ValueItem label="Transaction hash">
+            <ValueItem label="Block number">
               <EtherscanLink
                 chainId={props.context.chainId}
-                type="tx"
-                txHash={props.transactionHash.toString()}
+                type="block"
+                blockNumber={props.blockNumber}
               >
-                <InlineEllipsis className="max-w-[280px] sm:max-w-[250px] lg:max-w-md">
-                  {props.transactionHash.toString()}
-                </InlineEllipsis>
+                {props.blockNumber.toString()}
               </EtherscanLink>
             </ValueItem>
             <ValueItem label="Ethereum block timestamp">
               {formatTimestamp(props.ethereumTimestamp)} UTC
             </ValueItem>
           </div>
-          <div className="mt-8 flex flex-col">
+          <div className="mt-8">
             <ValueItem label="Balances tree root">
               <LongHash withCopy>
                 0x{props.balancesTreeRootHash.toString()}
+              </LongHash>
+            </ValueItem>
+          </div>
+          <div className="mt-8">
+            <ValueItem label="State transition hash">
+              <LongHash withCopy>
+                0x{props.stateTransitionHash.toString()}
               </LongHash>
             </ValueItem>
           </div>

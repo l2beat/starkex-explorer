@@ -118,7 +118,8 @@ export class StateUpdateController {
     const content = renderStateUpdatePage({
       context,
       id: stateUpdateId.toString(),
-      transactionHash: stateUpdate.stateTransitionHash,
+      blockNumber: stateUpdate.blockNumber,
+      stateTransitionHash: stateUpdate.stateTransitionHash,
       balancesTreeRootHash: stateUpdate.rootHash,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
