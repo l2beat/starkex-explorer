@@ -106,7 +106,10 @@ function NewSpotForcedWithdrawalPage(props: Props) {
               </ForcedActionCard>
             </div>
             <div className="flex flex-col gap-2">
-              <TermsOfServiceAck prefix="By initiating this action you agree to our" />
+              <TermsOfServiceAck
+                prefix="By initiating this action you agree to our"
+                instanceName={props.context.instanceName}
+              />
               <Button className="w-full" size="lg">
                 Prepare for withdrawal
               </Button>
