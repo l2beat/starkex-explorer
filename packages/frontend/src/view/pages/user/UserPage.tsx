@@ -135,8 +135,8 @@ function UserPage(props: UserPageProps) {
               content: (
                 <>
                   <InfoBanner className="mb-3">
-                    Guaranteed state of balance (proven on Ethereum), updated
-                    every few hours
+                    State of assets (proven on Ethereum), updated every few
+                    hours
                   </InfoBanner>
                   <TablePreview
                     viewAllPosition="bottom"
