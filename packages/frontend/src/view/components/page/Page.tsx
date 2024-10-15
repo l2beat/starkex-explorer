@@ -36,7 +36,7 @@ export function Page(props: Props) {
         isDydx={isDydx}
         description={props.description}
         image={
-          props.image ?? isDydx ? '/og-image.png' : '/images/meta-image.png'
+          props.image ?? '/images/meta-image.png'
         }
         title={combineTitle(
           props.baseTitle ?? `${props.context.instanceName} Explorer`,
