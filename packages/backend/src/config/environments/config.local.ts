@@ -25,7 +25,7 @@ export function getLocalConfig(env: Env): Config {
       ...starkexConfig,
       blockchain: {
         ...starkexConfig.blockchain,
-        chainId: isHardhatFork ? 31337 : starkexConfig.blockchain.chainId,
+        chainId: starkexConfig.blockchain.chainId,
         jsonRpcUrl: isHardhatFork
           ? 'http://localhost:8545'
           : starkexConfig.blockchain.jsonRpcUrl,

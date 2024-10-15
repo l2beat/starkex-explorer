@@ -18,9 +18,8 @@ export interface RecoveredKeys {
 
 export async function recoverKeysDydx(
   account: EthereumAddress,
-  chainId: number
 ): Promise<RecoveredKeys> {
-  const ethSignature = await Wallet.signDydxKey(account, chainId)
+  const ethSignature = await Wallet.signDydxKey(account)
   const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '00')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
@@ -28,9 +27,8 @@ export async function recoverKeysDydx(
 
 export async function recoverKeysDydxLegacy(
   account: EthereumAddress,
-  chainId: number
 ): Promise<RecoveredKeys> {
-  const ethSignature = await Wallet.signDydxKeyLegacy(account, chainId)
+  const ethSignature = await Wallet.signDydxKeyLegacy(account)
   const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '03')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }

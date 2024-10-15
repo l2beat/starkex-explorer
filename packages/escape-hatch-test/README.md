@@ -54,7 +54,7 @@ yarn console
 ```
 Network name: Hardhat Fork
 RPC URL: http://localhost:8545
-Chain ID: 31337
+Chain ID: 1
 Currency symbol: ETH
 ```
 

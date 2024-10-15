@@ -11,6 +11,7 @@ const config: HardhatUserConfig = {
   solidity: '0.8.18',
   networks: {
     hardhat: {
+      chainId: 1,
       accounts: [],
       forking: {
         url: env.string('JSON_RPC_URL'),

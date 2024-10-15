@@ -35,8 +35,6 @@ export function EtherscanLink(props: EtherscanLinkProps) {
 function getLink(chainId: number): `https://${string}` {
   switch (chainId) {
     case 1:
-    case 31337:
-      // 31337 - Hardhat fork chainId
       return 'https://etherscan.io'
     case 5:
       return 'https://goerli.etherscan.io'
