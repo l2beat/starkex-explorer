@@ -11,7 +11,6 @@ import { L2TransactionController } from './api/controllers/L2TransactionControll
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
-import { TermsOfServiceController } from './api/controllers/TermsOfServiceController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { TutorialController } from './api/controllers/TutorialController'
@@ -689,10 +688,6 @@ export class Application {
       tutorialService
     )
 
-    const termsOfServiceController = new TermsOfServiceController(
-      pageContextService
-    )
-
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -708,7 +703,6 @@ export class Application {
           l2TransactionController,
           escapeHatchController,
           tutorialController,
-          termsOfServiceController,
           config
         ),
         createTransactionRouter(
