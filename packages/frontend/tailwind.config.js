@@ -80,6 +80,7 @@ module.exports = {
       black: '#060606',
       brand: '#5F5CFF',
       'brand-darker': '#4F4CD7',
+      warning: '#B8860B',
     },
   },
   plugins: [
