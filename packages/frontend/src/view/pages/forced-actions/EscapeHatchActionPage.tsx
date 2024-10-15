@@ -124,7 +124,10 @@ function EscapeHatchActionPage(props: Props) {
                   </span>
                 </span>
               </div>
-              <TermsOfServiceAck prefix="By initiating the escape process, you agree to our" />
+              <TermsOfServiceAck
+                prefix="By initiating the escape process, you agree to our"
+                instanceName={props.context.instanceName}
+              />
               <Button className="w-full" size="lg">
                 Initiate Escape
               </Button>
