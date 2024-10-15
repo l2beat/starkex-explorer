@@ -40,7 +40,7 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
                 type="block"
                 blockNumber={props.blockNumber}
               >
-                  {props.blockNumber.toString()}
+                {props.blockNumber.toString()}
               </EtherscanLink>
             </ValueItem>
             <ValueItem label="Ethereum block timestamp">
@@ -61,7 +61,6 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
               </LongHash>
             </ValueItem>
           </div>
-
         </div>
       </Card>
     </section>

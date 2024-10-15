@@ -298,8 +298,7 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
-        blockNumber: randomInt(11906388, 20968939
-        ),
+        blockNumber: randomInt(11906388, 20968939),
         stateTransitionHash: Hash256.fake(),
         balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
@@ -330,8 +329,7 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
-        blockNumber: randomInt(11906388, 20968939
-        ),
+        blockNumber: randomInt(11906388, 20968939),
         stateTransitionHash: Hash256.fake(),
         balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
