@@ -10,6 +10,7 @@ import { z } from 'zod'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -80,10 +81,16 @@ function EscapeHatchActionPage(props: Props) {
             </span>
             <span className="font-medium text-zinc-500">
               You have the option to request a withdrawal of the entire value of
-              any position to position's owner address by activating an 'escape
-              hatch.' This process involves interacting with an Ethereum
-              contract, which calculates the total value of the position,
-              including any open trades and funding rates.
+              any position by activating an{' '}
+              <Link
+                href="/tutorials/escapehatch"
+                className="underline-offset-auto"
+              >
+                Escape Hatch
+              </Link>
+              . This process involves interacting with an Ethereum contract,
+              which calculates the total value of the position, including any
+              open trades and funding rates.
             </span>
             <span className="font-bold">
               Ultimately the funds will be withdraw to the Ethereum address of
