@@ -86,7 +86,7 @@ function EscapeHatchActionPage(props: Props) {
                 href="/tutorials/escapehatch"
                 className="underline-offset-auto"
               >
-                escape hatch
+                Escape Hatch
               </Link>
               . This process involves interacting with an Ethereum contract,
               which calculates the total value of the position, including any
