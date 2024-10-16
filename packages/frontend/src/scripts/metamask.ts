@@ -32,7 +32,7 @@ export function initMetamask() {
   if (!provider) {
     updateAccounts([])
     connectButton?.addEventListener('click', () => {
-      window.open('https://metamask.io/download/')
+      window.open('/metamask-required', '_self')
     })
     return
   }
