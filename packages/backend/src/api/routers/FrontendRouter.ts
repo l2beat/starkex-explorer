@@ -516,7 +516,7 @@ export function createFrontendRouter(
     applyControllerResult(ctx, result)
   })
 
-  router.get('/installMetaMask', async (ctx) => {
+  router.get('/metamask-required', async (ctx) => {
     const givenUser = getGivenUser(ctx)
     const result = await termsOfServiceController.getInstallMetaMaskPage(
       givenUser

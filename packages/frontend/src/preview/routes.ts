@@ -287,7 +287,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/installMetaMask',
+    path: '/metamask-required',
     description: 'Request to install MetaMask.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx, {
