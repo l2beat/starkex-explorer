@@ -12,7 +12,7 @@ import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
-import { TermsOfServiceController } from '../controllers/TermsOfServiceController'
+import { StaticPageController } from '../controllers/StaticPageController'
 import { TransactionController } from '../controllers/TransactionController'
 import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
@@ -33,7 +33,7 @@ export function createFrontendRouter(
   l2TransactionController: L2TransactionController,
   escapeHatchController: EscapeHatchController,
   tutorialController: TutorialController,
-  termsOfServiceController: TermsOfServiceController,
+  staticPageController: StaticPageController,
   config: Config
 ) {
   const router = new Router()
@@ -209,6 +209,15 @@ export function createFrontendRouter(
   router.get('/users/recover', async (ctx) => {
     const givenUser = getGivenUser(ctx)
     const result = await userController.getUserRecoverPage(givenUser)
+
+    applyControllerResult(ctx, result)
+  })
+
+  router.get('/users/not-associated', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await staticPageController.getUserNotAssociatedPage(
+      givenUser
+    )
 
     applyControllerResult(ctx, result)
   })
@@ -510,17 +519,13 @@ export function createFrontendRouter(
 
   router.get('/tos', async (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = await termsOfServiceController.getTermsOfServicePage(
-      givenUser
-    )
+    const result = await staticPageController.getTermsOfServicePage(givenUser)
     applyControllerResult(ctx, result)
   })
 
   router.get('/metamask-required', async (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = await termsOfServiceController.getInstallMetaMaskPage(
-      givenUser
-    )
+    const result = await staticPageController.getInstallMetaMaskPage(givenUser)
     applyControllerResult(ctx, result)
   })
 

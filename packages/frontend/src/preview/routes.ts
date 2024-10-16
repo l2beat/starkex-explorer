@@ -37,6 +37,7 @@ import {
   renderTutorialPage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserNotAssociatedPage,
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
@@ -428,6 +429,18 @@ const routes: Route[] = [
         fallbackToFakeUser: true,
       })
       ctx.body = renderUserRecoverPage({
+        context,
+      })
+    },
+  },
+  {
+    path: '/users/not-associated',
+    description: 'User not associated with any position page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      ctx.body = renderUserNotAssociatedPage({
         context,
       })
     },
