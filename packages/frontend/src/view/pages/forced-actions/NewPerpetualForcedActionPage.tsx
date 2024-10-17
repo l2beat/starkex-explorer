@@ -70,6 +70,7 @@ function NewPerpetualForcedActionPage(
                 positionOrVaultId={props.positionOrVaultId}
                 asset={props.asset}
                 starkKey={props.starkKey}
+                instanceName={props.context.instanceName}
               />
             ) : (
               <NewPerpetualForcedTradeFormContent
@@ -77,6 +78,7 @@ function NewPerpetualForcedActionPage(
                 asset={props.asset}
                 starkKey={props.starkKey}
                 collateralAsset={props.context.collateralAsset}
+                instanceName={props.context.instanceName}
               />
             )}
           </form>

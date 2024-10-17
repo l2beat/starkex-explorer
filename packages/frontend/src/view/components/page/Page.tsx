@@ -25,6 +25,7 @@ interface Props {
 export function Page(props: Props) {
   const isDebug = process.env.DEBUG === 'true'
   const isPreview = process.env.DEPLOYMENT_ENV === 'preview'
+  const isDydx = props.context.instanceName === 'dYdX'
   return (
     <html
       lang="en"
@@ -32,15 +33,17 @@ export function Page(props: Props) {
       data-chain-id={props.context.chainId}
     >
       <Head
+        isDydx={isDydx}
         description={props.description}
         image={props.image ?? '/images/meta-image.png'}
         title={combineTitle(
-          props.baseTitle ?? `L2BEAT ${props.context.instanceName} Explorer`,
+          props.baseTitle ?? `${props.context.instanceName} Explorer`,
           props.title
         )}
         url={combineUrl(
-          props.baseUrl ??
-            `https://${props.context.instanceName.toLowerCase()}.l2beat.com`,
+          props.baseUrl ?? isDydx
+            ? 'https://explorer.dydx.exchange'
+            : `https://${props.context.instanceName.toLowerCase()}.l2beat.com`,
           props.path
         )}
         stylesheets={

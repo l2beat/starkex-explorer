@@ -1,9 +1,10 @@
-import { CollateralAsset } from '@explorer/shared'
+import { CollateralAsset, InstanceName } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { ArrowDownIcon } from '../../../assets/icons/ArrowIcon'
 import { Button } from '../../../components/Button'
+import { TermsOfServiceAck } from '../../../components/TermsOfServiceAck'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
@@ -16,6 +17,7 @@ interface NewPerpetualForcedTradeFormContentProps {
   starkKey: StarkKey
   asset: NewForcedActionFormAsset
   collateralAsset: CollateralAsset
+  instanceName: InstanceName
 }
 
 export function NewPerpetualForcedTradeFormContent(
@@ -51,6 +53,10 @@ export function NewPerpetualForcedTradeFormContent(
           <TotalInput assetId={props.collateralAsset.assetId} />
         </ForcedActionCard>
       </div>
+      <TermsOfServiceAck
+        prefix="By initiating this action you agree to our"
+        instanceName={props.instanceName}
+      />
       <div className="flex flex-col gap-2">
         <Button className="w-full" size="lg" id={FormId.SubmitButton}>
           Create {label} offer

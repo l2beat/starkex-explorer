@@ -12,7 +12,6 @@ import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
-import { StaticPageController } from '../controllers/StaticPageController'
 import { TransactionController } from '../controllers/TransactionController'
 import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
@@ -20,6 +19,7 @@ import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
 import { addSpotTradingRoutes } from './SpotFrontendRouter'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser, getPagination } from './utils'
+import { StaticPageController } from '../controllers/StaticPageController'
 
 export function createFrontendRouter(
   homeController: HomeController,
@@ -229,12 +229,19 @@ export function createFrontendRouter(
         params: z.object({
           starkKey: stringAs(StarkKey),
         }),
+        query: z.object({
+          performUserActions: z
+            .string()
+            .transform((value) => value === 'true')
+            .optional(),
+        }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          ctx.params.starkKey
+          ctx.params.starkKey,
+          ctx.query.performUserActions
         )
         applyControllerResult(ctx, result)
       }
@@ -516,18 +523,6 @@ export function createFrontendRouter(
       }
     )
   )
-
-  router.get('/tos', async (ctx) => {
-    const givenUser = getGivenUser(ctx)
-    const result = await staticPageController.getTermsOfServicePage(givenUser)
-    applyControllerResult(ctx, result)
-  })
-
-  router.get('/metamask-required', async (ctx) => {
-    const givenUser = getGivenUser(ctx)
-    const result = await staticPageController.getInstallMetaMaskPage(givenUser)
-    applyControllerResult(ctx, result)
-  })
 
   if (config.starkex.tradingMode === 'perpetual') {
     if (!forcedTradeOfferController) {

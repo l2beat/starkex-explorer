@@ -1,6 +1,18 @@
 import React from 'react'
 
-export function Favicons() {
+export function Favicons({ isDydx }: { isDydx: boolean }) {
+  if (isDydx) {
+    return (
+      <>
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href="https://dydx.trade/favicon.svg"
+        />
+      </>
+    )
+  }
+
   return (
     <>
       {/* <link rel="shortcut icon" href="/favicon.png" />

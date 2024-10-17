@@ -313,7 +313,8 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
-        transactionHash: Hash256.fake(),
+        blockNumber: randomInt(11906388, 20968939),
+        stateTransitionHash: Hash256.fake(),
         balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
@@ -343,7 +344,8 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
-        transactionHash: Hash256.fake(),
+        blockNumber: randomInt(11906388, 20968939),
+        stateTransitionHash: Hash256.fake(),
         balancesTreeRootHash: PedersenHash.fake(),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
@@ -1175,6 +1177,74 @@ const routes: Route[] = [
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
         escapableAssets: [],
+      })
+    },
+  },
+  {
+    path: '/users/someone/exchange-frozen',
+    description: 'Someone user page, the exchange is frozen.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+
+      ctx.body = renderUserPage({
+        context: context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [
+          randomUserAssetEntry('ESCAPE', { hashOrId: AssetId('USDC-6') }),
+          ...repeat(7, () => randomUserAssetEntry('USE_COLLATERAL_ESCAPE')),
+        ],
+        totalAssets: 18,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 6999,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+        escapableAssets: [],
+      })
+    },
+  },
+  {
+    path: '/users/someone/exchange-frozen/performUserActions',
+    description:
+      'Someone user page, the exchange is frozen. You can perform actions for them.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+
+      ctx.body = renderUserPage({
+        context: context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [
+          randomUserAssetEntry('ESCAPE', { hashOrId: AssetId('USDC-6') }),
+          ...repeat(7, () => randomUserAssetEntry('USE_COLLATERAL_ESCAPE')),
+        ],
+        totalAssets: 18,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 6999,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+        escapableAssets: [],
+        performUserActions: true,
       })
     },
   },

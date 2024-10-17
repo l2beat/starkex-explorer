@@ -3,7 +3,6 @@ import classNames from 'classnames'
 import React from 'react'
 
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
-import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
@@ -31,12 +30,10 @@ export function Navbar({
           className="flex items-center justify-center gap-2 divide-x sm:gap-4"
           href="/"
         >
-          <div className="flex items-center justify-center gap-2 sm:gap-4">
-            <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-            <ProjectLogo instanceName={instanceName} />
-          </div>
+          <ProjectLogo instanceName={instanceName} />
           <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
-            {instanceName.toUpperCase()}{' '}
+            {instanceName === 'dYdX' ? 'dYdX' : instanceName.toUpperCase()}{' '}
+            {instanceName === 'dYdX' ? 'v3' : ''}{' '}
             {isFork ? 'FORK' : isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>

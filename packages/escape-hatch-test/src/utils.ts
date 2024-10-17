@@ -2,6 +2,10 @@ import * as helpers from '@nomicfoundation/hardhat-toolbox/network-helpers'
 import { ethers } from 'ethers'
 
 export class HardhatUtils {
+  USDC_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+  ERC20_ABI = [
+    'function balanceOf(address _owner) public view returns (uint256 balance)'
+  ]
   PERPETUAL_ABI = [
     'function isFrozen() public view returns (bool)',
     'function forcedWithdrawalRequest(uint256,uint256,uint256,bool) external',
@@ -59,6 +63,15 @@ export class HardhatUtils {
 
   async getBalanceOf(address: string) {
     return this.provider.getBalance(address)
+  }
+
+  async getUSDCBalance(address: string) {
+    const usdc = new ethers.Contract(
+      this.USDC_ADDRESS,
+      this.ERC20_ABI,
+      this.provider
+    )
+    return await usdc.balanceOf(address)
   }
 
   async triggerFreezable() {

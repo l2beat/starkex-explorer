@@ -80,7 +80,7 @@ function getTrustWalletImageUrl(address: string) {
 }
 
 function getDydxImageUrl(symbol: string) {
-  return `https://trade.dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
+  return `https://dydx.trade/currencies/${symbol.toLowerCase()}.png`
 }
 
 const perpetualsInfo: Record<string, Omit<AssetInfo, 'imageUrl'>> = {

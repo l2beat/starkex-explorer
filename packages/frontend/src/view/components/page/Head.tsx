@@ -4,6 +4,7 @@ import { Favicons } from './Favicons'
 import { MetaTags } from './MetaTags'
 
 interface HeadProps {
+  isDydx: boolean
   title: string
   description: string
   image: string
@@ -19,7 +20,7 @@ export function Head(props: HeadProps) {
       {props.stylesheets.map((href, i) => (
         <link key={i} rel="stylesheet" href={href} />
       ))}
-      <Favicons />
+      <Favicons isDydx={props.isDydx} />
       <MetaTags
         title={props.title}
         description={props.description}

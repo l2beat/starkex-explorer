@@ -38,6 +38,10 @@ import { sumUpTransactionCount } from '../../peripherals/database/PreprocessedL2
 import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
+  PricesRecord,
+  PricesRepository,
+} from '../../peripherals/database/PricesRepository'
+import {
   SentTransactionRecord,
   SentTransactionRepository,
 } from '../../peripherals/database/transactions/SentTransactionRepository'
@@ -61,6 +65,7 @@ export class UserController {
     private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly pricesRepository: PricesRepository,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
@@ -145,7 +150,8 @@ export class UserController {
 
   async getUserPage(
     givenUser: Partial<UserDetails>,
-    starkKey: StarkKey
+    starkKey: StarkKey,
+    performUserActions: boolean | undefined
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
@@ -157,6 +163,7 @@ export class UserController {
     const [
       registeredUser,
       userAssets,
+      assetPrices,
       history,
       l2Transactions,
       preprocessedUserL2TransactionsStatistics,
@@ -176,6 +183,7 @@ export class UserController {
         paginationOpts,
         collateralAsset?.assetId
       ),
+      this.pricesRepository.getAllLatest(),
       this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         paginationOpts
@@ -246,6 +254,7 @@ export class UserController {
         context.tradingMode,
         escapableMap,
         context.freezeStatus,
+        assetPrices,
         collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -316,6 +325,7 @@ export class UserController {
       totalTransactions,
       offers,
       totalOffers: forcedTradeOffersCount,
+      performUserActions,
     })
 
     return { type: 'success', content }
@@ -328,15 +338,19 @@ export class UserController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const [registeredUser, userAssets, userStatistics] = await Promise.all([
-      this.userRegistrationEventRepository.findByStarkKey(starkKey),
-      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
-        starkKey,
-        pagination,
-        collateralAsset?.assetId
-      ),
-      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
-    ])
+    const [registeredUser, userAssets, assetPrices, userStatistics] =
+      await Promise.all([
+        this.userRegistrationEventRepository.findByStarkKey(starkKey),
+        this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
+          starkKey,
+          pagination,
+          collateralAsset?.assetId
+        ),
+        this.pricesRepository.getAllLatest(),
+        this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(
+          starkKey
+        ),
+      ])
 
     if (!userStatistics) {
       return {
@@ -369,6 +383,7 @@ export class UserController {
         context.tradingMode,
         escapableMap,
         context.freezeStatus,
+        assetPrices,
         collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -557,6 +572,7 @@ function toUserAssetEntry(
   tradingMode: TradingMode,
   escapableMap: EscapableMap,
   freezeStatus: FreezeStatus,
+  assetPrices: PricesRecord[],
   collateralAssetId?: AssetId,
   assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
@@ -577,6 +593,10 @@ function toUserAssetEntry(
     }
   }
 
+  // Price from preprocessedAssetHistory is a price from the moment when the position was opened.
+  // We need to use the latest price for the asset from PricesRepository.
+  const assetPrice = assetPrices.find((p) => p.assetId === asset.assetHashOrId)
+
   return {
     asset: {
       hashOrId: asset.assetHashOrId,
@@ -586,11 +606,12 @@ function toUserAssetEntry(
     },
     balance: asset.balance,
     value:
-      asset.price === undefined
-        ? 0n
-        : asset.assetHashOrId === collateralAssetId
+      asset.assetHashOrId === collateralAssetId
         ? asset.balance / 10000n // TODO: use the correct decimals
-        : getAssetValueUSDCents(asset.balance, asset.price),
+        : assetPrice !== undefined
+        ? getAssetValueUSDCents(asset.balance, assetPrice.price)
+        : undefined,
+
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action,
   }
