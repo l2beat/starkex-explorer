@@ -12,6 +12,7 @@ import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
+import { StaticPageController } from '../controllers/StaticPageController'
 import { TransactionController } from '../controllers/TransactionController'
 import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
@@ -19,7 +20,6 @@ import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
 import { addSpotTradingRoutes } from './SpotFrontendRouter'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser, getPagination } from './utils'
-import { StaticPageController } from '../controllers/StaticPageController'
 
 export function createFrontendRouter(
   homeController: HomeController,
