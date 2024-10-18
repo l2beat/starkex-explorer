@@ -21,10 +21,10 @@ function UserNotAssociatedPage(props: UserNotAssociatedPageProps) {
           The wallet is not associated with any active position
         </div>
         <div className="mt-6 font-medium leading-5">
-          It looks like this wallet isn’t associated to any active positions at
-          the moment. Ensure you're connected to the correct wallet. If you're a
-          new user, please allow some time for the blockchain to update -
-          Ethereum transactions may take a few moments to settle.
+          It seems this wallet isn't associated with any active positions at the
+          moment. Please make sure you're connected to the correct wallet. If
+          you're a new user and have recently deposited funds to the exchange,
+          please allow some time for the blockchain to update.
         </div>
       </ContentWrapper>
     </Page>
