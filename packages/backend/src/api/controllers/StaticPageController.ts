@@ -5,7 +5,6 @@ import {
 import { UserDetails } from '@explorer/shared'
 
 import { PageContextService } from '../../core/PageContextService'
-import { getHtmlFromMarkdown } from '../../utils/markdown/getHtmlFromMarkdown'
 import { ControllerResult } from './ControllerResult'
 
 export class StaticPageController {
