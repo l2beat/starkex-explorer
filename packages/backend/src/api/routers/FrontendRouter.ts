@@ -516,12 +516,6 @@ export function createFrontendRouter(
     )
   )
 
-  router.get('/tos', async (ctx) => {
-    const givenUser = getGivenUser(ctx)
-    const result = await staticPageController.getTermsOfServicePage(givenUser)
-    applyControllerResult(ctx, result)
-  })
-
   router.get('/metamask-required', async (ctx) => {
     const givenUser = getGivenUser(ctx)
     const result = await staticPageController.getInstallMetaMaskPage(givenUser)
