@@ -133,6 +133,14 @@ export class UserController {
       }
     }
 
+    const recoveryDoneAutomatically = context.instanceName === 'dYdX'
+    if (recoveryDoneAutomatically) {
+      return {
+        type: 'redirect',
+        url: '/users/not-associated',
+      }
+    }
+
     const content = renderUserRecoverPage({
       context,
     })

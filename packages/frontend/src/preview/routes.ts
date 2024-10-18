@@ -22,6 +22,7 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderInstallMetaMaskPage,
   renderMerkleProofPage,
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
@@ -36,6 +37,7 @@ import {
   renderTutorialPage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserNotAssociatedPage,
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
@@ -284,6 +286,19 @@ const routes: Route[] = [
         },
       })
     },
+  },
+  {
+    path: '/metamask-required',
+    description: 'Request to install MetaMask.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      ctx.body = renderInstallMetaMaskPage({
+        context,
+      })
+    },
     breakAfter: true,
   },
   // #endregion
@@ -416,6 +431,18 @@ const routes: Route[] = [
         fallbackToFakeUser: true,
       })
       ctx.body = renderUserRecoverPage({
+        context,
+      })
+    },
+  },
+  {
+    path: '/users/not-associated',
+    description: 'User not associated with any position page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      ctx.body = renderUserNotAssociatedPage({
         context,
       })
     },

@@ -13,7 +13,7 @@ export function TermsOfServiceAck({
   return instanceName === 'dYdX' ? (
     <div className="text-center">
       {prefix ?? 'By accessing this website, you agree to our '}{' '}
-      <Link href="https://dydx.exchange/terms">Terms of Service</Link>
+      <Link href="https://dydx.exchange/terms">Terms of Use</Link>
     </div>
   ) : null
 }
