@@ -43,6 +43,7 @@ export class PreprocessedAssetHistoryRepository<
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.findByHistoryId = this.wrapFind(this.findByHistoryId)
+    this.getAllCurrent = this.wrapGet(this.getAllCurrent)
     this.getByStateUpdateIdPaginated = this.wrapGet(
       this.getByStateUpdateIdPaginated
     )
@@ -119,6 +120,18 @@ export class PreprocessedAssetHistoryRepository<
     const knex = await this.knex(trx)
     const row = await knex('preprocessed_asset_history').where('id', id).first()
     return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
+  }
+
+  async getAllCurrent(trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const rows = await knex('preprocessed_asset_history').where(
+      'is_current',
+      true
+    )
+
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
   }
 
   async getByStateUpdateIdPaginated(

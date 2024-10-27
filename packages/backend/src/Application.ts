@@ -12,6 +12,7 @@ import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { StaticPageController } from './api/controllers/StaticPageController'
+import { StatsController } from './api/controllers/StatsController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { TutorialController } from './api/controllers/TutorialController'
@@ -671,6 +672,12 @@ export class Application {
       config.starkex.contracts.escapeVerifier
     )
 
+    const statsController = new StatsController(
+      stateUpdater,
+      stateUpdateRepository,
+      preprocessedAssetHistoryRepository
+    )
+
     const transactionValidator = new TransactionValidator(ethereumClient)
 
     const userTransactionController = new TransactionSubmitController(
@@ -710,6 +717,7 @@ export class Application {
           escapeHatchController,
           tutorialController,
           staticPageController,
+          statsController,
           config
         ),
         createTransactionRouter(

@@ -13,6 +13,7 @@ import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { StaticPageController } from '../controllers/StaticPageController'
+import { StatsController } from '../controllers/StatsController'
 import { TransactionController } from '../controllers/TransactionController'
 import { TutorialController } from '../controllers/TutorialController'
 import { UserController } from '../controllers/UserController'
@@ -34,6 +35,7 @@ export function createFrontendRouter(
   escapeHatchController: EscapeHatchController,
   tutorialController: TutorialController,
   staticPageController: StaticPageController,
+  statsController: StatsController,
   config: Config
 ) {
   const router = new Router()
@@ -218,6 +220,12 @@ export function createFrontendRouter(
     const result = await staticPageController.getUserNotAssociatedPage(
       givenUser
     )
+
+    applyControllerResult(ctx, result)
+  })
+
+  router.get('/stats', async (ctx) => {
+    const result = await statsController.getStatsPage()
 
     applyControllerResult(ctx, result)
   })
