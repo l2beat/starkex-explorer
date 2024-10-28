@@ -69,7 +69,8 @@ function DydxSunsetFreezeBanner({
       ) : (
         <>
           <span>
-            dYdX v3 is scheduled to shut down on October 28th at 12:05 P.M. UTC.
+            dYdX v3 has stopped trading. Funds will be withdrawable after
+            October 30, ~14:30 UTC.
           </span>{' '}
           <a
             href="https://dydx.exchange/blog/v3-product-sunset"
