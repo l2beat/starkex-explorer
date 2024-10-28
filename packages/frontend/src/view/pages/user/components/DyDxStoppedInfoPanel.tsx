@@ -14,10 +14,10 @@ export function DydxStoppedInfoPanel(props: DydxStoppedInfoPanelProps) {
   }
   return (
     <section>
-      <Card className="flex flex-col gap-3 bg-opacity-20">
+      <Card className="flex flex-col gap-3 bg-yellow-300 bg-opacity-20">
         <div className="flex">
           <InfoIcon className="mr-1.5 mt-px shrink-0 fill-yellow-300" />
-          <p className="font-bold leading-tight ">
+          <p className="font-bold leading-tight text-yellow-300">
             dYdX v3 has stopped trading.
           </p>
         </div>
