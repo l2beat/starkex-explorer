@@ -20,6 +20,7 @@ import {
   TradingMode,
   UserDetails,
 } from '@explorer/shared'
+import { MerkleProof, PositionLeaf } from '@explorer/state'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
@@ -27,6 +28,7 @@ import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'
+import { StateUpdater } from '../../core/StateUpdater'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
@@ -41,6 +43,7 @@ import {
   PricesRecord,
   PricesRepository,
 } from '../../peripherals/database/PricesRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import {
   SentTransactionRecord,
   SentTransactionRepository,
@@ -53,6 +56,7 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
+import { calculatePositionValue } from '../../utils/calculatePositionValue'
 import { ControllerResult } from './ControllerResult'
 import { getCollateralAssetDetails } from './getCollateralAssetDetails'
 import { EscapableMap, getEscapableAssets } from './getEscapableAssets'
@@ -79,7 +83,9 @@ export class UserController {
     private readonly excludeL2TransactionTypes:
       | L2TransactionTypesToExclude
       | undefined,
-    private readonly exchangeAddress: EthereumAddress
+    private readonly exchangeAddress: EthereumAddress,
+    private readonly stateUpdater: StateUpdater,
+    private readonly stateUpdateRepository: StateUpdateRepository
   ) {}
 
   async getUserRegisterPage(
@@ -293,6 +299,19 @@ export class UserController {
       context.tradingMode === 'perpetual' &&
       escapableAssetHashes.length > 0
 
+    if (
+      !hideAllAssets &&
+      context.tradingMode === 'perpetual' &&
+      userAssets.length > 0
+    ) {
+      const firstAsset = userAssets[0]
+      if (firstAsset !== undefined) {
+        console.log(
+          await this.getPositionValue(firstAsset.positionOrVaultId, context)
+        )
+      }
+    }
+
     const content = renderUserPage({
       context,
       starkKey,
@@ -329,6 +348,32 @@ export class UserController {
     })
 
     return { type: 'success', content }
+  }
+
+  async getPositionValue(positionOrVaultId: bigint, context: PageContext) {
+    if (context.tradingMode !== 'perpetual') {
+      return { escapeWithdrawalAmount: undefined, netFunding: undefined }
+    }
+
+    const merkleProof = await this.stateUpdater.generateMerkleProof(
+      positionOrVaultId
+    )
+
+    const latestStateUpdate = await this.stateUpdateRepository.findLast()
+    if (!latestStateUpdate) {
+      throw new Error('No state update found')
+    }
+    if (!latestStateUpdate.perpetualState) {
+      throw new Error('No perpetual state found')
+    }
+
+    if (!(merkleProof.leaf instanceof PositionLeaf)) {
+      throw new Error('Merkle proof is not for a position')
+    }
+    return calculatePositionValue(
+      merkleProof as MerkleProof<PositionLeaf>,
+      latestStateUpdate.perpetualState
+    )
   }
 
   async getUserAssetsPage(
