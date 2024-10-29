@@ -29,7 +29,7 @@ export function UserProfile({
   chainId,
   ethereumAddress,
   positionValue,
-  collateralAsset
+  collateralAsset,
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
   return (

@@ -46,7 +46,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
-        ...(showFundingPayment ? [{ header: 'Funding Payment' }] : []),
+        ...(showFundingPayment ? [{ header: 'Funding' }] : []),
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}

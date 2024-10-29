@@ -109,7 +109,11 @@ function UserPage(props: UserPageProps) {
               user={props.context.user}
               starkKey={props.starkKey}
               chainId={props.context.chainId}
-              collateralAsset={props.context.tradingMode === 'perpetual' ? props.context.collateralAsset : undefined}
+              collateralAsset={
+                props.context.tradingMode === 'perpetual'
+                  ? props.context.collateralAsset
+                  : undefined
+              }
               ethereumAddress={props.ethereumAddress}
               positionValue={props.positionValue}
             />
