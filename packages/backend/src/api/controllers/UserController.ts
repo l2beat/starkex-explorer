@@ -56,7 +56,10 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
-import { calculatePositionValue, PositionValue } from '../../utils/calculatePositionValue'
+import {
+  calculatePositionValue,
+  PositionValue,
+} from '../../utils/calculatePositionValue'
 import { ControllerResult } from './ControllerResult'
 import { getCollateralAssetDetails } from './getCollateralAssetDetails'
 import { EscapableMap, getEscapableAssets } from './getEscapableAssets'
@@ -285,7 +288,7 @@ export class UserController {
         assetPrices,
         positionValues,
         collateralAsset?.assetId,
-        assetDetailsMap,
+        assetDetailsMap
       )
     )
     console.log(assetEntries)
@@ -316,7 +319,6 @@ export class UserController {
         this.excludeL2TransactionTypes
       )
 
-
     const content = renderUserPage({
       context,
       starkKey,
@@ -342,7 +344,9 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: hideAllAssets ? [] : assetEntries, // When frozen and escaped, don't show assets
-      positionValue: positionValues?.positionValue ? positionValues.positionValue / 10000n : undefined,
+      positionValue: positionValues?.positionValue
+        ? positionValues.positionValue / 10000n
+        : undefined,
       totalAssets: hideAllAssets ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
       totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
@@ -428,7 +432,6 @@ export class UserController {
       escapableAssetHashes,
     })
 
-
     const hideAllAssets =
       context.freezeStatus === 'frozen' &&
       context.tradingMode === 'perpetual' &&
@@ -462,13 +465,14 @@ export class UserController {
       )
     )
 
-
     const content = renderUserAssetsPage({
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       assets: hideAllAssets ? [] : assets, // When frozen and escaped, don't show assets
-      positionValue: postionValues?.positionValue ? postionValues.positionValue / 10000n : undefined,
+      positionValue: postionValues?.positionValue
+        ? postionValues.positionValue / 10000n
+        : undefined,
       ...pagination,
       total: hideAllAssets ? 0 : userStatistics.assetCount,
     })
@@ -645,7 +649,7 @@ function toUserAssetEntry(
   assetPrices: PricesRecord[],
   positionValues: PositionValue | undefined,
   collateralAssetId?: AssetId,
-  assetDetailsMap?: AssetDetailsMap,
+  assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
   const escapableEntry = escapableMap[asset.positionOrVaultId.toString()]
   let action: UserAssetEntry['action'] = 'NO_ACTION'
@@ -668,7 +672,8 @@ function toUserAssetEntry(
   // We need to use the latest price for the asset from PricesRepository.
   const assetPrice = assetPrices.find((p) => p.assetId === asset.assetHashOrId)
 
-  const positionValue = positionValues?.fundingPayments[asset.assetHashOrId.toString()]
+  const positionValue =
+    positionValues?.fundingPayments[asset.assetHashOrId.toString()]
   return {
     asset: {
       hashOrId: asset.assetHashOrId,
@@ -683,7 +688,8 @@ function toUserAssetEntry(
         : assetPrice !== undefined
         ? getAssetValueUSDCents(asset.balance, assetPrice.price)
         : undefined,
-    fundingPayment: positionValue !== undefined ? positionValue / 10000n : undefined,
+    fundingPayment:
+      positionValue !== undefined ? positionValue / 10000n : undefined,
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action,
   }

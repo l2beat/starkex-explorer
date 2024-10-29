@@ -137,7 +137,14 @@ function UserPage(props: UserPageProps) {
               content: (
                 <>
                   <InfoBanner className="mb-3 leading-tight">
-                    {props.positionValue !== undefined ? `Estimated value of the position: ${formatWithDecimals(props.positionValue, 2)} USDC. ` : ''}State of assets (proven on Ethereum) is updated every few hours.
+                    {props.positionValue !== undefined
+                      ? `Estimated value of the position: ${formatWithDecimals(
+                          props.positionValue,
+                          2
+                        )} USDC. `
+                      : ''}
+                    State of assets (proven on Ethereum) is updated every few
+                    hours.
                   </InfoBanner>
                   <TablePreview
                     viewAllPosition="bottom"

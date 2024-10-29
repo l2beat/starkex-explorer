@@ -129,25 +129,30 @@ function EscapeHatchActionPage(props: Props) {
                   </span>
                 </span>
               </div>
-              {props.positionValue !== undefined && context.tradingMode === 'perpetual' ? 
-              (              <ForcedActionCard>
-                <div className="flex gap-2">
-                  <div className="flex flex-1 flex-col gap-2">
-                    <span className="text-sm font-medium text-zinc-500">
-                      Estimated value
-                    </span>
-                    <span className="break-all text-xl font-semibold">
-                      {formatWithDecimals(props.positionValue, 2)}
-                    </span>
+              {props.positionValue !== undefined &&
+              context.tradingMode === 'perpetual' ? (
+                <ForcedActionCard>
+                  <div className="flex gap-2">
+                    <div className="flex flex-1 flex-col gap-2">
+                      <span className="text-sm font-medium text-zinc-500">
+                        Estimated value
+                      </span>
+                      <span className="break-all text-xl font-semibold">
+                        {formatWithDecimals(props.positionValue, 2)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className="text-sm font-medium text-zinc-500">
+                        Asset
+                      </span>
+                      <AssetWithLogo
+                        assetInfo={assetToInfo({
+                          hashOrId: context.collateralAsset.assetId,
+                        })}
+                      />
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="text-sm font-medium text-zinc-500">
-                      Asset
-                    </span>
-                    <AssetWithLogo assetInfo={assetToInfo({hashOrId: context.collateralAsset.assetId})} />
-                  </div>
-                </div>
-              </ForcedActionCard>
+                </ForcedActionCard>
               ) : null}
               <TermsOfServiceAck
                 prefix="By initiating the escape process, you agree to our"

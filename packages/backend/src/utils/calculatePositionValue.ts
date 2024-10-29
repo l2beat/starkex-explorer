@@ -6,7 +6,7 @@ const FXP_BITS = 32n
 export interface PositionValue {
   fundingPayments: Record<string, bigint>
   positionValue: bigint
-} 
+}
 
 export function calculatePositionValue(
   merkleProof: MerkleProof<PositionLeaf>,

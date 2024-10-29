@@ -37,7 +37,6 @@ function UserAssetsPage(props: UserAssetsPageProps) {
       context={props.context}
     >
       <ContentWrapper>
-
         <TableWithPagination
           {...common}
           title={
@@ -48,9 +47,15 @@ function UserAssetsPage(props: UserAssetsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-                <InfoBanner className="mb-3 leading-tight">
-                    {props.positionValue !== undefined ? `Estimated value of the position: ${formatWithDecimals(props.positionValue, 2)} USDC. ` : ''}State of assets (proven on Ethereum) is updated every few hours.
-                  </InfoBanner>
+          <InfoBanner className="mb-3 leading-tight">
+            {props.positionValue !== undefined
+              ? `Estimated value of the position: ${formatWithDecimals(
+                  props.positionValue,
+                  2
+                )} USDC. `
+              : ''}
+            State of assets (proven on Ethereum) is updated every few hours.
+          </InfoBanner>
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}

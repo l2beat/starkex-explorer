@@ -72,13 +72,17 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 </span>
               )}
             </div>,
-            ...(showFundingPayment ? [
-              <span className="text-lg font-medium text-white">
-              {entry.fundingPayment !== undefined
-                ? formatWithDecimals(entry.fundingPayment, 2, { prefix: '$' })
-                : '-'}
-            </span>
-            ] : []),
+            ...(showFundingPayment
+              ? [
+                  <span className="text-lg font-medium text-white">
+                    {entry.fundingPayment !== undefined
+                      ? formatWithDecimals(entry.fundingPayment, 2, {
+                          prefix: '$',
+                        })
+                      : '-'}
+                  </span>,
+                ]
+              : []),
             <span className="text-zinc-500">
               #{entry.vaultOrPositionId}{' '}
               {props.tradingMode === 'spot' && (
