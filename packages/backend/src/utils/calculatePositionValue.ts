@@ -5,7 +5,7 @@ const FXP_BITS = 32n
 
 export interface PositionValue {
   fundingPayments: Record<string, bigint>
-  positionValue: bigint
+  positionValue: bigint | undefined
 }
 
 export function calculatePositionValue(

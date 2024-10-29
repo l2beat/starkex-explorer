@@ -137,12 +137,17 @@ function UserPage(props: UserPageProps) {
               content: (
                 <>
                   <InfoBanner className="mb-3 leading-tight">
-                    {props.positionValue !== undefined
-                      ? `Estimated value of the position: ${formatWithDecimals(
-                          props.positionValue,
-                          2
-                        )} USDC. `
-                      : ''}
+                    {props.positionValue !== undefined ? (
+                      <span>
+                        Estimated value of the position:{' '}
+                        <strong className="text-lg">
+                          {formatWithDecimals(props.positionValue, 2)} USDC
+                        </strong>
+                        .{' '}
+                      </span>
+                    ) : (
+                      ''
+                    )}
                     State of assets (proven on Ethereum) is updated every few
                     hours.
                   </InfoBanner>

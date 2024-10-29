@@ -362,7 +362,7 @@ export class UserController {
 
   async getPositionValue(positionOrVaultId: bigint, context: PageContext) {
     if (context.tradingMode !== 'perpetual') {
-      return { fundingPayments: {}, positionValue: 0n }
+      return { fundingPayments: {}, positionValue: undefined }
     }
 
     const merkleProof = await this.stateUpdater.generateMerkleProof(
