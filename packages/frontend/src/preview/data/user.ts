@@ -81,6 +81,7 @@ export function randomUserAssetEntry(
     asset: asset ?? assetBucket.pick(),
     balance: amountBucket.pick(),
     value: amountBucket.pick(),
+    fundingPayment: amountBucket.pick(),
     action: action ?? actionBucket.pick(),
     vaultOrPositionId: randomId(),
   }

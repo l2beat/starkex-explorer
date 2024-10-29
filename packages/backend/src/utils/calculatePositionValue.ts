@@ -3,10 +3,15 @@ import { MerkleProof, PositionLeaf } from '@explorer/state'
 
 const FXP_BITS = 32n
 
+export interface PositionValue {
+  fundingPayments: Record<string, bigint>
+  positionValue: bigint
+} 
+
 export function calculatePositionValue(
   merkleProof: MerkleProof<PositionLeaf>,
   state: State
-): { fundingPayments: Record<string, bigint>; positionValue: bigint } {
+): PositionValue {
   const position = merkleProof.leaf
   const fundingPayments: Record<string, bigint> = {}
   let fxpBalance = position.collateralBalance << FXP_BITS

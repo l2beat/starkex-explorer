@@ -8,6 +8,9 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 import { z } from 'zod'
 
+import { assetToInfo } from '../../../utils/assets'
+import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
+import { AssetWithLogo } from '../../components/AssetWithLogo'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Link } from '../../components/Link'
@@ -17,11 +20,13 @@ import { Page } from '../../components/page/Page'
 import { TermsOfServiceAck } from '../../components/TermsOfServiceAck'
 import { reactToHtml } from '../../reactToHtml'
 import { PerformUserActionsPanel } from '../user/components/PerformUserActionsPanel'
+import { ForcedActionCard } from './components/ForcedActionCard'
 
 export const VERIFY_ESCAPE_REQUEST_FORM_ID = 'verify-escape-request-form'
 
 type Props = {
   context: PageContextWithUser
+  positionValue: bigint | undefined
 } & VerifyEscapeFormProps
 
 export type VerifyEscapeFormProps = z.infer<typeof VerifyEscapeFormProps>
@@ -124,6 +129,26 @@ function EscapeHatchActionPage(props: Props) {
                   </span>
                 </span>
               </div>
+              {props.positionValue !== undefined && context.tradingMode === 'perpetual' ? 
+              (              <ForcedActionCard>
+                <div className="flex gap-2">
+                  <div className="flex flex-1 flex-col gap-2">
+                    <span className="text-sm font-medium text-zinc-500">
+                      Estimated value
+                    </span>
+                    <span className="break-all text-xl font-semibold">
+                      {formatWithDecimals(props.positionValue, 2)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-sm font-medium text-zinc-500">
+                      Asset
+                    </span>
+                    <AssetWithLogo assetInfo={assetToInfo({hashOrId: context.collateralAsset.assetId})} />
+                  </div>
+                </div>
+              </ForcedActionCard>
+              ) : null}
               <TermsOfServiceAck
                 prefix="By initiating the escape process, you agree to our"
                 instanceName={props.context.instanceName}

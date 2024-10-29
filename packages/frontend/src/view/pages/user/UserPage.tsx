@@ -2,6 +2,7 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
 import { CountBadge } from '../../components/CountBadge'
 import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -58,6 +59,7 @@ interface UserPageProps {
   offers?: OfferEntry[]
   totalOffers: number
   performUserActions?: boolean
+  positionValue: bigint | undefined
 }
 
 export function renderUserPage(props: UserPageProps) {
@@ -134,9 +136,8 @@ function UserPage(props: UserPageProps) {
               accessoryRight: <CountBadge count={props.totalAssets} />,
               content: (
                 <>
-                  <InfoBanner className="mb-3">
-                    State of assets (proven on Ethereum), updated every few
-                    hours
+                  <InfoBanner className="mb-3 leading-tight">
+                    {props.positionValue !== undefined ? `Estimated value of the position: ${formatWithDecimals(props.positionValue, 2)} USDC. ` : ''}State of assets (proven on Ethereum) is updated every few hours.
                   </InfoBanner>
                   <TablePreview
                     viewAllPosition="bottom"

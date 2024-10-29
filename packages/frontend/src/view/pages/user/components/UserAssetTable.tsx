@@ -26,6 +26,7 @@ export interface UserAssetEntry {
   balance: bigint
   value: bigint | undefined
   vaultOrPositionId: string
+  fundingPayment: bigint | undefined
   action:
     | 'WITHDRAW'
     | 'CLOSE'
@@ -36,13 +37,16 @@ export interface UserAssetEntry {
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
   const isUserRegistered = !!props.ethereumAddress
-
+  const showFundingPayment = props.assets.some(
+    (a) => a.fundingPayment !== undefined
+  )
   return (
     <Table
       rowClassName="h-16"
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
+        ...(showFundingPayment ? [{ header: 'Funding Payment' }] : []),
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
@@ -68,6 +72,13 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 </span>
               )}
             </div>,
+            ...(showFundingPayment ? [
+              <span className="text-lg font-medium text-white">
+              {entry.fundingPayment !== undefined
+                ? formatWithDecimals(entry.fundingPayment, 2, { prefix: '$' })
+                : '-'}
+            </span>
+            ] : []),
             <span className="text-zinc-500">
               #{entry.vaultOrPositionId}{' '}
               {props.tradingMode === 'spot' && (
