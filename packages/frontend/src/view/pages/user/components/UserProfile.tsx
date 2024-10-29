@@ -1,5 +1,5 @@
-import { UserDetails } from '@explorer/shared'
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { assetToInfo } from '../../../../utils/assets'
@@ -18,6 +18,7 @@ interface UserProfileProps {
   user: Partial<UserDetails> | undefined
   starkKey: StarkKey
   chainId: number
+  collateralAsset: CollateralAsset | undefined
   positionValue: bigint | undefined
   ethereumAddress?: EthereumAddress
 }
@@ -28,6 +29,7 @@ export function UserProfile({
   chainId,
   ethereumAddress,
   positionValue,
+  collateralAsset
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
   return (
@@ -86,7 +88,7 @@ export function UserProfile({
           )}
         </>
       )}
-      {positionValue ? (
+      {positionValue && collateralAsset ? (
         <>
           <p className="mb-1.5 mt-6 flex items-center gap-0.5 text-sm font-semibold text-zinc-500">
             Estimated position value{' '}
@@ -97,7 +99,7 @@ export function UserProfile({
           <div className="flex items-center gap-2 font-semibold text-white">
             {formatWithDecimals(positionValue, 2)}{' '}
             <AssetWithLogo
-              assetInfo={assetToInfo({ hashOrId: AssetId('USDC-6') })}
+              assetInfo={assetToInfo({ hashOrId: collateralAsset.assetId })}
               type="small"
             />
           </div>
