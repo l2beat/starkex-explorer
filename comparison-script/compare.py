@@ -74,14 +74,18 @@ class WebComparator:
         
         print(f"Comparing {url}...")
         
-        prod_content = self.download_content(prod_url).replace('>', '>\n')
+        prod_content = self.download_content(prod_url)
         if prod_content is None:
+            self.notify_discord(f"Error downloading {prod_url}")
             return False
+        prod_content = prod_content.replace('>', '>\n')
             
-        local_content = self.download_content(local_url).replace('>', '>\n')
-        # print(local_content)
+        local_content = self.download_content(local_url)
+
         if local_content is None:
+            self.notify_discord(f"Error downloading {local_url}")
             return False
+        local_content = local_content.replace('>', '>\n')
         
         return self.compare_contents(prod_content, local_content, url)
     
@@ -93,6 +97,8 @@ class WebComparator:
         
         if all_match:
             print("\nAll files match! ✓")
+        else:
+            print("\nSome URLS do not match! ✗")
         
     def monitor(self) -> None:
         while True:
