@@ -36,7 +36,7 @@ export function NewPerpetualForcedWithdrawalFormContent(
         </ForcedActionCard>
       </div>
       <TermsOfServiceAck
-        prefix="By initiating this action you agree to our"
+        prefix="By initiating this action you agree to dYdX v3"
         instanceName={props.instanceName}
       />
       <div className="flex flex-col gap-2">
