@@ -2,7 +2,6 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
 import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -16,7 +15,6 @@ interface UserAssetsPageProps {
   context: PageContext
   starkKey: StarkKey
   ethereumAddress: EthereumAddress | undefined
-  positionValue: bigint | undefined
   assets: UserAssetEntry[]
   limit: number
   offset: number
@@ -48,12 +46,6 @@ function UserAssetsPage(props: UserAssetsPageProps) {
           total={props.total}
         >
           <InfoBanner className="mb-3 leading-tight">
-            {props.positionValue !== undefined
-              ? `Estimated value of the position: ${formatWithDecimals(
-                  props.positionValue,
-                  2
-                )} USDC. `
-              : ''}
             State of assets (proven on Ethereum) is updated every few hours.
           </InfoBanner>
           <UserAssetsTable

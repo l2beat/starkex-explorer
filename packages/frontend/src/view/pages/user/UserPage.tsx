@@ -2,7 +2,6 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
 import { CountBadge } from '../../components/CountBadge'
 import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -111,6 +110,7 @@ function UserPage(props: UserPageProps) {
               starkKey={props.starkKey}
               chainId={props.context.chainId}
               ethereumAddress={props.ethereumAddress}
+              positionValue={props.positionValue}
             />
             <PerformUserActionsPanel
               performUserActions={props.performUserActions}
@@ -137,17 +137,6 @@ function UserPage(props: UserPageProps) {
               content: (
                 <>
                   <InfoBanner className="mb-3 leading-tight">
-                    {props.positionValue !== undefined ? (
-                      <span>
-                        Estimated value of the position:{' '}
-                        <strong className="text-lg">
-                          {formatWithDecimals(props.positionValue, 2)} USDC
-                        </strong>
-                        .{' '}
-                      </span>
-                    ) : (
-                      ''
-                    )}
                     State of assets (proven on Ethereum) is updated every few
                     hours.
                   </InfoBanner>

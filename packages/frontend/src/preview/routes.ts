@@ -619,7 +619,6 @@ const routes: Route[] = [
         context,
         starkKey: StarkKey.fake(),
         ethereumAddress: undefined,
-        positionValue: 123456n,
         assets: repeat(visible, randomUserAssetEntry),
         limit,
         offset,

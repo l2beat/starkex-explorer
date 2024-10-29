@@ -277,7 +277,6 @@ export class UserController {
         )
       }
     }
-    console.log(positionValues)
 
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
@@ -291,7 +290,7 @@ export class UserController {
         assetDetailsMap
       )
     )
-    console.log(assetEntries)
+
     const balanceChangesEntries = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
@@ -470,9 +469,6 @@ export class UserController {
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       assets: hideAllAssets ? [] : assets, // When frozen and escaped, don't show assets
-      positionValue: postionValues?.positionValue
-        ? postionValues.positionValue / 10000n
-        : undefined,
       ...pagination,
       total: hideAllAssets ? 0 : userStatistics.assetCount,
     })

@@ -1,18 +1,24 @@
 import { UserDetails } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { assetToInfo } from '../../../../utils/assets'
+import { formatWithDecimals } from '../../../../utils/formatting/formatAmount'
+import { InfoIcon } from '../../../assets/icons/InfoIcon'
+import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { Card } from '../../../components/Card'
 import { EtherscanLink } from '../../../components/EtherscanLink'
 import { InfoBanner } from '../../../components/InfoBanner'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { LongHash } from '../../../components/LongHash'
+import { TooltipWrapper } from '../../../components/Tooltip'
 
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
   starkKey: StarkKey
   chainId: number
+  positionValue: bigint | undefined
   ethereumAddress?: EthereumAddress
 }
 
@@ -21,12 +27,13 @@ export function UserProfile({
   starkKey,
   chainId,
   ethereumAddress,
+  positionValue,
 }: UserProfileProps) {
   const isMine = user?.starkKey === starkKey
   return (
     <Card>
       <p className="mb-1.5 text-sm font-semibold text-zinc-500">Stark key</p>
-      <LongHash className="mt-3 font-semibold text-white" withCopy>
+      <LongHash className="font-semibold text-white" withCopy>
         {starkKey.toString()}
       </LongHash>
       <p className="mb-1.5 mt-6 text-sm font-semibold text-zinc-500 ">
@@ -79,6 +86,23 @@ export function UserProfile({
           )}
         </>
       )}
+      {positionValue ? (
+        <>
+          <p className="mb-1.5 mt-6 flex items-center gap-0.5 text-sm font-semibold text-zinc-500">
+            Estimated position value{' '}
+            <TooltipWrapper content="Exact value of the withdrawal will be calculated by the StarkEx smart contracts">
+              <InfoIcon className="scale-75" />
+            </TooltipWrapper>
+          </p>
+          <div className="flex items-center gap-2 font-semibold text-white">
+            {formatWithDecimals(positionValue, 2)}{' '}
+            <AssetWithLogo
+              assetInfo={assetToInfo({ hashOrId: AssetId('USDC-6') })}
+              type="small"
+            />
+          </div>
+        </>
+      ) : null}
     </Card>
   )
 }
