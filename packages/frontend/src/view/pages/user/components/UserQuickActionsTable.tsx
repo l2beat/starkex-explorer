@@ -56,7 +56,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   return (
     <Card className="flex flex-col gap-6 border border-brand">
       <TermsOfServiceAck
-        prefix="By performing following actions you agree to our"
+        prefix="By performing following actions you agree to dYdX v3"
         instanceName={props.context.instanceName}
       />
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}

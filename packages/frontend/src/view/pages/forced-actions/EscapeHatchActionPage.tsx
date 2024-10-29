@@ -155,7 +155,7 @@ function EscapeHatchActionPage(props: Props) {
                 </ForcedActionCard>
               ) : null}
               <TermsOfServiceAck
-                prefix="By initiating the escape process, you agree to our"
+                prefix="By initiating the escape, you agree to dYdX v3"
                 instanceName={props.context.instanceName}
               />
               <Button className="w-full" size="lg">

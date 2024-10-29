@@ -107,7 +107,7 @@ function NewSpotForcedWithdrawalPage(props: Props) {
             </div>
             <div className="flex flex-col gap-2">
               <TermsOfServiceAck
-                prefix="By initiating this action you agree to our"
+                prefix="By initiating this action you agree to dYdX v3"
                 instanceName={props.context.instanceName}
               />
               <Button className="w-full" size="lg">
