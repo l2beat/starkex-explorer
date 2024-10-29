@@ -8,6 +8,7 @@ import {
   PageContextWithUser,
   UserDetails,
 } from '@explorer/shared'
+import { MerkleProof, PositionLeaf } from '@explorer/state'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
@@ -15,6 +16,7 @@ import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { calculatePositionValue } from '../../utils/calculatePositionValue'
 import { ControllerResult } from './ControllerResult'
 import { serializeMerkleProofForEscape } from './serializeMerkleProofForEscape'
 
@@ -157,6 +159,13 @@ export class EscapeHatchController {
     const serializedState = encodeStateAsInt256Array(
       latestStateUpdate.perpetualState
     )
+    const positionValues =
+      context.tradingMode === 'perpetual'
+        ? calculatePositionValue(
+            merkleProof as MerkleProof<PositionLeaf>,
+            latestStateUpdate.perpetualState
+          )
+        : undefined
     let content: string
     switch (context.tradingMode) {
       case 'perpetual':
@@ -166,6 +175,9 @@ export class EscapeHatchController {
           starkKey: merkleProof.starkKey,
           escapeVerifierAddress: this.escapeVerifierAddress,
           positionOrVaultId,
+          positionValue: positionValues?.positionValue
+            ? positionValues.positionValue / 10000n
+            : undefined,
           serializedMerkleProof,
           assetCount: merkleProof.perpetualAssetCount,
           serializedState,
@@ -177,6 +189,7 @@ export class EscapeHatchController {
           tradingMode: context.tradingMode,
           starkKey: merkleProof.starkKey,
           escapeVerifierAddress: this.escapeVerifierAddress,
+          positionValue: undefined,
           positionOrVaultId,
           serializedEscapeProof: serializedMerkleProof,
         })

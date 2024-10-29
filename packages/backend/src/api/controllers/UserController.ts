@@ -20,6 +20,7 @@ import {
   TradingMode,
   UserDetails,
 } from '@explorer/shared'
+import { MerkleProof, PositionLeaf } from '@explorer/state'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
@@ -27,6 +28,7 @@ import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'
+import { StateUpdater } from '../../core/StateUpdater'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
@@ -41,6 +43,7 @@ import {
   PricesRecord,
   PricesRepository,
 } from '../../peripherals/database/PricesRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import {
   SentTransactionRecord,
   SentTransactionRepository,
@@ -53,6 +56,10 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
+import {
+  calculatePositionValue,
+  PositionValue,
+} from '../../utils/calculatePositionValue'
 import { ControllerResult } from './ControllerResult'
 import { getCollateralAssetDetails } from './getCollateralAssetDetails'
 import { EscapableMap, getEscapableAssets } from './getEscapableAssets'
@@ -79,7 +86,9 @@ export class UserController {
     private readonly excludeL2TransactionTypes:
       | L2TransactionTypesToExclude
       | undefined,
-    private readonly exchangeAddress: EthereumAddress
+    private readonly exchangeAddress: EthereumAddress,
+    private readonly stateUpdater: StateUpdater,
+    private readonly stateUpdateRepository: StateUpdateRepository
   ) {}
 
   async getUserRegisterPage(
@@ -248,6 +257,27 @@ export class UserController {
       escapableAssetHashes,
     })
 
+    // If escape process has started on perpetuals, hide all assets
+    const hideAllAssets =
+      context.freezeStatus === 'frozen' &&
+      context.tradingMode === 'perpetual' &&
+      escapableAssetHashes.length > 0
+
+    let positionValues: PositionValue | undefined
+    if (
+      !hideAllAssets &&
+      context.tradingMode === 'perpetual' &&
+      userAssets.length > 0
+    ) {
+      const firstAsset = userAssets[0]
+      if (firstAsset !== undefined) {
+        positionValues = await this.getPositionValue(
+          firstAsset.positionOrVaultId,
+          context
+        )
+      }
+    }
+
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
         a,
@@ -255,6 +285,7 @@ export class UserController {
         escapableMap,
         context.freezeStatus,
         assetPrices,
+        positionValues,
         collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -287,12 +318,6 @@ export class UserController {
         this.excludeL2TransactionTypes
       )
 
-    // If escape process has started on perpetuals, hide all assets
-    const hideAllAssets =
-      context.freezeStatus === 'frozen' &&
-      context.tradingMode === 'perpetual' &&
-      escapableAssetHashes.length > 0
-
     const content = renderUserPage({
       context,
       starkKey,
@@ -318,6 +343,9 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: hideAllAssets ? [] : assetEntries, // When frozen and escaped, don't show assets
+      positionValue: positionValues?.positionValue
+        ? positionValues.positionValue / 10000n
+        : undefined,
       totalAssets: hideAllAssets ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
       totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
@@ -329,6 +357,32 @@ export class UserController {
     })
 
     return { type: 'success', content }
+  }
+
+  async getPositionValue(positionOrVaultId: bigint, context: PageContext) {
+    if (context.tradingMode !== 'perpetual') {
+      return { fundingPayments: {}, positionValue: undefined }
+    }
+
+    const merkleProof = await this.stateUpdater.generateMerkleProof(
+      positionOrVaultId
+    )
+
+    const latestStateUpdate = await this.stateUpdateRepository.findLast()
+    if (!latestStateUpdate) {
+      throw new Error('No state update found')
+    }
+    if (!latestStateUpdate.perpetualState) {
+      throw new Error('No perpetual state found')
+    }
+
+    if (!(merkleProof.leaf instanceof PositionLeaf)) {
+      throw new Error('Merkle proof is not for a position')
+    }
+    return calculatePositionValue(
+      merkleProof as MerkleProof<PositionLeaf>,
+      latestStateUpdate.perpetualState
+    )
   }
 
   async getUserAssetsPage(
@@ -377,6 +431,26 @@ export class UserController {
       escapableAssetHashes,
     })
 
+    const hideAllAssets =
+      context.freezeStatus === 'frozen' &&
+      context.tradingMode === 'perpetual' &&
+      escapableAssetHashes.length > 0
+
+    let postionValues: PositionValue | undefined
+    if (
+      !hideAllAssets &&
+      context.tradingMode === 'perpetual' &&
+      userAssets.length > 0
+    ) {
+      const firstAsset = userAssets[0]
+      if (firstAsset !== undefined) {
+        postionValues = await this.getPositionValue(
+          firstAsset.positionOrVaultId,
+          context
+        )
+      }
+    }
+
     const assets = userAssets.map((a) =>
       toUserAssetEntry(
         a,
@@ -384,15 +458,11 @@ export class UserController {
         escapableMap,
         context.freezeStatus,
         assetPrices,
+        postionValues,
         collateralAsset?.assetId,
         assetDetailsMap
       )
     )
-
-    const hideAllAssets =
-      context.freezeStatus === 'frozen' &&
-      context.tradingMode === 'perpetual' &&
-      escapableAssetHashes.length > 0
 
     const content = renderUserAssetsPage({
       context,
@@ -573,6 +643,7 @@ function toUserAssetEntry(
   escapableMap: EscapableMap,
   freezeStatus: FreezeStatus,
   assetPrices: PricesRecord[],
+  positionValues: PositionValue | undefined,
   collateralAssetId?: AssetId,
   assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
@@ -597,6 +668,8 @@ function toUserAssetEntry(
   // We need to use the latest price for the asset from PricesRepository.
   const assetPrice = assetPrices.find((p) => p.assetId === asset.assetHashOrId)
 
+  const positionValue =
+    positionValues?.fundingPayments[asset.assetHashOrId.toString()]
   return {
     asset: {
       hashOrId: asset.assetHashOrId,
@@ -611,7 +684,8 @@ function toUserAssetEntry(
         : assetPrice !== undefined
         ? getAssetValueUSDCents(asset.balance, assetPrice.price)
         : undefined,
-
+    fundingPayment:
+      positionValue !== undefined ? positionValue / 10000n : undefined,
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action,
   }

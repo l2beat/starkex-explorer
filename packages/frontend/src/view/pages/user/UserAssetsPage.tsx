@@ -2,6 +2,7 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
@@ -44,6 +45,9 @@ function UserAssetsPage(props: UserAssetsPageProps) {
           offset={props.offset}
           total={props.total}
         >
+          <InfoBanner className="mb-3 leading-tight">
+            State of assets (proven on Ethereum) is updated every few hours.
+          </InfoBanner>
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}

@@ -621,7 +621,9 @@ export class Application {
       preprocessedUserL2TransactionsStatisticsRepository,
       vaultRepository,
       config.starkex.l2Transactions.excludeTypes,
-      config.starkex.contracts.perpetual
+      config.starkex.contracts.perpetual,
+      stateUpdater,
+      stateUpdateRepository
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,

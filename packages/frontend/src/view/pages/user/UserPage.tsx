@@ -58,6 +58,7 @@ interface UserPageProps {
   offers?: OfferEntry[]
   totalOffers: number
   performUserActions?: boolean
+  positionValue: bigint | undefined
 }
 
 export function renderUserPage(props: UserPageProps) {
@@ -108,7 +109,13 @@ function UserPage(props: UserPageProps) {
               user={props.context.user}
               starkKey={props.starkKey}
               chainId={props.context.chainId}
+              collateralAsset={
+                props.context.tradingMode === 'perpetual'
+                  ? props.context.collateralAsset
+                  : undefined
+              }
               ethereumAddress={props.ethereumAddress}
+              positionValue={props.positionValue}
             />
             <PerformUserActionsPanel
               performUserActions={props.performUserActions}
@@ -134,9 +141,9 @@ function UserPage(props: UserPageProps) {
               accessoryRight: <CountBadge count={props.totalAssets} />,
               content: (
                 <>
-                  <InfoBanner className="mb-3">
-                    State of assets (proven on Ethereum), updated every few
-                    hours
+                  <InfoBanner className="mb-3 leading-tight">
+                    State of assets (proven on Ethereum) is updated every few
+                    hours.
                   </InfoBanner>
                   <TablePreview
                     viewAllPosition="bottom"
