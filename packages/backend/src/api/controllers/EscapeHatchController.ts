@@ -175,7 +175,7 @@ export class EscapeHatchController {
           starkKey: merkleProof.starkKey,
           escapeVerifierAddress: this.escapeVerifierAddress,
           positionOrVaultId,
-          positionValue: positionValues?.positionValue,
+          positionValue: positionValues?.positionValue ? positionValues.positionValue / 10000n : undefined,
           serializedMerkleProof,
           assetCount: merkleProof.perpetualAssetCount,
           serializedState,
