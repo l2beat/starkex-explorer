@@ -10,14 +10,19 @@ import {
 } from '@explorer/shared'
 import { MerkleProof, PositionLeaf } from '@explorer/state'
 import { EthereumAddress } from '@explorer/types'
+import isEmpty from 'lodash/isEmpty'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { calculatePositionValue } from '../../utils/calculatePositionValue'
 import { ControllerResult } from './ControllerResult'
+import { getPerpetualEscapables } from './getEscapableAssets'
 import { serializeMerkleProofForEscape } from './serializeMerkleProofForEscape'
 
 export class EscapeHatchController {
@@ -27,7 +32,8 @@ export class EscapeHatchController {
     private readonly stateUpdater: StateUpdater,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly starkExAddress: EthereumAddress,
-    private readonly escapeVerifierAddress: EthereumAddress
+    private readonly escapeVerifierAddress: EthereumAddress,
+    private readonly userTransactionRepository: UserTransactionRepository
   ) {}
 
   async getFreezeRequestActionPage(
@@ -159,6 +165,22 @@ export class EscapeHatchController {
     const serializedState = encodeStateAsInt256Array(
       latestStateUpdate.perpetualState
     )
+
+    if (context.tradingMode === 'perpetual') {
+      const escapableMap = await getPerpetualEscapables(
+        this.userTransactionRepository,
+        merkleProof.starkKey,
+        context.collateralAsset
+      )
+      // If escape process has started on perpetuals, don't allow to start it again
+      if (!isEmpty(escapableMap)) {
+        return {
+          type: 'not found',
+          message: 'Escape process has already started',
+        }
+      }
+    }
+
     const positionValues =
       context.tradingMode === 'perpetual'
         ? calculatePositionValue(
@@ -166,6 +188,7 @@ export class EscapeHatchController {
             latestStateUpdate.perpetualState
           )
         : undefined
+
     let content: string
     switch (context.tradingMode) {
       case 'perpetual':

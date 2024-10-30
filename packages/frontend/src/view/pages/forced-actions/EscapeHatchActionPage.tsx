@@ -10,6 +10,7 @@ import { z } from 'zod'
 
 import { assetToInfo } from '../../../utils/assets'
 import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
+import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { AssetWithLogo } from '../../components/AssetWithLogo'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
@@ -18,6 +19,7 @@ import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TermsOfServiceAck } from '../../components/TermsOfServiceAck'
+import { TooltipWrapper } from '../../components/Tooltip'
 import { reactToHtml } from '../../reactToHtml'
 import { PerformUserActionsPanel } from '../user/components/PerformUserActionsPanel'
 import { ForcedActionCard } from './components/ForcedActionCard'
@@ -134,8 +136,11 @@ function EscapeHatchActionPage(props: Props) {
                 <ForcedActionCard>
                   <div className="flex gap-2">
                     <div className="flex flex-1 flex-col gap-2">
-                      <span className="text-sm font-medium text-zinc-500">
+                      <span className="flex items-center gap-1 text-sm font-medium text-zinc-500">
                         Estimated value
+                        <TooltipWrapper content="Exact value of the withdrawal will be calculated by the StarkEx smart contracts">
+                          <InfoIcon className="h-3.5 w-3.5" />
+                        </TooltipWrapper>
                       </span>
                       <span className="break-all text-xl font-semibold">
                         {formatWithDecimals(props.positionValue, 2)}
@@ -155,7 +160,7 @@ function EscapeHatchActionPage(props: Props) {
                 </ForcedActionCard>
               ) : null}
               <TermsOfServiceAck
-                prefix="By initiating the escape process, you agree to our"
+                prefix="By initiating the escape, you agree to dYdX v3"
                 instanceName={props.context.instanceName}
               />
               <Button className="w-full" size="lg">
