@@ -670,7 +670,8 @@ export class Application {
       stateUpdater,
       stateUpdateRepository,
       config.starkex.contracts.perpetual,
-      config.starkex.contracts.escapeVerifier
+      config.starkex.contracts.escapeVerifier,
+      userTransactionRepository
     )
 
     const transactionValidator = new TransactionValidator(ethereumClient)
