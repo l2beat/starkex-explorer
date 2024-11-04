@@ -31,7 +31,7 @@ function InstallMetaMaskPage(props: Props) {
               Even if you haven't used MetaMask to create your account on the
               exchange, you can trigger Escape Hatch operations for your
               positions using a different Ethereum account. See our{' '}
-              <Link href="/faqescapehatch#what-if-i-don-t-have-a-metamask-compatible-wallet">
+              <Link href="/tutorials/faqescapehatch#what-if-i-don-t-have-a-metamask-compatible-wallet">
                 FAQ
               </Link>{' '}
               for more details.
