@@ -318,6 +318,33 @@ export class UserController {
         this.excludeL2TransactionTypes
       )
 
+    // This is a workaround to show the collateral asset row
+    // at the top of the assets table when the exchange is frozen
+    // and user has other perpetual assets but no collateral asset.
+    // This is because that's where we show the 'Escape' button.
+    if (
+      context.tradingMode === 'perpetual' &&
+      context.freezeStatus === 'frozen' &&
+      collateralAsset !== undefined &&
+      !hideAllAssets &&
+      assetEntries.length > 0
+    ) {
+      // As per logic before, collateral asset is always the first one
+      const topAsset = assetEntries[0]
+      if (topAsset && topAsset.asset.hashOrId !== collateralAsset.assetId) {
+        assetEntries.unshift({
+          asset: {
+            hashOrId: collateralAsset.assetId,
+          },
+          balance: 0n,
+          value: 0n,
+          vaultOrPositionId: topAsset.vaultOrPositionId,
+          fundingPayment: undefined,
+          action: 'ESCAPE',
+        })
+      }
+    }
+
     const content = renderUserPage({
       context,
       starkKey,

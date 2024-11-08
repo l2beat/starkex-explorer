@@ -66,7 +66,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               </span>
               {props.tradingMode === 'perpetual' && (
                 <span className="mt-2 text-xxs text-zinc-500">
-                  {entry.value
+                  {entry.value !== undefined
                     ? formatWithDecimals(entry.value, 2, { prefix: '$' })
                     : 'Unknown price'}
                 </span>
