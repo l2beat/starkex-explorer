@@ -12,7 +12,7 @@ dYdX and StarkWare have granted a revocable, non-exclusive, non-transferable, no
 
 Make sure that you have the required dependencies installed:
 
-- [node.js](https://nodejs.org/en/) - version 16
+- [node.js](https://nodejs.org/en/) - version 20
 - [Yarn](https://classic.yarnpkg.com/en/docs/install) - version 1.22.0 or later
 
 This repository is a monorepo consisting of five projects:
