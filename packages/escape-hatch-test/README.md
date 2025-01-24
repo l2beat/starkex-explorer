@@ -4,7 +4,7 @@
 
 - `yarn test` - run automated tests
 - `yarn startfork BLOCK_NUMBER` - start a local Ethereum node with a forked mainnet at a specific block
-- `yarn console` - connect to a local forked network, can be used to run arbitary commands on the node (see `packages/escape-hatch-test/src/utils.ts` for all available commands)
+- `yarn console` - connect to a local forked network, can be used to run arbitrary commands on the node (see `packages/escape-hatch-test/src/utils.ts` for all available commands)
 
 ## Setup
 
