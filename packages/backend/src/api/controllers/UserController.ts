@@ -463,7 +463,7 @@ export class UserController {
       context.tradingMode === 'perpetual' &&
       escapableAssetHashes.length > 0
 
-    let postionValues: PositionValue | undefined
+    let positionValues: PositionValue | undefined
     if (
       !hideAllAssets &&
       context.tradingMode === 'perpetual' &&
@@ -471,7 +471,7 @@ export class UserController {
     ) {
       const firstAsset = userAssets[0]
       if (firstAsset !== undefined) {
-        postionValues = await this.getPositionValue(
+        positionValues = await this.getPositionValue(
           firstAsset.positionOrVaultId,
           context
         )
@@ -485,7 +485,7 @@ export class UserController {
         escapableMap,
         context.freezeStatus,
         assetPrices,
-        postionValues,
+        positionValues,
         collateralAsset?.assetId,
         assetDetailsMap
       )

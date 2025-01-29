@@ -126,7 +126,7 @@ export class L2TransactionRepository extends BaseRepository {
     if (record.state !== 'alternative') {
       if (existing) {
         throw new Error(
-          'L2 Transaction already exists when adding from Feeder Gatway'
+          'L2 Transaction already exists when adding from Feeder Gateway'
         )
       }
     }
