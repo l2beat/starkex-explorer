@@ -28,7 +28,7 @@ const DepositTransaction = z.strictObject({
   type: z.literal('DEPOSIT'),
 })
 
-const WithdrawalToAddresTransaction = z.strictObject({
+const WithdrawalToAddressTransaction = z.strictObject({
   position_id: UnsignedIntAsString,
   public_key: StarkKey0x,
   eth_address: EthereumAddress,
@@ -194,7 +194,7 @@ const MultiTransaction = z.strictObject({
   txs: z.array(
     z.discriminatedUnion('type', [
       DepositTransaction,
-      WithdrawalToAddresTransaction,
+      WithdrawalToAddressTransaction,
       ForcedWithdrawalTransaction,
       TradeTransaction,
       ForcedTradeTransaction,
@@ -212,7 +212,7 @@ const MultiTransaction = z.strictObject({
 export type PerpetualL2Transaction = z.infer<typeof PerpetualL2Transaction>
 export const PerpetualL2Transaction = z.discriminatedUnion('type', [
   DepositTransaction,
-  WithdrawalToAddresTransaction,
+  WithdrawalToAddressTransaction,
   ForcedWithdrawalTransaction,
   TradeTransaction,
   ForcedTradeTransaction,
