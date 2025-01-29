@@ -210,7 +210,7 @@ describe(L2TransactionRepository.name, () => {
         await expect(
           repository.addFeederGatewayTransaction(genericDepositTransaction)
         ).toBeRejectedWith(
-          'L2 Transaction already exists when adding from Feeder Gatway'
+          'L2 Transaction already exists when adding from Feeder Gateway'
         )
       })
 
