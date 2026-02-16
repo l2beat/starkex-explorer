@@ -21,6 +21,7 @@ export function getLocalConfig(env: Env): Config {
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: env.boolean('FRESH_START', false),
     forceHttps: false,
+    ipRateLimitPerMinute: env.integer('IP_RATE_LIMIT_PER_MINUTE', 0),
     starkex: {
       ...starkexConfig,
       blockchain: {

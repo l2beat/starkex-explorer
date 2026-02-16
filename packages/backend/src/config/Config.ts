@@ -14,5 +14,6 @@ export interface Config<T extends TradingMode = TradingMode> {
   freshStart: boolean
   forceHttps: boolean
   basicAuth?: string
+  ipRateLimitPerMinute: number
   starkex: StarkexConfig<T>
 }

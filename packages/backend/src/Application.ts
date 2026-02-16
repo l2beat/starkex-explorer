@@ -18,6 +18,7 @@ import { TutorialController } from './api/controllers/TutorialController'
 import { UserController } from './api/controllers/UserController'
 import { frontendErrorMiddleware } from './api/middleware/frontendErrorMiddleware'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
+import { createIpRateLimitMiddleware } from './api/middleware/ipRateLimitMiddleware'
 import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -696,6 +697,9 @@ export class Application {
     )
 
     const staticPageController = new StaticPageController(pageContextService)
+    const ipRateLimitMiddleware = createIpRateLimitMiddleware({
+      requestsPerMinute: config.ipRateLimitPerMinute,
+    })
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
@@ -722,6 +726,7 @@ export class Application {
       ],
       middleware: [
         createFrontendMiddleware(),
+        ipRateLimitMiddleware,
         (ctx, next) => frontendErrorMiddleware(ctx, next, pageContextService),
       ],
       forceHttps: config.forceHttps,
