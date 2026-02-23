@@ -21,6 +21,7 @@ export function getProductionConfig(env: Env): Config {
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: false,
     forceHttps: true,
+    ipRateLimitPerMinute: env.integer('IP_RATE_LIMIT_PER_MINUTE', 0),
     starkex: getStarkexConfig(env),
   }
 }

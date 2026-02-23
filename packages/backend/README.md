@@ -50,6 +50,7 @@ You can configure the behavior of the app with the following environment variabl
 - `TEST_DB_URL` - Database url used in `yarn test`
 - `LOG_LEVEL` - Integer specifying the log level (`0 | 1 | 2 | 3`). See `src/tools/Logger.ts`
 - `PORT` - The port on which the application exposes the api
+- `IP_RATE_LIMIT_PER_MINUTE` - Maximum number of page `GET` requests per minute per IP (`0` disables the limiter)
 - `MAX_BLOCK_NUMBER` - Integer specifying the maximum block number that is going to be stored - all blocks created later in time will be skipped (used in environments with limited database space e.g. heroku review apps)
 
 ## Repository naming convention
